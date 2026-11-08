@@ -235,7 +235,7 @@ main{padding-bottom:110px}.hero,.card,.stat,.panel-card,.searchbox,.result,.musi
 .edit-profile-chip{font-size:9px;color:#d7b9ff;border:1px solid #a07fff59;background:#9364dc1f;border-radius:30px;padding:9px;white-space:nowrap}.profile-hero-bottom{border-top:1px solid #ffffff19;margin-top:17px;padding-top:12px;color:#9298a8;font-size:10px}
 .home-welcome{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.home-welcome h2{font-size:23px;margin:5px 0}.home-welcome h2 span{color:#a9afc0;font-weight:500}.home-welcome p{font-size:11px;color:var(--muted)}.home-version{padding:9px;border:1px solid var(--glassline);border-radius:12px;color:#bca0ec}
 .home-feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:22px}.home-feature-tile{min-height:115px;text-align:left;padding:15px;border:1px solid #ffffff1c;border-radius:16px;background:#ffffff0b;color:#f2f3fa;display:flex;flex-direction:column;align-items:flex-start;gap:8px}.home-feature-tile b{font-size:12px}.home-feature-tile small{font-size:10px;color:#9299aa}.tile-icon{font-size:21px;color:#c69aff;background:#a970ff24;border-radius:10px;padding:6px}
-.music-panel{padding:18px;border-radius:20px}.music-art{height:140px;border-radius:16px;background:radial-gradient(circle,#ad6fff47,transparent 45%),#171626;display:grid;place-items:center;color:#c9a6ff;font-size:30px;margin-bottom:15px}.music-disc{font-size:38px}.music-art span{font-size:9px;letter-spacing:2px}.music-panel label{display:block;font-size:9px;letter-spacing:1.5px;color:#adb4c5;margin:12px 0 7px}.music-search-row{display:flex;gap:8px}.music-search-row .field{flex:1;min-width:0}.music-player-frame{aspect-ratio:16/9;margin-top:16px;border:1px solid var(--glassline);border-radius:14px;overflow:hidden}.music-player-frame iframe{width:100%;height:100%;border:0}.music-placeholder{height:100%;display:grid;place-items:center;color:#c4a1ff}.music-note{font-size:10px;color:#9298a8;margin-top:10px}
+.music-panel{padding:18px;border-radius:20px}.music-art{height:140px;border-radius:16px;background:radial-gradient(circle,#ad6fff47,transparent 45%),#171626;display:grid;place-items:center;color:#c9a6ff;font-size:30px;margin-bottom:15px}.music-disc{font-size:38px;transform-origin:center;will-change:transform}.music-disc.is-playing{animation:renoxDiscSpin 3.2s linear infinite}@keyframes renoxDiscSpin{to{transform:rotate(360deg)}}.v7-disc{transform-origin:center;will-change:transform}.v7-disc.is-playing{animation:renoxDiscSpin 3.2s linear infinite}.v7-progress i{display:block;width:0;height:100%;background:linear-gradient(90deg,#9b6cff,#52d9ff);border-radius:99px;transition:width .12s linear}.music-art span{font-size:9px;letter-spacing:2px}.music-panel label{display:block;font-size:9px;letter-spacing:1.5px;color:#adb4c5;margin:12px 0 7px}.music-search-row{display:flex;gap:8px}.music-search-row .field{flex:1;min-width:0}.music-player-frame{aspect-ratio:16/9;margin-top:16px;border:1px solid var(--glassline);border-radius:14px;overflow:hidden}.music-player-frame iframe{width:100%;height:100%;border:0}.music-placeholder{height:100%;display:grid;place-items:center;color:#c4a1ff}.music-note{font-size:10px;color:#9298a8;margin-top:10px}
 .renox-bottom-nav{display:none}
 @media(max-width:760px){.sidebar{display:none!important}main{margin:0!important;width:100%!important;padding:18px 15px 100px!important}.renox-bottom-nav{display:flex;position:fixed;z-index:40;left:12px;right:12px;bottom:12px;justify-content:space-around;padding:10px 5px calc(9px + env(safe-area-inset-bottom));border:1px solid #ffffff2b;border-radius:20px;background:#11131dd9;backdrop-filter:blur(22px);box-shadow:0 10px 35px #0008}.bottom-item{flex:1;border:0;background:transparent;color:#8c91a2;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:20px;padding:5px}.bottom-item small{font-size:9px}.bottom-item.active{color:#d4b0ff;background:#a970ff21;border-radius:12px}.home-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.home-feature-tile{min-height:110px;padding:12px}.home-profile-avatar{width:58px;height:58px;flex-basis:58px}.profile-hero-card{padding:15px}.edit-profile-chip{font-size:8px;padding:7px}.music-search-row{flex-wrap:wrap}.music-search-row button{width:100%}}
 @media(max-width:390px){.edit-profile-chip{display:none}.profile-hero-copy h1{font-size:21px}}
@@ -748,7 +748,7 @@ async function lookup(query){
   if(!r.ok)throw new Error(data.error||'Lookup failed');
   const u=data.user;
   currentID=u.id;
-  $('avatar').src=data.avatar||'';
+  setRobloxAvatar(data.avatar,u.id);
   $('display').textContent=u.displayName||u.name;
   $('username').textContent='@'+u.name;
   $('description').textContent=u.description||'No description available.';
@@ -1056,11 +1056,79 @@ let v7YTPlayer=null,v7MusicTimer=null;
 async function searchYouTubeMusic(){
  const q=$('youtubeSearchInput').value.trim();if(!q){$('musicStatus').textContent='Masukkan judul lagu.';return}
  $('musicStatus').textContent='Mencari di YouTube...';$('musicResults').innerHTML='';
- try{const d=await apiJSON('/api/music/search?q='+encodeURIComponent(q));$('musicResults').innerHTML=(d.results||[]).map(x=>`<article class="music-result"><span><b>${escapeText(x.title)}</b><small>Hasil pencarian YouTube</small><a target="_blank" rel="noopener" href="${escapeText(x.url)}">BUKA DI YOUTUBE ↗</a></span></article>`).join('');$('musicStatus').textContent='Hasil pencarian berasal dari YouTube. Pilih hasil untuk memutar di YouTube.';}
- catch(e){$('musicStatus').textContent='⚠ '+e.message}
+ try{
+  const d=await apiJSON('/api/music/search?q='+encodeURIComponent(q));
+  window.renoxMusicResults=Array.isArray(d.results)?d.results:[];
+  $('musicResults').innerHTML=window.renoxMusicResults.map((x,i)=>'<article class="music-result"><span><b>'+escapeText(x.title||'Video YouTube')+'</b><small>Hasil pencarian YouTube</small><button type="button" class="primary" onclick="playMusicResult('+i+')">PUTAR ▶</button> <a target="_blank" rel="noopener" href="'+escapeText(x.url||'#')+'">BUKA DI YOUTUBE ↗</a></span></article>').join('')||'<p class="hint">Tidak ada hasil yang ditemukan.</p>';
+  $('musicStatus').textContent=window.renoxMusicResults.length+' hasil ditemukan. Tekan PUTAR untuk memutar melalui YouTube.';
+ }catch(e){$('musicStatus').textContent='⚠ '+e.message}
 }
-function playMusicResult(i){const x=window.renoxMusicResults?.[i];if(!x)return;const frame=$('musicPlayerFrame');frame.innerHTML=`<audio id="renoxAudio" controls autoplay preload="none" style="width:100%"></audio>`;const a=$('renoxAudio');a.src=x.preview;a.addEventListener('play',()=>document.querySelector('.music-disc')?.classList.add('is-playing'));a.addEventListener('pause',()=>document.querySelector('.music-disc')?.classList.remove('is-playing'));a.addEventListener('ended',()=>document.querySelector('.music-disc')?.classList.remove('is-playing'));a.play().catch(()=>{$('musicStatus').textContent='Tekan Play pada pemutar untuk memulai audio.'});$('v7SongName').textContent=x.title+' — '+x.artist;$('v7SongTime').textContent='PREVIEW AUDIO';$('musicStatus').textContent='Memutar preview lagu. Durasi preview dibatasi oleh penyedia musik.';}
-function playYouTubeMusic(){const raw=$('youtubeUrlInput').value.trim();if(!raw){$('musicStatus').textContent='Tempel URL audio terlebih dahulu.';return}let u;try{u=new URL(raw)}catch{$('musicStatus').textContent='URL tidak valid. Gunakan URL https:// yang lengkap.';return}if(u.protocol!=='https:'&&u.protocol!=='http:'){$('musicStatus').textContent='Skema URL tidak didukung. Gunakan tautan https:// atau http:// langsung ke audio.';return}if(/(^|\.)((youtube\.com)|(youtu\.be))$/i.test(u.hostname)){let id=u.hostname==='youtu.be'?u.pathname.slice(1):u.searchParams.get('v')||((u.pathname.match(/\/embed\/([^/?]+)/)||[])[1])||'';if(!/^[A-Za-z0-9_-]{11}$/.test(id)){$('musicStatus').textContent='Link YouTube tidak valid.';return}$('musicPlayerFrame').innerHTML=`<iframe title="YouTube audio/video" loading="lazy" src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:0"></iframe>`;$('v7SongName').textContent='YouTube video';$('v7SongTime').textContent='PLAYER';$('musicStatus').textContent='Memutar embed YouTube di aplikasi.';return}if(!/\.(mp3|m4a|aac|ogg|opus|wav|flac)(\?.*)?$/i.test(u.pathname)&&!u.searchParams.has('audio')){$('musicStatus').textContent='URL terbuka, tetapi tidak terlihat seperti file audio langsung. Gunakan URL MP3/M4A/OGG atau stream audio.';return}$('musicPlayerFrame').innerHTML='<audio id="renoxAudio" controls autoplay preload="none" style="width:100%"></audio>';const a=$('renoxAudio');a.src=u.href;a.addEventListener('play',()=>document.querySelector('.music-disc')?.classList.add('is-playing'));a.addEventListener('pause',()=>document.querySelector('.music-disc')?.classList.remove('is-playing'));a.addEventListener('ended',()=>document.querySelector('.music-disc')?.classList.remove('is-playing'));a.play().catch(()=>$('musicStatus').textContent='Audio siap. Tekan Play untuk memulai.');$('v7SongName').textContent=u.pathname.split('/').pop()||'URL audio';$('v7SongTime').textContent='URL PLAYER';$('musicStatus').textContent='Mencoba memutar URL audio.';}
+function updateRenoxAudioProgress(a){
+ if(!a)return;
+ const progress=$('v7SongProgress'),time=$('v7SongTime');
+ const duration=Number.isFinite(a.duration)&&a.duration>0?a.duration:0;
+ if(progress)progress.style.width=duration?Math.min(100,a.currentTime/duration*100)+'%':'0%';
+ if(time)time.textContent=(duration?formatMusicTime(a.currentTime)+' / '+formatMusicTime(duration):'Memuat durasi…');
+}
+function formatMusicTime(sec){if(!Number.isFinite(sec)||sec<0)return '0:00';return Math.floor(sec/60)+':'+String(Math.floor(sec%60)).padStart(2,'0')}
+function attachRenoxAudio(a,title){
+ const disc=document.querySelector('.music-disc'),miniDisc=document.querySelector('.v7-disc');
+ const spin=on=>{disc?.classList.toggle('is-playing',on);miniDisc?.classList.toggle('is-playing',on)};
+ a.addEventListener('play',()=>spin(true));a.addEventListener('playing',()=>spin(true));
+ a.addEventListener('pause',()=>spin(false));a.addEventListener('ended',()=>{spin(false);updateRenoxAudioProgress(a)});
+ a.addEventListener('timeupdate',()=>updateRenoxAudioProgress(a));
+ a.addEventListener('loadedmetadata',()=>updateRenoxAudioProgress(a));
+ a.addEventListener('durationchange',()=>updateRenoxAudioProgress(a));
+ $('v7SongName').textContent=title||'RENOX MUSIC';updateRenoxAudioProgress(a);
+}
+function playMusicResult(i){
+ const x=window.renoxMusicResults?.[i];if(!x)return;
+ const url=x.url||x.link||'',videoId=extractYouTubeId(url);
+ if(videoId){playYouTubeVideoId(videoId,x.title||'YouTube Music');return}
+ if(x.preview){playDirectMusic(x.preview,(x.title||'Audio')+(x.artist?' — '+x.artist:''));return}
+ $('musicStatus').textContent='Hasil ini tidak menyediakan preview audio. Buka melalui YouTube.';
+}
+function extractYouTubeId(raw){
+ try{const u=new URL(raw);if(!/(^|\\.)((youtube\\.com)|(youtu\\.be))$/i.test(u.hostname))return '';return u.hostname==='youtu.be'?u.pathname.slice(1):u.searchParams.get('v')||((u.pathname.match(/\\/(?:embed|shorts)\\/([^/?]+)/)||[])[1])||''}catch{return ''}
+}
+function playYouTubeVideoId(id,title){
+ if(!/^[A-Za-z0-9_-]{11}$/.test(id)){$('musicStatus').textContent='ID video YouTube tidak valid.';return}
+ $('musicPlayerFrame').innerHTML='<iframe title="YouTube music player" loading="lazy" src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+ document.querySelector('.music-disc')?.classList.add('is-playing');document.querySelector('.v7-disc')?.classList.add('is-playing');
+ $('v7SongName').textContent=title;$('v7SongTime').textContent='Kontrol progres tersedia di pemutar YouTube.';
+ $('v7SongProgress').style.width='0%';$('musicStatus').textContent='Memutar melalui pemutar YouTube resmi. Gunakan kontrol di dalam pemutar untuk progres lagu.';
+}
+function playDirectMusic(url,title){
+ let u;try{u=new URL(url)}catch{$('musicStatus').textContent='URL preview tidak valid.';return}
+ if(!['https:','http:'].includes(u.protocol)){$('musicStatus').textContent='URL audio harus menggunakan HTTP atau HTTPS.';return}
+ $('musicPlayerFrame').innerHTML='<audio id="renoxAudio" controls autoplay preload="metadata" style="width:100%"></audio>';
+ const a=$('renoxAudio');a.src=u.href;attachRenoxAudio(a,title);
+ a.play().then(()=>$('musicStatus').textContent='Memutar audio. Progress dan durasi mengikuti lagu.').catch(()=>$('musicStatus').textContent='Audio siap. Tekan Play untuk memulai.');
+}
+function playYouTubeMusic(){
+ const raw=$('youtubeUrlInput').value.trim();if(!raw){$('musicStatus').textContent='Tempel URL audio terlebih dahulu.';return}
+ const id=extractYouTubeId(raw);if(id){playYouTubeVideoId(id,'YouTube Music');return}
+ playDirectMusic(raw,raw.split('/').pop().split('?')[0]||'URL audio');
+}
+async function setRobloxAvatar(preferred,userId){
+ const img=$('avatar');if(!img)return;
+ const fallback='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="60" fill="#25213b"/><text x="60" y="72" text-anchor="middle" font-size="48" fill="#c8a6ff">?</text></svg>');
+ img.onerror=async()=>{
+  img.onerror=null;
+  try{
+   const response=await fetch('https://thumbnails.roblox.com/v1/users/avatar?userIds='+encodeURIComponent(userId)+'&size=150x150&format=Png&isCircular=false');
+   if(!response.ok)throw new Error('thumbnail unavailable');
+   const data=await response.json(),url=data.data?.[0]?.imageUrl;
+   if(url){img.onerror=()=>{img.onerror=null;img.src=fallback};img.src=url;return}
+  }catch{}
+  img.src=fallback;
+ };
+ img.src=preferred||'https://thumbnails.roblox.com/v1/users/avatar?userIds='+encodeURIComponent(userId)+'&size=150x150&format=Png&isCircular=false';
+ if(!preferred){
+  img.onerror=async()=>{img.onerror=null;try{const r=await fetch('https://thumbnails.roblox.com/v1/users/avatar?userIds='+encodeURIComponent(userId)+'&size=150x150&format=Png&isCircular=false');const d=await r.json();img.src=d.data?.[0]?.imageUrl||fallback}catch{img.src=fallback}};
+ }
+}
+
 
 async function saveOwnerPin(){try{const d=await apiJSON('/api/owner/pinned-feature',{method:'POST',body:JSON.stringify({title:$('ownerPinTitle').value,description:$('ownerPinDescription').value})});$('ownerPinStatus').textContent='✓ Pin halaman utama berhasil diperbarui.';if($('homePinnedTitle'))$('homePinnedTitle').textContent=d.pinnedFeature.title;if($('homePinnedDescription'))$('homePinnedDescription').textContent=d.pinnedFeature.description}catch(e){$('ownerPinStatus').textContent='⚠ '+e.message}}
 function installPageBackControls(){document.querySelectorAll('.page').forEach(page=>{if(page.id==='home'||page.querySelector('.page-backbar'))return;const bar=document.createElement('div');bar.className='page-backbar';const back=document.createElement('button');back.type='button';back.className='page-back-button';back.innerHTML='<span>‹</span> BACK';back.addEventListener('click',()=>showPage('home'));const close=document.createElement('button');close.type='button';close.className='page-close-button';close.setAttribute('aria-label','Close');close.textContent='✕';close.addEventListener('click',()=>showPage('home'));bar.append(back,close);page.insertBefore(bar,page.firstChild)})}
