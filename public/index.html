@@ -2104,6 +2104,18 @@ body.renox-comic-theme .home-announcement-mark svg{stroke:#17130f!important}
 .renox-announcement-card{position:relative}
 .renox-announcement-card:before{content:"NoxXd  ✓";display:block;text-align:left;color:#1688ee;font-weight:900;margin-bottom:12px}
 @media(max-width:600px){#profile .profile{grid-template-columns:1fr!important;text-align:center}#profile .profile .avatar{margin:0 auto}.unban-project-card{padding:16px}}
+/* Additional mobile and comic-theme repair */
+#statusStrip{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;overflow:visible!important}
+#statusStrip .status-item,#statusStrip .status-add{width:100%!important;max-width:none!important;flex:0 0 auto!important;display:grid!important;grid-template-columns:64px minmax(0,1fr)!important;align-items:center!important;text-align:left!important}
+#statusStrip .status-item small,#statusStrip .status-add small{max-width:none!important;white-space:normal!important}
+#privatechat .nox-wa-app{position:relative;z-index:3;pointer-events:auto;max-width:100%;overflow:hidden}
+#privatechat .nox-wa-app button,#privatechat .nox-wa-app input,#privatechat .nox-wa-app a{position:relative;z-index:4;pointer-events:auto}
+#privatechat .nox-wa-app input{color:#111!important;background:#fff!important;-webkit-text-fill-color:#111!important}
+#privatechat .nox-wa-app input::placeholder{color:#555!important;opacity:1}
+#privatechat .nox-wa-overlay,#privatechat .nox-wa-backdrop{pointer-events:none}
+body.renox-comic-theme .home-hadith-card,body.renox-comic-theme .home-prayer-card,body.renox-comic-theme .prayer-card{display:block!important;visibility:visible!important;opacity:1!important;background:#fffdf5!important;color:#171717!important;border:2px solid #171717!important;box-shadow:5px 5px 0 #ff6a2b!important}
+body.renox-comic-theme .home-hadith-card :is(h3,span,blockquote,p),body.renox-comic-theme .home-prayer-card :is(h3,span,small,label),body.renox-comic-theme .prayer-times span{color:#171717!important;-webkit-text-fill-color:#171717!important;opacity:1!important}
+body.renox-comic-theme .home-prayer-card .field{background:#fff!important;color:#171717!important;border:2px solid #171717!important}
 </style>
 <style id="renox-requested-polish">
 #community .chat-shell{background:#fff!important;color:#111!important;border:2px solid #111!important}
