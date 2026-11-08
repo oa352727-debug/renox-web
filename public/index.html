@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Renox Project</title><meta name="renox-build" content="2026.11.08.2">
+<title>Renox Project</title><meta name="renox-build" content="2026.11.08.3">
 <style>
 /* Home status stacking: keep the status card above following dashboard cards. */
 .status-section{position:relative;z-index:2;isolation:isolate;overflow:visible}
@@ -437,6 +437,37 @@ body.renox-comic-theme .liquid-bottom-nav{background:#fff!important;border:2px s
 #renoxUpdateModal[hidden]{display:none!important}#renoxUpdateModal{position:fixed;inset:0;z-index:100900;background:#050914e8;display:grid;place-items:center;padding:20px}.renox-update-card{width:min(470px,100%);padding:28px;border:2px solid #171717;border-radius:24px;background:#fffdf7;color:#171717;box-shadow:8px 8px 0 #ff5a24;text-align:center}.renox-update-mark{width:65px;height:65px;margin:0 auto 14px;border-radius:19px;display:grid;place-items:center;background:#ffdf65;border:2px solid #171717;font-size:30px}.renox-update-card h2{font-size:25px;font-weight:1000}.renox-update-card p{font-size:12px;line-height:1.7;color:#424242;margin:10px 0 18px}.renox-update-progress{height:13px;border:2px solid #171717;border-radius:20px;overflow:hidden;background:#eee;margin:16px 0 8px}.renox-update-progress>span{display:block;width:0;height:100%;background:linear-gradient(90deg,#ff5a24,#ffbd35);transition:width .16s ease}.renox-update-percent{font-size:12px;font-weight:1000}.renox-update-action{width:100%;padding:13px;border:2px solid #171717;border-radius:12px;background:#ff5a24;color:white;font-weight:1000;box-shadow:3px 3px 0 #171717}
 @media(max-width:760px){.nox-wa-app{grid-template-columns:1fr;min-height:75vh}.nox-wa-sidebar{max-height:230px;border-right:0;border-bottom:1px solid #ffffff18}.nox-wa-recent{max-height:100px}.nox-wa-messages{min-height:280px;max-height:43vh}.nox-wa-top{padding:13px}.nox-wa-top h1{font-size:19px}}
 body.renox-comic-theme .nox-wa-app{border:2px solid #171717;box-shadow:5px 5px 0 #ff5a24}
+</style><style id="renox-cosmic-glass-fixes">
+/* Cosmic-comic polish and readable glass prayer timetable */
+body.renox-comic-theme{background:#fff9ef!important}
+body.renox-comic-theme:before{background:radial-gradient(circle,#1d1b24 1px,transparent 1.5px) 0 0/18px 18px,radial-gradient(circle at 88% 12%,#ffdc6a55,transparent 24%),radial-gradient(circle at 8% 85%,#8c73ff22,transparent 28%),linear-gradient(145deg,#fffdf6,#fff2e4)!important}
+body.renox-comic-theme .hero,body.renox-comic-theme .card,body.renox-comic-theme .stat,body.renox-comic-theme .panel-card,body.renox-comic-theme .feed-item{border:2px solid #201b25!important;box-shadow:4px 4px 0 #201b25,7px 7px 0 #ff6747!important}
+body.renox-comic-theme .prayer-card.home-prayer-card{background:rgba(255,255,255,.66)!important;color:#17151b!important;border:2px solid #27212b!important;box-shadow:4px 4px 0 #27212b,7px 7px 0 #6b57c8!important;backdrop-filter:blur(18px) saturate(1.35)!important;-webkit-backdrop-filter:blur(18px) saturate(1.35)!important}
+body.renox-comic-theme .home-prayer-card .section-head h3,body.renox-comic-theme .home-prayer-card .section-head span,body.renox-comic-theme .home-prayer-card .hint{color:#211b2b!important;font-weight:850!important}
+body.renox-comic-theme .home-prayer-card .prayer-city-row input{background:rgba(255,255,255,.72)!important;color:#17151b!important;border:1px solid #332b3b!important}
+body.renox-comic-theme .home-prayer-card .prayer-times span{background:rgba(255,255,255,.70)!important;color:#211b2b!important;border:1px solid #3b3346!important;backdrop-filter:blur(12px)!important}
+body.renox-comic-theme .home-prayer-card .prayer-times b{color:#5636a8!important;font-weight:1000!important}
+.prayer-card.home-prayer-card{background:rgba(255,255,255,.13)!important;backdrop-filter:blur(16px) saturate(1.35)!important;-webkit-backdrop-filter:blur(16px) saturate(1.35)!important}
+.prayer-card .prayer-times span{background:rgba(255,255,255,.18)!important;border:1px solid rgba(255,255,255,.28)!important}
+.status-strip{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:7px!important;max-height:340px;overflow-y:auto!important;overflow-x:hidden!important;padding:8px!important}
+.status-item,.status-add{width:100%!important;min-width:0!important;flex:none!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:13px!important;padding:8px 10px!important;text-align:left!important;border-radius:13px!important;background:rgba(255,255,255,.06)!important}
+.status-item:hover,.status-add:hover{background:rgba(255,255,255,.12)!important}
+.status-item small,.status-add small{max-width:none!important;white-space:normal!important;text-align:left!important;font-size:12px!important;font-weight:800!important}
+.status-ring{flex:0 0 52px!important;width:52px!important;height:52px!important}
+.status-add>span{flex:0 0 52px!important;width:52px!important;height:52px!important}
+body.renox-comic-theme .status-item,body.renox-comic-theme .status-add{color:#211b25!important;background:rgba(255,255,255,.72)!important;border:1px solid #29232d!important}
+.renox-profile-banner-video{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;z-index:0!important;pointer-events:none!important}
+.profile-banner-active{position:relative!important;isolation:isolate!important;overflow:hidden!important}
+.profile-banner-active>*:not(.renox-profile-banner-video){position:relative;z-index:1}
+.renox-announcement-modal{position:fixed;inset:0;z-index:100950;display:grid;place-items:center;padding:20px;background:rgba(7,8,18,.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.renox-announcement-card{width:min(480px,100%);padding:25px;border:2px solid #211b28;border-radius:24px;background:linear-gradient(145deg,#fffdf6,#f4edff);color:#211b28;box-shadow:8px 8px 0 #ff6545,12px 12px 0 #5140a1;text-align:left}
+.renox-announcement-mark{width:58px;height:58px;display:grid;place-items:center;border-radius:17px;background:#ffe16a;border:2px solid #211b28;font-size:28px;margin-bottom:15px}
+.renox-announcement-card>small{font-size:9px;letter-spacing:1.5px;font-weight:1000;color:#5942a0}
+.renox-announcement-card h2{font-size:23px;line-height:1.2;margin:10px 0;color:#211b28}
+.renox-announcement-card p{font-size:13px;line-height:1.7;color:#3f3748;white-space:pre-wrap;overflow-wrap:anywhere}
+.renox-announcement-card .renox-announcement-date{display:block;margin-top:13px;color:#766b7f;font-size:9px}
+.renox-announcement-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}.renox-announcement-actions button{padding:11px 14px;border-radius:10px;font-size:10px;font-weight:900}
+@media(max-width:600px){.prayer-times{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px!important}.prayer-times span{padding:9px 2px!important;font-size:9px!important}.prayer-times b{font-size:11px!important}.renox-announcement-card{padding:20px}}
 </style></head>
 <body class="auth-locked">
 <div id="accountGate" class="renox-auth-gate">
@@ -884,15 +915,47 @@ async function telegramLookup(){
  }catch(e){box.innerHTML=`<div class="hint">⚠ ${escapeText(e.message)}<br><br>Telegram hanya menyediakan preview tanpa login untuk kanal/grup publik tertentu. Profil personal tidak dapat diambil secara anonim.</div>`}
 }
 async function tiktokLookup(){const box=$('tiktokResult');const username=$('tiktokUsername').value.trim().replace(/^@/, '').replace(/[^a-zA-Z0-9._]/g,'');if(!username){box.textContent='Masukkan username TikTok terlebih dahulu.';return}box.textContent='Mencari profil @'+username+'...';try{const d=await apiJSON('/api/tiktok?username='+encodeURIComponent(username));const u=d.user||{};const avatar=u.avatarLarger||u.avatarMedium||u.avatarThumb||'';box.innerHTML=`<div class="tiktok-profile-result"><img src="${escapeText(avatar||'https://placehold.co/120x120/202536/e9edf7?text=TT')}" alt="Foto profil"><div class="tiktok-profile-info"><h3>${escapeText(u.nickname||u.uniqueId||username)}</h3><p>@${escapeText(u.uniqueId||username)}</p><span>${escapeText(u.signature||'')}</span><small style="display:block;margin-top:7px;color:#aeb8ce">${u.verified?'✓ Akun terverifikasi publik · ':''}${u.region?'Wilayah: '+escapeText(u.region)+' · ':''}${u.userId?'UID: '+escapeText(u.userId):''}${u.createTime?' · Dibuat: '+new Date(u.createTime*1000).toLocaleDateString('id-ID'):''}</small>${u.privateAccount?'<small>AKUN PRIVATE</small>':''}${u.bioLink?'<a target="_blank" rel="noopener" href="'+escapeText(u.bioLink)+'">Bio link ↗</a>':''}</div></div><div class="tiktok-stats"><div><b>${Number(u.followerCount||0).toLocaleString('id-ID')}</b><small>FOLLOWERS</small></div><div><b>${Number(u.followingCount||0).toLocaleString('id-ID')}</b><small>FOLLOWING</small></div><div><b>${Number(u.videoCount||0).toLocaleString('id-ID')}</b><small>VIDEOS</small></div><div><b>${Number(u.heartCount||0).toLocaleString('id-ID')}</b><small>LIKES</small></div></div><a class="tiktok-open" href="https://www.tiktok.com/@${encodeURIComponent(username)}" target="_blank" rel="noopener">OPEN TIKTOK PROFILE ↗</a>`}catch(e){box.textContent='⚠ '+e.message+' — layanan profil publik mungkin sedang membatasi permintaan.'}}
-let dmPeer='',dmAfter=0,dmRecent=[];try{dmRecent=JSON.parse(localStorage.getItem('renoxDmRecent')||'[]')}catch{}
+let dmPeer='',dmAfter=0,dmRecent=[],dmRenderedKeys=new Set(),dmRefreshBusy=false;
+try{dmRecent=JSON.parse(localStorage.getItem('renoxDmRecent')||'[]')}catch{dmRecent=[]}
 function renderDMRecent(){const box=$('dmRecentList');if(!box)return;box.innerHTML=dmRecent.length?dmRecent.map(id=>'<button class="nox-wa-recent-item" onclick="selectDM(\''+encodeURIComponent(id)+'\')"><span class="nox-wa-recent-avatar">R</span><span><b>'+escapeText(id)+'</b><small>Pesan pribadi</small></span></button>').join(''):'<div class="nox-wa-empty">Belum ada chat. Masukkan Guest ID untuk memulai.</div>'}
 function selectDM(id){$('dmPeer').value=decodeURIComponent(id);openDM()}
-async function openDM(){dmPeer=$('dmPeer').value.trim();dmAfter=0;$('dmMessages').innerHTML='';if(!dmPeer){$('dmStatus').textContent='Masukkan Guest ID penerima.';return}if(dmPeer===guestId){$('dmStatus').textContent='Tidak dapat chat dengan Guest ID sendiri.';return}dmRecent=[dmPeer,...dmRecent.filter(x=>x!==dmPeer)].slice(0,20);localStorage.setItem('renoxDmRecent',JSON.stringify(dmRecent));renderDMRecent();$('dmContactName').textContent='Member RENOX';$('dmStatus').textContent='Menghubungkan · '+dmPeer;$('dmInput').disabled=false;$('dmSendButton').disabled=false;try{await refreshDM();$('dmStatus').textContent='Guest ID: '+dmPeer+' · Pesan pribadi'}catch(e){$('dmStatus').textContent='Gagal memuat: '+e.message}}
-async function refreshDM(){if(!dmPeer)return;const d=await apiJSON('/api/private-chat?me='+encodeURIComponent(guestId)+'&with='+encodeURIComponent(dmPeer)+'&after='+dmAfter);const box=$('dmMessages');(d.messages||[]).forEach(m=>{dmAfter=Math.max(dmAfter,m.createdAt||0);const row=document.createElement('article');row.className='nox-wa-message '+(m.from===guestId?'outgoing':'incoming');const meta=document.createElement('small');meta.textContent=(m.from===guestId?'Anda':m.fromName||'Member')+' · '+(m.createdAt?new Date(m.createdAt).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):'');const body=document.createElement('div');body.className='nox-wa-message-text';body.textContent=m.message||'';row.append(meta,body);box.querySelector('.nox-wa-welcome')?.remove();box.appendChild(row)});if(d.messages?.length)box.scrollTop=box.scrollHeight}
-async function sendDM(){const input=$('dmInput'),message=input.value.trim(),button=$('dmSendButton');if(!dmPeer||!message)return;button.disabled=true;try{await apiJSON('/api/private-chat',{method:'POST',body:JSON.stringify({guestId,to:dmPeer,message})});input.value='';await refreshDM()}catch(e){$('dmStatus').textContent='Pesan gagal dikirim: '+e.message}finally{button.disabled=false;input.focus()}}
-
-
-
+async function openDM(){
+ const nextPeer=$('dmPeer').value.trim();
+ if(!nextPeer){$('dmStatus').textContent='Masukkan Guest ID penerima.';return}
+ if(nextPeer===guestId){$('dmStatus').textContent='Tidak dapat chat dengan Guest ID sendiri.';return}
+ dmPeer=nextPeer;dmAfter=0;dmRenderedKeys.clear();$('dmMessages').innerHTML='<div class="nox-wa-welcome"><div>✉</div><b>Memuat percakapan...</b><span>Mohon tunggu sebentar.</span></div>';
+ dmRecent=[dmPeer,...dmRecent.filter(x=>x!==dmPeer)].slice(0,20);localStorage.setItem('renoxDmRecent',JSON.stringify(dmRecent));renderDMRecent();
+ $('dmContactName').textContent='Member RENOX';$('dmStatus').textContent='Menghubungkan · '+dmPeer;$('dmInput').disabled=false;$('dmSendButton').disabled=false;
+ try{await refreshDM(true);$('dmStatus').textContent='Guest ID: '+dmPeer+' · Pesan pribadi'}catch(e){$('dmStatus').textContent='Gagal memuat: '+e.message;$('dmInput').disabled=true;$('dmSendButton').disabled=true}
+}
+async function refreshDM(force=false){
+ if(!dmPeer||dmRefreshBusy||!$('privatechat')?.classList.contains('active'))return;
+ dmRefreshBusy=true;const peerAtRequest=dmPeer;
+ try{
+  const d=await apiJSON('/api/private-chat?me='+encodeURIComponent(guestId)+'&with='+encodeURIComponent(peerAtRequest)+'&after='+encodeURIComponent(dmAfter));
+  if(peerAtRequest!==dmPeer)return;
+  const messages=Array.isArray(d.messages)?d.messages:[];
+  const box=$('dmMessages');let added=0;
+  messages.forEach(m=>{
+   const stamp=Number(m.createdAt)||Date.parse(m.createdAt)||0;
+   const key=String(m.id??(String(m.from||'')+'|'+stamp+'|'+String(m.message??m.text??'')));
+   if(dmRenderedKeys.has(key))return;
+   dmRenderedKeys.add(key);if(stamp)dmAfter=Math.max(dmAfter,stamp);
+   const row=document.createElement('article');row.className='nox-wa-message '+(m.from===guestId?'outgoing':'incoming');
+   const meta=document.createElement('small');meta.textContent=(m.from===guestId?'Anda':m.fromName||'Member')+' · '+(stamp?new Date(stamp).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):'');
+   const body=document.createElement('div');body.className='nox-wa-message-text';body.textContent=m.message??m.text??'';
+   row.append(meta,body);box.querySelector('.nox-wa-welcome')?.remove();box.appendChild(row);added++;
+  });
+  if(added||force)box.scrollTop=box.scrollHeight;
+ }finally{dmRefreshBusy=false}
+}
+async function sendDM(){
+ const input=$('dmInput'),message=input.value.trim(),button=$('dmSendButton');if(!dmPeer||!message||button.disabled)return;
+ button.disabled=true;
+ try{await apiJSON('/api/private-chat',{method:'POST',body:JSON.stringify({guestId,to:dmPeer,message})});input.value='';await refreshDM(true)}
+ catch(e){$('dmStatus').textContent='Pesan gagal dikirim: '+e.message}
+ finally{button.disabled=false;input.focus()}
+}
 const hadithDaily=[{text:'Sesungguhnya amal itu tergantung pada niatnya.',source:'HR. Bukhari no. 1 dan Muslim no. 1907'},{text:'Barang siapa beriman kepada Allah dan hari akhir, hendaklah berkata baik atau diam.',source:'HR. Bukhari no. 6018 dan Muslim no. 47'},{text:'Senyummu kepada saudaramu adalah sedekah.',source:'HR. Tirmidzi no. 1956'}];
 function renderDailyHadith(){const item=hadithDaily[Math.floor(Date.now()/86400000)%hadithDaily.length];if($('dailyHadith'))$('dailyHadith').textContent='“'+item.text+'”';if($('hadithSource'))$('hadithSource').textContent=item.source}
 async function loadPrayerTimes(){const city=$('prayerCity').value.trim();if(!city)return;const box=$('prayerTimes');box.innerHTML='<span>Memuat jadwal...</span>';try{const d=await apiJSON('/api/prayer-times?city='+encodeURIComponent(city));const t=d.timings||{};box.innerHTML=[['Fajr','Subuh'],['Dhuhr','Zuhur'],['Asr','Asar'],['Maghrib','Magrib'],['Isha','Isya']].map(([k,label])=>`<span>${label}<b>${escapeText(String(t[k]||'--').split(' ')[0])}</b></span>`).join('');$('prayerDate').textContent=d.city+' · '+d.date+' · '+(d.source||'Jadwal sholat')}catch(e){box.innerHTML='<span>Gagal memuat jadwal. Periksa koneksi lalu coba lagi.</span>';$('prayerDate').textContent=e.message||'Periksa koneksi server dan nama kota.'}}
@@ -972,7 +1035,43 @@ function loadDisplaySettings(){let a=localStorage.getItem('renoxAccent')||'#6485
 let knownAnnouncementIds=new Set();let notificationInitialized=false;let audioReady=false;document.addEventListener('pointerdown',()=>{audioReady=true},{once:true});
 function notifyDeveloper(item,kind){const pop=document.createElement('div');pop.className='notice-pop';pop.innerHTML=`<strong>✦ RENOX ${kind==='leaks'?'NEW LEAK':'OFFICIAL ANNOUNCEMENT'}</strong><p><b>${escapeText(item.title)}</b><br>${escapeText(item.content).slice(0,220)}</p><button class="primary" onclick="this.parentElement.remove();showPage('${kind}',document.querySelector('.nav[onclick*=\"${kind}\"]'))">LIHAT SEKARANG</button>`;document.body.appendChild(pop);setTimeout(()=>pop.remove(),12000);if(audioReady){try{const C=window.AudioContext||window.webkitAudioContext,ctx=new C();[660,880,1100].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=f;o.connect(g);g.connect(ctx.destination);g.gain.setValueAtTime(.0001,ctx.currentTime+i*.13);g.gain.exponentialRampToValueAtTime(.12,ctx.currentTime+i*.13+.02);g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+i*.13+.16);o.start(ctx.currentTime+i*.13);o.stop(ctx.currentTime+i*.13+.17)});setTimeout(()=>ctx.close(),800)}catch{}}}
 function setMaintenanceVisibility(active){const screen=$('maintenanceScreen');if(!screen)return;screen.classList.toggle('show',!!active);document.body.classList.toggle('maintenance-lock',!!active)}
-async function loadPublicContent(){try{let d=await apiJSON('/api/public');if(d.maintenance&&!renoxOwnerMode)await checkDeveloper();$('maintenanceBanner').style.display=d.maintenance?'block':'none';const md=$('maintenanceReasonPublic');if(md){md.hidden=!d.maintenance;if(d.maintenance){$('maintenanceReasonTitle').textContent=d.maintenanceTitle||'Alasan maintenance';$('maintenanceReasonText').textContent=d.maintenanceReason||'Sistem sedang menjalani pemeliharaan dan peningkatan layanan.';$('maintenanceAffectedText').textContent=d.maintenanceAffected?'Fitur terdampak: '+d.maintenanceAffected:'Layanan RENOX sementara belum dapat digunakan.';$('maintenanceUntilText').textContent=d.maintenanceUntil?'Perkiraan selesai: '+new Date(d.maintenanceUntil).toLocaleString('id-ID'):'Waktu selesai belum diumumkan.';}}setMaintenanceVisibility(!!d.maintenance&&!renoxOwnerMode);const render=(a,id,tag)=>$(id).innerHTML=(a||[]).length?a.map(x=>`<article class="feed-item"><h4>${escapeText(x.title)}</h4><p>${escapeText(x.content)}</p><div class="feed-meta">${tag} · ${new Date(x.createdAt).toLocaleString('id-ID')}</div></article>`).join(''):'<div class="empty">Belum ada postingan.</div>';render(d.announcements,'announcementFeed','OFFICIAL UPDATE');const latest=(d.announcements||[])[0];if(latest){$('homeAnnouncementTitle').textContent=latest.title;$('homeAnnouncementText').textContent=latest.content;$('homeAnnouncement').style.display='flex'}else{$('homeAnnouncementTitle').textContent='Belum ada pengumuman';$('homeAnnouncementText').textContent='Pengumuman resmi akan tampil di sini.'}render(d.leaks,'leakFeed','COMMUNITY LEAK · UNVERIFIED');for(const [kind,items] of [['announcements',d.announcements],['leaks',d.leaks]]){for(const item of (items||[]).slice(0,10).reverse()){if(!knownAnnouncementIds.has(item.id)){if(notificationInitialized)notifyDeveloper(item,kind);knownAnnouncementIds.add(item.id)}}}notificationInitialized=true}catch(e){console.warn(e)}}
+let announcementPollReady=false;
+function showAnnouncementPopup(item){
+ if(document.getElementById('renoxAnnouncementModal'))return;
+ const modal=document.createElement('div');modal.id='renoxAnnouncementModal';modal.className='renox-announcement-modal';
+ const card=document.createElement('section');card.className='renox-announcement-card';
+ const mark=document.createElement('div');mark.className='renox-announcement-mark';mark.textContent='📣';
+ const tag=document.createElement('small');tag.textContent='RENOX OFFICIAL ANNOUNCEMENT';
+ const title=document.createElement('h2');title.textContent=item.title||'Pengumuman terbaru';
+ const body=document.createElement('p');body.textContent=item.content||'Ada pengumuman baru dari tim RENOX.';
+ const meta=document.createElement('small');meta.className='renox-announcement-date';meta.textContent=item.createdAt?new Date(item.createdAt).toLocaleString('id-ID'):'PENGUMUMAN RESMI';
+ const actions=document.createElement('div');actions.className='renox-announcement-actions';
+ const close=document.createElement('button');close.className='secondary';close.textContent='NANTI';close.onclick=()=>modal.remove();
+ const open=document.createElement('button');open.className='primary';open.textContent='BACA PENGUMUMAN';open.onclick=()=>{modal.remove();showPage('announcements')};
+ actions.append(close,open);card.append(mark,tag,title,body,meta,actions);modal.appendChild(card);
+ modal.addEventListener('click',e=>{if(e.target===modal)modal.remove()});document.body.appendChild(modal);
+}
+async function loadPublicContent(){
+ try{
+  const d=await apiJSON('/api/public');
+  if(d.maintenance&&!renoxOwnerMode)await checkDeveloper();
+  $('maintenanceBanner').style.display=d.maintenance?'block':'none';
+  const md=$('maintenanceReasonPublic');
+  if(md){md.hidden=!d.maintenance;if(d.maintenance){$('maintenanceReasonTitle').textContent=d.maintenanceTitle||'Alasan maintenance';$('maintenanceReasonText').textContent=d.maintenanceReason||'Sistem sedang menjalani pemeliharaan dan peningkatan layanan.';$('maintenanceAffectedText').textContent=d.maintenanceAffected?'Fitur terdampak: '+d.maintenanceAffected:'Layanan RENOX sementara belum dapat digunakan.';$('maintenanceUntilText').textContent=d.maintenanceUntil?'Perkiraan selesai: '+new Date(d.maintenanceUntil).toLocaleString('id-ID'):'Waktu selesai belum diumumkan.'}}
+  setMaintenanceVisibility(!!d.maintenance&&!renoxOwnerMode);
+  const render=(a,id,tag)=>$(id).innerHTML=(a||[]).length?a.map(x=>'<article class="feed-item"><h4>'+escapeText(x.title)+'</h4><p>'+escapeText(x.content)+'</p><div class="feed-meta">'+tag+' · '+new Date(x.createdAt).toLocaleString('id-ID')+'</div></article>').join(''):'<div class="empty">Belum ada postingan.</div>';
+  render(d.announcements,'announcementFeed','OFFICIAL UPDATE');
+  const latest=(d.announcements||[])[0];
+  if(latest){
+   $('homeAnnouncementTitle').textContent=latest.title;$('homeAnnouncementText').textContent=latest.content;$('homeAnnouncement').style.display='flex';
+   const seenId=localStorage.getItem('renoxLastSeenAnnouncement');
+   if(String(latest.id)!==String(seenId)){showAnnouncementPopup(latest);localStorage.setItem('renoxLastSeenAnnouncement',String(latest.id))}
+  }else{$('homeAnnouncementTitle').textContent='Belum ada pengumuman';$('homeAnnouncementText').textContent='Pengumuman resmi akan tampil di sini.'}
+  render(d.leaks,'leakFeed','COMMUNITY LEAK · UNVERIFIED');
+  for(const [kind,items] of [['announcements',d.announcements],['leaks',d.leaks]]){for(const item of (items||[]).slice(0,10).reverse()){if(!knownAnnouncementIds.has(item.id)){if(notificationInitialized&&kind==='leaks')notifyDeveloper(item,kind);knownAnnouncementIds.add(item.id)}}}
+  notificationInitialized=true;announcementPollReady=true;
+ }catch(e){console.warn(e)}
+}
 async function checkMaintenance(){const el=$('maintenanceCheck');el.textContent='Memeriksa status server...';try{const d=await apiJSON('/api/public');if(d.maintenance){if(!renoxOwnerMode)await checkDeveloper();setMaintenanceVisibility(!!d.maintenance&&!renoxOwnerMode);el.textContent=renoxOwnerMode?'Developer terverifikasi. Maintenance tetap aktif untuk pengunjung.':'Server masih maintenance. Silakan tunggu dan cek lagi.'}else{setMaintenanceVisibility(false);el.textContent='Server sudah dibuka.'}}catch(e){el.textContent='Belum dapat terhubung ke server.'}}
 function toggleOrbit(){document.body.classList.toggle('orbit-mode');localStorage.setItem('renoxOrbit',document.body.classList.contains('orbit-mode')?'1':'0')}
 async function maintenanceOwnerLogin(){const key=prompt('Masukkan Owner Key:');if(!key)return;try{await apiJSON('/api/owner/session',{method:'POST',body:JSON.stringify({key})});renoxOwnerMode=true;$('maintenanceScreen').classList.remove('show');$('maintenanceCheck').textContent='Developer login berhasil. Buka Owner Console untuk menonaktifkan maintenance.';await openOwnerConsole()}catch(e){$('maintenanceCheck').textContent='Login gagal: '+e.message}}
@@ -1324,10 +1423,15 @@ async function refreshServerStats(){try{const d=await apiJSON('/api/server-stats
 function renderProfileBanner(media){
  const preview=$('profileBannerPreview'),home=document.querySelector('.profile-hero-card');
  [preview,home].filter(Boolean).forEach(el=>{
-  el.querySelectorAll('.renox-profile-banner-video').forEach(v=>v.remove());
+  el.querySelectorAll('.renox-profile-banner-video').forEach(v=>{v.pause();v.remove()});
   el.style.backgroundImage='linear-gradient(120deg,#18284b,#30204d)';
   if(media&&String(media).startsWith('data:video/')){
-   const v=document.createElement('video');v.className='renox-profile-banner-video';v.src=media;v.autoplay=true;v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.preload='auto';el.appendChild(v);const play=v.play();if(play)play.catch(()=>{});el.classList.add('profile-banner-active');
+   const v=document.createElement('video');v.className='renox-profile-banner-video';v.src=media;
+   v.autoplay=true;v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.preload='auto';
+   v.setAttribute('muted','');v.setAttribute('autoplay','');v.setAttribute('loop','');v.setAttribute('playsinline','');
+   v.addEventListener('ended',()=>{try{v.currentTime=0;const p=v.play();if(p)p.catch(()=>{})}catch{}});
+   v.addEventListener('canplay',()=>{if(v.paused){const p=v.play();if(p)p.catch(()=>{})}});
+   el.appendChild(v);const play=v.play();if(play)play.catch(()=>{});el.classList.add('profile-banner-active');
   }else if(media){el.style.backgroundImage='linear-gradient(90deg,rgba(7,12,25,.55),rgba(7,12,25,.35)),url("'+media+'")';el.classList.add('profile-banner-active')}
   else el.classList.remove('profile-banner-active');
  });
@@ -1381,7 +1485,7 @@ async function getHtmlSource(){
 function copyHtmlSource(){const v=$("htmlSourceOutput").value;if(!v){$("htmlSourceStatus").textContent="Belum ada HTML untuk disalin.";return}navigator.clipboard.writeText(v).then(()=>$("htmlSourceStatus").textContent="HTML disalin.").catch(()=>$("htmlSourceStatus").textContent="Browser menolak akses clipboard.");}
 
 
-document.addEventListener('DOMContentLoaded',()=>{applyGraphicsSettings();if(localStorage.getItem('renoxThemePriority20261108')!=='1'){localStorage.setItem('renoxTheme','comic');localStorage.setItem('renoxThemePriority20261108','1')}setRenoxTheme(localStorage.getItem('renoxTheme')||'comic');renderDMRecent();checkRenoxUpdate();setInterval(checkRenoxUpdate,45000);setInterval(()=>{if(dmPeer&&$('privatechat')?.classList.contains('active'))refreshDM().catch(()=>{})},5000);setRenoxLanguage(localStorage.getItem('renoxLanguage')||'id');if($('refreshRateSelect'))$('refreshRateSelect').value=localStorage.getItem('renoxRefreshPreference')||'60';renderDMRecent();checkRenoxUpdate();setInterval(checkRenoxUpdate,45000);setInterval(()=>{if(dmPeer&&$('privatechat')?.classList.contains('active'))refreshDM().catch(()=>{})},5000);if($('fontSelect')&&localStorage.getItem('renoxFont'))$('fontSelect').value=localStorage.getItem('renoxFont');checkAccount();checkDeveloper();refreshGlobalTheme();loadPublicContent();renderDailyHadith();loadPrayerTimes();loadStatuses();refreshChat();filterAnimeCatalog();setInterval(refreshGlobalTheme,4000);setInterval(loadStatuses,30000);setInterval(refreshChat,4500);setInterval(checkAccount,12000);setInterval(()=>{if($('accountGate').style.display==='none')refreshServerStats()},10000);if(guestProfile.banner){if($('profileBannerSelect'))$('profileBannerSelect').value='';applyProfileBanner(guestProfile.banner)}});
+document.addEventListener('DOMContentLoaded',()=>{applyGraphicsSettings();if(localStorage.getItem('renoxThemePriority20261108')!=='1'){localStorage.setItem('renoxTheme','comic');localStorage.setItem('renoxThemePriority20261108','1')}setRenoxTheme(localStorage.getItem('renoxTheme')||'comic');renderDMRecent();checkRenoxUpdate();setInterval(checkRenoxUpdate,45000);setInterval(()=>{if(dmPeer&&$('privatechat')?.classList.contains('active'))refreshDM().catch(()=>{})},5000);setRenoxLanguage(localStorage.getItem('renoxLanguage')||'id');if($('refreshRateSelect'))$('refreshRateSelect').value=localStorage.getItem('renoxRefreshPreference')||'60';if($('fontSelect')&&localStorage.getItem('renoxFont'))$('fontSelect').value=localStorage.getItem('renoxFont');checkAccount();checkDeveloper();refreshGlobalTheme();loadPublicContent();setInterval(loadPublicContent,30000);renderDailyHadith();loadPrayerTimes();loadStatuses();refreshChat();filterAnimeCatalog();setInterval(refreshGlobalTheme,4000);setInterval(loadStatuses,30000);setInterval(refreshChat,4500);setInterval(checkAccount,12000);setInterval(()=>{if($('accountGate').style.display==='none')refreshServerStats()},10000);if(guestProfile.banner){if($('profileBannerSelect'))$('profileBannerSelect').value='';applyProfileBanner(guestProfile.banner)}});
 </script>
 <div id="navDrawer" class="nav-drawer" hidden><div class="nav-drawer-head"><b>RENOX NAVIGATION</b><button onclick="toggleNavDrawer()">×</button></div><div id="navDrawerItems" class="nav-drawer-items"></div></div><div id="publicProfileModal" class="public-profile-modal" hidden onclick="if(event.target===this)closePublicProfile()"><div class="public-profile-card"><button class="public-profile-close" onclick="closePublicProfile()">×</button><div id="publicProfileBanner" class="public-profile-banner"></div><div class="public-profile-body"><img id="publicProfileAvatar" class="public-profile-avatar" src="https://placehold.co/100x100" alt=""><h2 id="publicProfileName">Member</h2><div id="publicProfileVerified"></div><p id="publicProfileRole">MEMBER · PROTOTYPE</p><p id="publicProfileJoined">Tanggal bergabung: belum tersedia</p><p id="publicProfileId"></p></div></div></div><nav class="liquid-bottom-nav" aria-label="Navigasi utama"><button class="active" onclick="bottomNavigate('home',this)"><span class="nav-icon">⌂</span><small>HOME</small></button><button onclick="bottomNavigate('gethtml',this)"><span class="nav-icon nav-html-logo">&lt;/&gt;</span><small>GET HTML</small></button><button onclick="bottomNavigate('tiktok',this)"><span class="nav-icon">♪</span><small>TIKTOK LOOKUP</small></button><button onclick="bottomNavigate('noxchat',this)"><span class="nav-icon">✉</span><small>NOX CHAT</small></button><button onclick="toggleNavDrawer()"><span class="nav-icon">☰</span><small>MORE</small></button><i class="liquid-indicator"></i></nav>
 <style id="renox-identity-redesign">
@@ -1630,7 +1734,7 @@ function showWifiGuide(kind){
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paint,{once:true});else paint();
 })();
-const RENOX_BUILD_VERSION='2026.11.08.2';let renoxUpdateBusy=false;
+const RENOX_BUILD_VERSION='2026.11.08.3';let renoxUpdateBusy=false;
 function checkRenoxUpdate(){if(renoxUpdateBusy||document.visibilityState==='hidden'||$('renoxUpdateModal'))return;const u=new URL(location.href);u.searchParams.set('_renox_check',Date.now());fetch(u.href,{cache:'no-store',credentials:'same-origin'}).then(r=>r.ok?r.text():'').then(html=>{const m=html.match(/<meta\s+name=["']renox-build["']\s+content=["']([^"']+)["']/i);if(m&&m[1]!==RENOX_BUILD_VERSION&&m[1]!==localStorage.getItem('renoxDismissedBuild')){const box=document.createElement('div');box.id='renoxUpdateModal';box.innerHTML='<div class="renox-update-card"><div class="renox-update-mark">↻</div><h2>UPDATE RENOX TERSEDIA!</h2><p>Versi baru sudah dipublikasikan. Tekan tombol untuk memuat versi terbaru.</p><div class="renox-update-progress"><span id="renoxUpdateBar"></span></div><div class="renox-update-percent" id="renoxUpdatePercent">0%</div><button class="renox-update-action" id="renoxUpdateButton" onclick="applyRenoxUpdate()">UPDATE SEKARANG</button></div>';document.body.appendChild(box);box.dataset.version=m[1]}}).catch(()=>{})}
 async function applyRenoxUpdate(){if(renoxUpdateBusy)return;renoxUpdateBusy=true;const btn=$('renoxUpdateButton'),bar=$('renoxUpdateBar'),pct=$('renoxUpdatePercent');btn.disabled=true;btn.textContent='MEMUAT UPDATE...';try{const u=new URL(location.href);u.searchParams.set('_renox_update',Date.now());const r=await fetch(u.href,{cache:'reload',credentials:'same-origin'});if(!r.ok)throw new Error('Versi baru belum tersedia.');const total=Number(r.headers.get('content-length'))||0,reader=r.body?.getReader();let n=0;if(reader){while(true){const part=await reader.read();if(part.done)break;n+=part.value.length;const p=total?Math.min(99,Math.floor(n/total*100)):Math.min(90,Math.floor(n/(n+90000)*100));bar.style.width=p+'%';pct.textContent=p+'%'}}bar.style.width='100%';pct.textContent='100%';btn.textContent='BERHASIL · MEMUAT ULANG';localStorage.setItem('renoxDismissedBuild',$('renoxUpdateModal').dataset.version||'');setTimeout(()=>location.reload(),450)}catch(e){renoxUpdateBusy=false;btn.disabled=false;btn.textContent='COBA LAGI';pct.textContent='Gagal memuat update';bar.style.width='0%';alert('Update gagal: '+e.message)}}
 </script>
