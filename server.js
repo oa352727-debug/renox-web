@@ -18,8 +18,8 @@ const PRESENCE_TTL = 90_000;
 const MAX_BODY = 3_000_000;
 const NOXTOK_MAX_VIDEO_BYTES = Math.max(1, Number(process.env.NOXTOK_MAX_VIDEO_MB || 250)) * 1024 * 1024;
 const RELEASE = {
-  version: "10.1.0",
-  name: "Renox Project · Community & Unban Update",
+  version: "10.2.0",
+  name: "Renox Project · Lookup & Web Tools Update",
   publishedAt: "2026-11-08",
   changes: [
     "Unban: formulir pengajuan wajib berisi nomor, alasan, dan tanggal pemblokiran.",
@@ -217,6 +217,25 @@ async function configuredGameLookup(envName, id, label) {
   if (!response.ok) throw new Error(`${label} provider error: ${response.status}`);
   return response.json();
 }
+async function synoxGet(pathname, params) {
+  const endpoint = new URL(`https://api.synoxcloud.xyz${pathname}`);
+  for (const [key, value] of Object.entries(params || {})) endpoint.searchParams.set(key, String(value));
+  endpoint.searchParams.set("apikey", "FREE");
+  const response = await fetch(endpoint, { headers: { "Accept": "application/json", "User-Agent": "RenoxProject/10.2" }, signal: AbortSignal.timeout(18000) });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || payload.status === false) throw new Error(payload.message || `SynoxCloud HTTP ${response.status}`);
+  return payload;
+}
+function isPublicWebUrl(raw) {
+  let u; try { u = new URL(raw); } catch { return false; }
+  if (!["http:", "https:"].includes(u.protocol) || u.username || u.password) return false;
+  const host = u.hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (!host || host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host === "metadata.google.internal") return false;
+  if (/^(127\.|10\.|192\.168\.|169\.254\.|0\.|::1$|fc[0-9a-f]{2}:|fe80:)/i.test(host)) return false;
+  const m = host.match(/^172\.(\d+)\./); if (m && +m[1] >= 16 && +m[1] <= 31) return false;
+  return true;
+}
+
 async function redditMemes() {
   const subs = ["memes", "dankmemes", "wholesomememes"];
   const results = await Promise.all(subs.map(async sub => {
@@ -368,15 +387,13 @@ const server = http.createServer(async (req, res) => {
       } catch (e) { return json(res,502,{error:e.message || "Meme Indonesia belum tersedia."}); }
     }
     if (req.method === "GET" && route === "/api/tiktok") {
-      const username = cleanText(url.searchParams.get("username"), 30).replace(/^@/, "");
+      const username = cleanText(url.searchParams.get("username"), 30).replace(/^@+/, "");
       if (!/^[a-zA-Z0-9._]{2,30}$/.test(username)) return json(res,400,{error:"Username TikTok tidak valid."});
-      const endpoint = new URL("https://www.tikwm.com/api/user/info"); endpoint.searchParams.set("unique_id",username);
-      const r = await fetch(endpoint,{headers:{"User-Agent":"Mozilla/5.0 RenoxProject/5.0","Accept":"application/json"},signal:AbortSignal.timeout(12000)});
-      if (!r.ok) return json(res,502,{error:"TikTok profile provider sedang tidak tersedia."});
-      const payload = await r.json(); const user = payload.data?.user || payload.data?.userInfo?.user || payload.user || payload.data;
-      const stats = payload.data?.stats || payload.data?.userStats || user?.stats || {};
-      if (!user || payload.code && payload.code !== 0) return json(res,404,{error:"Profil tidak ditemukan atau tidak dapat diakses."});
-      return json(res,200,{user:{uniqueId:cleanText(user.uniqueId||user.unique_id||username,30),nickname:cleanText(user.nickname||user.nickName||user.displayName,80),signature:cleanText(user.signature||user.bio||"",300),avatarLarger:user.avatarLarger||user.avatarMedium||user.avatarThumb||user.avatar||"",avatarMedium:user.avatarMedium||user.avatarThumb||"",avatarThumb:user.avatarThumb||"",followerCount:Number(user.followerCount??stats.followerCount??stats.follower_count??0),followingCount:Number(user.followingCount??stats.followingCount??stats.following_count??0),videoCount:Number(user.videoCount??stats.videoCount??stats.video_count??0),heartCount:Number(user.heartCount??stats.heartCount??stats.heart_count??stats.heart??0),verified:Boolean(user.verified||user.customVerify),privateAccount:Boolean(user.privateAccount||user.secret||user.private),region:cleanText(user.region||user.regionName||user.country||"",40),userId:cleanText(user.id||user.uid||user.secUid||"",80),createTime:Number(user.createTime||user.create_time||0),bioLink:cleanText(user.bioLink?.link||user.bioLink||"",240)}});
+      if (!rateLimit(`tiktok:${getClientKey(req)}`, 8, 60000)) return json(res,429,{error:"Terlalu banyak pencarian. Coba lagi sebentar."});
+      const payload = await synoxGet("/stalker/tiktokstalk", { user: username });
+      const user = payload.data?.user || {}, stats = payload.data?.stats || {};
+      if (!payload.status || !user.uniqueId) return json(res,404,{error:"Profil TikTok tidak ditemukan atau tidak tersedia."});
+      return json(res,200,{user:{uniqueId:cleanText(user.uniqueId,30),nickname:cleanText(user.nickname,80),signature:cleanText(user.signature,300),avatarLarger:user.avatarLarger||user.avatarMedium||user.avatarThumb||"",avatarMedium:user.avatarMedium||"",avatarThumb:user.avatarThumb||"",followerCount:Number(stats.followerCount||0),followingCount:Number(stats.followingCount||0),videoCount:Number(stats.videoCount||0),heartCount:Number(stats.heartCount||stats.heart||0),verified:Boolean(user.verified),privateAccount:Boolean(user.privateAccount),region:cleanText(user.region||"",40),userId:cleanText(user.id||"",80),createTime:Number(user.createTime||0)}});
     }
     if (req.method === "GET" && route === "/api/email-public") {
       const email=cleanText(url.searchParams.get("email"),120).toLowerCase();
@@ -538,24 +555,32 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === "GET" && route === "/api/telegram-lookup") {
       const username = cleanText(url.searchParams.get("username"), 32).replace(/^@+/, "");
-      if (!/^[A-Za-z0-9_]{5,32}$/.test(username)) return json(res, 400, { error: "Username Telegram tidak valid." });
-      if (!rateLimit(`telegram:${getClientKey(req)}`, 8, 60000)) return json(res, 429, { error: "Terlalu banyak pencarian. Coba lagi sebentar." });
-      // Telegram exposes preview metadata for public channels/groups at /s/<username>.
-      // It does not expose arbitrary personal-account profiles through an unauthenticated public API.
-      const r = await fetch(`https://t.me/s/${encodeURIComponent(username)}`, { headers: { "User-Agent": "Mozilla/5.0 (compatible; RenoxProject/8.2)", "Accept": "text/html" }, signal: AbortSignal.timeout(12000) });
-      if (!r.ok) return json(res, 404, { error: "Profil/kanal publik tidak ditemukan atau tidak dapat diakses." });
-      const html = await r.text();
-      const meta = (key) => {
-        const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const patterns = [new RegExp(`<meta[^>]+property=["']${escaped}["'][^>]+content=["']([^"']*)["']`, "i"), new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]+property=["']${escaped}["']`, "i")];
-        for (const re of patterns) { const m = html.match(re); if (m) return m[1].replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">"); }
-        return "";
-      };
-      const title = meta("og:title");
-      const description = meta("og:description");
-      const image = meta("og:image");
-      if (!title && !description && !image) return json(res, 404, { error: "Telegram tidak memberikan preview publik untuk username ini. Akun personal tidak dapat diambil lewat API publik tanpa autentikasi." });
-      return json(res, 200, { username, title: title || "@" + username, description: description || "Tidak ada deskripsi publik.", image, url: `https://t.me/${encodeURIComponent(username)}`, type: "public-preview", notice: "Preview dari metadata publik Telegram. Data yang tidak dipublikasikan tidak ditampilkan." });
+      if (!/^[A-Za-z0-9_]{5,32}$/.test(username)) return json(res,400,{error:"Username Telegram tidak valid."});
+      if (!rateLimit(`telegram:${getClientKey(req)}`,8,60000)) return json(res,429,{error:"Terlalu banyak pencarian. Coba lagi sebentar."});
+      const payload = await synoxGet("/stalker/telegram", { username });
+      const r = payload.result || {};
+      if (!payload.status || !r.username) return json(res,404,{error:"Preview Telegram publik tidak ditemukan."});
+      return json(res,200,{username:r.username,name:cleanText(r.name,100),bio:cleanText(r.bio,500),photo:r.photo||"",subscribers:Number(r.subscribers||0),type:cleanText(r.type,40),profile_url:r.profile_url||`https://t.me/${encodeURIComponent(username)}`,extra:cleanText(r.extra,100),notice:"Hanya metadata profil publik yang dikembalikan provider."});
+    }
+    if (req.method === "GET" && route === "/api/ml-lookup") {
+      const id=cleanText(url.searchParams.get("id"),24), serverId=cleanText(url.searchParams.get("server"),16);
+      if(!/^\d{5,20}$/.test(id)||!/^\d{1,10}$/.test(serverId))return json(res,400,{error:"User ID dan Server ID harus berupa angka yang valid."});
+      if(!rateLimit(`ml:${getClientKey(req)}`,8,60000))return json(res,429,{error:"Terlalu banyak lookup. Coba lagi sebentar."});
+      const payload=await synoxGet("/stalker/mobile-legend",{id,server:serverId});
+      if(!payload.status||!payload.result?.id)return json(res,404,{error:"Akun Mobile Legends tidak ditemukan."});
+      return json(res,200,{id:String(payload.result.id),server:String(payload.result.server),username:cleanText(payload.result.username,80),region:cleanText(payload.result.region,60)});
+    }
+    if (req.method === "GET" && route === "/api/web2zip") {
+      const target=String(url.searchParams.get("url")||"").trim();
+      if(!isPublicWebUrl(target))return json(res,400,{error:"Masukkan URL website publik HTTP/HTTPS. Alamat lokal atau jaringan internal ditolak."});
+      if(!rateLimit(`web2zip:${getClientKey(req)}`,3,60000))return json(res,429,{error:"Terlalu banyak proses arsip. Coba lagi sebentar."});
+      const payload=await synoxGet("/tools/web2zip",{url:target});
+      const result=payload.result||{};
+      if(!payload.status||!result.status||!/^https:\/\/copier\.saveweb2zip\.com\/api\/downloadArchive\/[A-Za-z0-9_-]+$/.test(result.download||""))return json(res,502,{error:"Provider tidak menghasilkan arsip ZIP yang valid."});
+      return json(res,200,{status:true,md5:cleanText(result.md5,100),copiedFilesAmount:Number(result.copiedFilesAmount||0),download:result.download});
+    }
+    if (req.method === "GET" && route === "/api/otp-checker") {
+      return json(res,403,{status:false,code:"OWNERSHIP_VERIFICATION_REQUIRED",error:"Pemeriksaan OTP dinonaktifkan. Renox tidak dapat mengambil atau menampilkan kode OTP dari nomor yang kepemilikannya belum diverifikasi."});
     }
     if (req.method === "GET" && route === "/api/lookup") {
       const q = cleanText(url.searchParams.get("q"), 50);
