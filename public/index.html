@@ -1423,10 +1423,10 @@ async function checkWhatsAppBan(){
  try{
   const d=await apiJSON('/api/checkban?number='+encodeURIComponent(n)),all=[d.status,d.reason,d.violation_type].join(' ').toLowerCase();
   const permanent=/permanent|permanently|permanent.?ban|permanen|final.?ban|final/.test(all),review=/review|under.?review|appeal|appealable|temporary|temporarily|tinjau|sementara|pending/.test(all),banned=!!d.banned;
-  const eligibility=permanent?'permanent':banned&&review?'review':!banned?'not_banned':'unknown';waAppealCheck={number:n,data:d,eligibility};
+  const eligibility=permanent?'permanent':banned?'review':!banned?'not_banned':'unknown';waAppealCheck={number:n,data:d,eligibility};
   out.textContent=(banned?'TERDETEKSI BANNED':'TIDAK TERDETEKSI BANNED')+' · Nomor '+(d.number||n)+' · Status '+(d.status||'-')+' · Alasan '+(d.reason||'-');
   if(permanent){status.textContent='UNBAN DITOLAK — nomor ini tidak bisa dibuka karena banned Permanently.';gate.disabled=true}
-  else if(banned&&review){gate.disabled=false;status.textContent='Isi nomor, alasan, dan tanggal banned untuk mengirim permohonan.'}
+  else if(banned){gate.disabled=false;status.textContent='Isi alasan banding dan tanggal banned untuk mengirim permohonan.'}
   else if(!banned){status.textContent='Nomor tidak terdeteksi banned. Pengajuan tidak diperlukan.'}
   else{status.textContent='Status ban tidak dapat dipastikan. Pengajuan belum dibuka.'}
  }catch(e){out.textContent='Gagal: '+e.message;status.textContent='Pemeriksaan gagal. Coba lagi nanti.'}
@@ -1435,7 +1435,7 @@ async function checkWhatsAppBan(){
 async function submitRenoxUnban(){
  if(!waAppealCheck||waAppealCheck.eligibility!=='review')return;
  const bannedAt=$('appealBannedDate').value,reason=$('appealReason').value,details=$('appealDetails').value.trim();
- if(!bannedAt){$('appealStatus').textContent='Pilih tanggal banned terlebih dahulu.';return}
+ if(!bannedAt){$('appealStatus').textContent='Pilih tanggal banned terlebih dahulu.';return}if(reason.trim().length<15){$('appealStatus').textContent='Alasan banding minimal 15 karakter.';return}
  const btn=$('appealPrepare');btn.disabled=true;btn.textContent='MENGIRIM...';
  try{const d=await apiJSON('/api/unban-request',{method:'POST',body:JSON.stringify({number:waAppealCheck.number,bannedAt,reason:reason+(details?'\n\nDetail tambahan: '+details:'')})});$('appealStatus').textContent=d.message||'Pengajuan terkirim. Silakan tinjau dan mohon tunggu hingga 6 jam.';btn.textContent='PENGAJUAN TERKIRIM'}
  catch(e){$('appealStatus').textContent=e.message;btn.disabled=false;btn.textContent='KIRIM PENGAJUAN UNBAN'}
