@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Renox Project</title><meta name="renox-build" content="2026.11.08.5">
+<title>Renox Project</title><meta name="renox-build" content="2026.11.08.6">
 <style>
 /* Home status stacking: keep the status card above following dashboard cards. */
 .status-section{position:relative;z-index:2;isolation:isolate;overflow:visible}
@@ -515,6 +515,19 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
 .renox-update-log strong{color:#f05b60}.renox-update-log small{color:#777;margin-left:10px}.renox-update-log p{color:#bbb;line-height:1.6;margin:12px 0}
 .renox-update-steps{padding:16px 18px 16px 36px;color:#aaa;line-height:2}.renox-update-action{background:#182817;color:#61bd68;border:0;border-radius:15px;box-shadow:none;font-size:16px;min-height:58px}
 .renox-update-note{font-size:11px;text-align:center;color:#777;margin-top:12px}
+</style>
+
+<style id="renox-patch-2026-11-08-6">
+#checkban .hero{padding:26px 22px;border:1px solid #6f83ff35;border-radius:24px;background:radial-gradient(circle at 88% 10%,#5a72ff2b,transparent 42%),linear-gradient(135deg,#151d35,#101322 68%,#21172f);box-shadow:0 18px 50px #0005}
+#checkban .card{border:1px solid #8794ff2c;border-radius:22px;background:linear-gradient(145deg,#171e32,#111522);box-shadow:0 16px 42px #0004;padding:20px}
+#checkban label{display:block;margin:14px 0 7px;color:#b8c4e7;font-size:10px;font-weight:900;letter-spacing:1.2px}
+#checkban .field{border:1px solid #9aa9ff2c;border-radius:13px;background:#090f1d;color:#f4f6ff}
+#checkban .primary{border-radius:14px;background:linear-gradient(110deg,#667cff,#9b6bff);box-shadow:0 8px 25px #687aff30}
+#checkban .hint{padding:12px 14px;border:1px solid #8794ff25;border-radius:12px;background:#0a1020;color:#c6d0e9;line-height:1.6}
+.nox-wa-search{border:1px solid #899cff33!important;border-radius:16px!important;background:linear-gradient(120deg,#141e35,#17152b)!important}
+.nox-wa-recent-item{border:1px solid #ffffff12!important;border-radius:14px!important;background:#ffffff08!important;margin:5px 0!important}
+.nox-wa-chat-head{background:linear-gradient(110deg,#151f37,#201a35)!important;border-bottom:1px solid #8b9bff30!important}
+.nox-wa-compose{border:1px solid #8b9bff30!important;border-radius:18px!important;background:#11182a!important}
 </style>
 </head>
 <body class="auth-locked">
@@ -1848,7 +1861,7 @@ function showWifiGuide(kind){
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paint,{once:true});else paint();
 })();
-const RENOX_BUILD_VERSION='2026.11.08.5';let renoxUpdateBusy=false;
+const RENOX_BUILD_VERSION='2026.11.08.6';let renoxUpdateBusy=false;
 function checkRenoxUpdate(){if(renoxUpdateBusy||document.visibilityState==='hidden'||$('renoxUpdateModal'))return;const u=new URL(location.href);u.searchParams.set('_renox_check',Date.now());fetch(u.href,{cache:'no-store',credentials:'same-origin'}).then(r=>r.ok?r.text():'').then(html=>{const m=html.match(/<meta\\s+name=["']renox-build["']\\s+content=["']([^"']+)["']/i);if(m&&m[1]!==RENOX_BUILD_VERSION&&m[1]!==localStorage.getItem('renoxDismissedBuild')){const box=document.createElement('div');box.id='renoxUpdateModal';box.innerHTML='<div class="renox-update-card"><div class="renox-update-mark">🚀</div><h2>Update Tersedia!</h2><p>Versi baru sudah siap dipasang.</p><div class="renox-update-section"><b># INFORMASI</b><div class="renox-update-version latest">↑ Versi Terbaru <strong>'+m[1]+'</strong></div><div class="renox-update-version">♧ Versi Saat Ini <strong>'+RENOX_BUILD_VERSION+'</strong></div><b># APA YANG BARU</b><div class="renox-update-log"><strong>(NEW) v'+m[1]+'</strong><small>08 November 2026</small><p>🔵 Nox Chat bergaya Telegram dengan pencarian anggota RENOX.</p><p>🔴 Form unban: nomor, alasan, tanggal banned, dan penolakan permanent ban.</p><p>🟢 Developer dapat meninjau pengajuan unban.</p><p>🟣 Login, Global Chat, dan tampilan pembaruan dipoles.</p></div></div><ol class="renox-update-steps"><li>Tekan tombol "Update Now" di bawah</li><li>Cache dan resource dimuat ulang</li><li>Web akan reload dengan versi baru</li></ol><div class="renox-update-progress"><span id="renoxUpdateBar"></span></div><div class="renox-update-percent" id="renoxUpdatePercent">0%</div><button class="renox-update-action" id="renoxUpdateButton" onclick="applyRenoxUpdate()">⬇ Update Now</button><p class="renox-update-note">ⓘ Proses update membutuhkan waktu. Jangan refresh saat proses berlangsung.</p></div>';document.body.appendChild(box);box.dataset.version=m[1]}}).catch(()=>{})}
 
 async function applyRenoxUpdate(){if(renoxUpdateBusy)return;renoxUpdateBusy=true;const btn=$('renoxUpdateButton'),bar=$('renoxUpdateBar'),pct=$('renoxUpdatePercent');btn.disabled=true;btn.textContent='MEMUAT UPDATE...';try{const u=new URL(location.href);u.searchParams.set('_renox_update',Date.now());const r=await fetch(u.href,{cache:'reload',credentials:'same-origin'});if(!r.ok)throw new Error('Versi baru belum tersedia.');const total=Number(r.headers.get('content-length'))||0,reader=r.body?.getReader();let n=0;if(reader){while(true){const part=await reader.read();if(part.done)break;n+=part.value.length;const p=total?Math.min(99,Math.floor(n/total*100)):Math.min(90,Math.floor(n/(n+90000)*100));bar.style.width=p+'%';pct.textContent=p+'%'}}bar.style.width='100%';pct.textContent='100%';btn.textContent='BERHASIL · MEMUAT ULANG';localStorage.setItem('renoxDismissedBuild',$('renoxUpdateModal').dataset.version||'');setTimeout(()=>location.reload(),450)}catch(e){renoxUpdateBusy=false;btn.disabled=false;btn.textContent='COBA LAGI';pct.textContent='Gagal memuat update';bar.style.width='0%';alert('Update gagal: '+e.message)}}
