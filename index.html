@@ -6,6 +6,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Renox Project</title>
 <style>
+/* Home status stacking: keep the status card above following dashboard cards. */
+.status-section{position:relative;z-index:2;isolation:isolate;overflow:visible}
+#serverStatsCard{position:relative;z-index:1}
+#statusViewer[hidden],#statusComposer[hidden],#developerContactModal[hidden]{display:none!important}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 :root{
  --bg:#070914;--panel:#101426;--panel2:#151b30;
@@ -427,7 +432,7 @@ html.renox-no-shadows .sidebar,html.renox-no-shadows .hero,html.renox-no-shadows
   </div>
  </div>
 </div>
-<div id="developerContactModal" class="developer-contact-modal" hidden onclick="if(event.target===this)closeDeveloperContact()"><div class="developer-contact-card"><button class="status-view-close" onclick="closeDeveloperContact()">×</button><h3>CONTACT DEVELOPER</h3><img src="https://files.catbox.moe/5kx06h.png" alt="Developer contact information"><a href="https://t.me/DiszRenox" target="_blank" rel="noopener">OPEN TELEGRAM ↗</a></div></div>
+<div id="developerContactModal" class="developer-contact-modal" hidden onclick="if(event.target===this)closeDeveloperContact()"><div class="developer-contact-card"><button class="status-view-close" onclick="closeDeveloperContact()">×</button><h3>CONTACT DEVELOPER</h3><img src="https://files.catbox.moe/5kx06h.png" alt="Developer contact information"><a href="https://t.me/DiszRenox" rel="noopener noreferrer">OPEN TELEGRAM ↗</a></div></div>
 <div id="maintenanceScreen" class="maintenance-screen"><div class="maintenance-box"><div class="mini">RENOX SYSTEM NOTICE</div><h1>SEDANG <span style="color:var(--cyan)">MAINTENANCE</span></h1><p id="maintenanceDefaultText">Kami sedang menambahkan fitur dan menstabilkan server. Mohon tunggu sampai layanan dibuka kembali.</p><div id="maintenanceReasonPublic" class="maintenance-detail" hidden><b id="maintenanceReasonTitle">Alasan maintenance</b><p id="maintenanceReasonText"></p><p id="maintenanceAffectedText"></p><p id="maintenanceUntilText"></p></div><button class="primary" style="margin-top:22px" onclick="checkMaintenance()">CEK ULANG ↻</button><button class="orbit-toggle" onclick="maintenanceOwnerLogin()">DEVELOPER LOGIN</button><div id="maintenanceCheck" class="hint">Silakan cek kembali beberapa saat lagi.</div></div></div>
 <button id="projectAudioToggle" class="project-audio-toggle" onclick="toggleProjectAudio()" aria-label="Putar musik project">♫ <span>PROJECT AUDIO</span></button>
 <div class="layout">
@@ -672,7 +677,7 @@ html.renox-no-shadows .sidebar,html.renox-no-shadows .hero,html.renox-no-shadows
  <div class="card"><div class="history" id="historyList"></div></div>
 </section>
 
-<div class="footer">RENOX PROJECT v9.3 © 2026 • SIGNATURE EDITION<div class="footer-contacts"><a href="https://t.me/DiszRenox" target="_blank" rel="noopener">CONTACT DEVELOPER · TELEGRAM</a><a href="https://t.me/unbandrenox" target="_blank" rel="noopener">GROUP DISKUSI · TELEGRAM</a></div></div>
+<div class="footer">RENOX PROJECT v9.3 © 2026 • SIGNATURE EDITION<div class="footer-contacts"><a href="https://t.me/DiszRenox" rel="noopener noreferrer">CONTACT DEVELOPER · TELEGRAM</a><a href="https://t.me/unbandrenox" rel="noopener noreferrer">GROUP DISKUSI · TELEGRAM</a></div></div>
 </main>
 </div>
 
