@@ -1186,7 +1186,51 @@ function openGmailAppealDraft(){if(!waAppealCheck||waAppealCheck.eligibility!=='
 function toggleGatePassword(){const input=$('gatePassword');if(input)input.type=input.type==='password'?'text':'password'}
 async function gateAuth(mode){const username=$('gateUsername').value.trim(),password=$('gatePassword').value;try{const d=await apiJSON('/api/auth/'+mode,{method:'POST',body:JSON.stringify({username,password,remember:!!$('rememberLogin')?.checked})});$('gateStatus').textContent='✓ '+(mode==='register'?'Akun berhasil dibuat.':'Login berhasil.');await checkAccount();}catch(e){$('gateStatus').textContent='⚠ '+e.message}}
 async function accountLogout(){try{await apiJSON('/api/auth/logout',{method:'POST',body:'{}'});await checkAccount()}catch(e){$('authStatus').textContent=e.message}}
-async function checkAccount(){try{const d=await apiJSON('/api/auth/me');const gate=$('accountGate');const locked=!d.authenticated||!!d.blockedByMaintenance||!!d.revoked;document.body.classList.toggle('auth-locked',locked);gate.style.display=locked?'flex':'none';if(!d.authenticated&&d.blockedByMaintenance){$('gateStatus').textContent='RENOX sedang maintenance. Login hanya tersedia untuk developer dan staff.';return false}if(!d.authenticated&&d.revoked){$('gateStatus').textContent='Akun ini keluar karena digunakan di perangkat lain.';return false}if(d.authenticated){const accountName=d.username||'Member',oldId=guestId,oldProfile={...guestProfile};if(d.guestId&&d.guestId!==guestId){guestId=d.guestId;localStorage.setItem(GUEST_KEY,guestId);let cached=JSON.parse(localStorage.getItem('renoxProfile:'+guestId)||'null');try{const existing=await apiJSON('/api/profile/'+encodeURIComponent(guestId));cached=existing.profile}catch{}guestProfile=cached?{...oldProfile,...cached,id:guestId}:{...oldProfile,id:guestId,name:/^Guest(?:-|$)/i.test(oldProfile.name||'')?accountName:oldProfile.name};if(!cached){try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:guestProfile.name||accountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});guestProfile=saved.profile}catch{}}}else if(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name)){guestProfile.name=accountName}localStorage.setItem('renoxProfile:'+guestId,JSON.stringify(guestProfile));$('authStatus').textContent='✓ Login aktif sebagai '+accountName;updateGuestPreview();loadGuestProfile();loadStatuses();refreshServerStats();}else $('authStatus').textContent='Sesi belum login.';return !!d.authenticated}catch(e){document.body.classList.add('auth-locked');$('accountGate').style.display='flex';if($('gateStatus'))$('gateStatus').textContent='Gagal memeriksa sesi: '+(e?.message||'Kesalahan API tidak diketahui');return false}}
+async function checkAccount(){
+ let d;
+ try{d=await apiJSON('/api/auth/me')}catch(e){
+  document.body.classList.add('auth-locked');
+  const gate=$('accountGate');if(gate)gate.style.display='flex';
+  const status=$('gateStatus');if(status)status.textContent='Gagal memeriksa sesi: '+(e?.message||'Kesalahan API tidak diketahui');
+  return false;
+ }
+ const authenticated=!!d.authenticated;
+ const locked=!authenticated||!!d.blockedByMaintenance||!!d.revoked;
+ document.body.classList.toggle('auth-locked',locked);
+ const gate=$('accountGate');if(gate)gate.style.display=locked?'flex':'none';
+ if(!authenticated){
+  const status=$('gateStatus');
+  if(status&&d.blockedByMaintenance)status.textContent='RENOX sedang maintenance. Login hanya tersedia untuk developer dan staff.';
+  else if(status&&d.revoked)status.textContent='Akun ini keluar karena digunakan di perangkat lain.';
+  const authStatus=$('authStatus');if(authStatus)authStatus.textContent='Sesi belum login.';
+  return false;
+ }
+ const accountName=d.username||'Member';
+ const authStatus=$('authStatus');if(authStatus)authStatus.textContent='✓ Login aktif sebagai '+accountName;
+ // Autentikasi sudah berhasil. Kesalahan pemuatan profil/dashboard tidak boleh
+ // mengunci pengguna kembali ke layar login.
+ try{
+  if(d.guestId&&d.guestId!==guestId){
+   guestId=d.guestId;
+   try{localStorage.setItem(GUEST_KEY,guestId)}catch(e){}
+   let cached=null;
+   try{cached=JSON.parse(localStorage.getItem('renoxProfile:'+guestId)||'null')}catch(e){}
+   try{const existing=await apiJSON('/api/profile/'+encodeURIComponent(guestId));cached=existing.profile}catch(e){}
+   guestProfile=cached?{...guestProfile,...cached,id:guestId}:{...guestProfile,id:guestId,name:/^Guest(?:-|$)/i.test(guestProfile.name||'')?accountName:guestProfile.name};
+   if(!cached){
+    try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:guestProfile.name||accountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile=saved.profile}catch(e){}
+   }
+  }else if(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name)){
+   guestProfile.name=accountName;
+  }
+  try{localStorage.setItem('renoxProfile:'+guestId,JSON.stringify(guestProfile))}catch(e){}
+  try{updateGuestPreview()}catch(e){console.warn('RENOX profile preview:',e)}
+  try{loadGuestProfile()}catch(e){console.warn('RENOX profile load:',e)}
+  try{loadStatuses()}catch(e){console.warn('RENOX status load:',e)}
+  try{refreshServerStats()}catch(e){console.warn('RENOX server stats:',e)}
+ }catch(e){console.warn('RENOX dashboard initialization:',e)}
+ return true;
+}
 function fmtBytes(n){if(!Number.isFinite(n))return'—';const u=['B','KB','MB','GB','TB'];let i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return n.toFixed(i?1:0)+' '+u[i]}
 function fmtUptime(s){s=Math.max(0,Number(s)||0);const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);return `${d}d ${h}h ${m}m`}
 async function refreshServerStats(){try{const d=await apiJSON('/api/server-stats');$('srvPanel').textContent=d.panel;$('srvCpu').textContent=`${d.cpu.usagePercent}% (${d.cpu.cores} core)`;$('srvRam').textContent=`${fmtBytes(d.ram.used)} / ${fmtBytes(d.ram.total)} (${d.ram.percent}%)`;$('srvMemory').textContent=fmtBytes(d.process.rss)+' RSS · heap '+fmtBytes(d.process.heapUsed);$('srvRamTotal').textContent=fmtBytes(d.ram.total);$('srvUptime').textContent=fmtUptime(d.uptime);if($('srvBot'))$('srvBot').textContent=d.botActive?'ACTIVE':'OFFLINE';$('serverStatsStatus').textContent='LIVE · diperbarui';}catch(e){$('serverStatsStatus').textContent='Tidak tersedia'}}
