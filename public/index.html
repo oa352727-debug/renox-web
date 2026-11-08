@@ -1296,7 +1296,230 @@ function copyHtmlSource(){const v=$("htmlSourceOutput").value;if(!v){$("htmlSour
 
 document.addEventListener('DOMContentLoaded',()=>{applyGraphicsSettings();setRenoxTheme(localStorage.getItem('renoxTheme')||'current');if($('refreshRateSelect'))$('refreshRateSelect').value=localStorage.getItem('renoxRefreshPreference')||'60';if($('fontSelect')&&localStorage.getItem('renoxFont'))$('fontSelect').value=localStorage.getItem('renoxFont');checkAccount();checkDeveloper();refreshGlobalTheme();loadPublicContent();renderDailyHadith();loadPrayerTimes();loadStatuses();refreshChat();filterAnimeCatalog();setInterval(refreshGlobalTheme,4000);setInterval(loadStatuses,30000);setInterval(refreshChat,4500);setInterval(checkAccount,12000);setInterval(()=>{if($('accountGate').style.display==='none')refreshServerStats()},10000);if(guestProfile.banner){$('profileBannerSelect').value=guestProfile.banner;applyProfileBanner(guestProfile.banner)}});
 </script>
-<div id="navDrawer" class="nav-drawer" hidden><div class="nav-drawer-head"><b>RENOX NAVIGATION</b><button onclick="toggleNavDrawer()">×</button></div><div id="navDrawerItems" class="nav-drawer-items"></div></div><nav class="liquid-bottom-nav" aria-label="Navigasi utama"><button class="active" onclick="bottomNavigate('home',this)"><span class="nav-icon">⌂</span><small>HOME</small></button><button onclick="bottomNavigate('gethtml',this)"><span class="nav-icon nav-html-logo">&lt;/&gt;</span><small>GET HTML</small></button><button onclick="bottomNavigate('community',this)"><span class="nav-icon">▤</span><small>CHAT</small></button><button onclick="bottomNavigate('noxchat',this)"><span class="nav-icon">✉</span><small>NOX CHAT</small></button><button onclick="toggleNavDrawer()"><span class="nav-icon">☰</span><small>MORE</small></button><i class="liquid-indicator"></i></nav></body>
+<div id="navDrawer" class="nav-drawer" hidden><div class="nav-drawer-head"><b>RENOX NAVIGATION</b><button onclick="toggleNavDrawer()">×</button></div><div id="navDrawerItems" class="nav-drawer-items"></div></div><nav class="liquid-bottom-nav" aria-label="Navigasi utama"><button class="active" onclick="bottomNavigate('home',this)"><span class="nav-icon">⌂</span><small>HOME</small></button><button onclick="bottomNavigate('gethtml',this)"><span class="nav-icon nav-html-logo">&lt;/&gt;</span><small>GET HTML</small></button><button onclick="bottomNavigate('community',this)"><span class="nav-icon">▤</span><small>CHAT</small></button><button onclick="bottomNavigate('noxchat',this)"><span class="nav-icon">✉</span><small>NOX CHAT</small></button><button onclick="toggleNavDrawer()"><span class="nav-icon">☰</span><small>MORE</small></button><i class="liquid-indicator"></i></nav>
+<style id="renox-identity-redesign">
+/* RENOX 11 — complete visual identity layer; feature logic remains untouched */
+:root{
+ --rx-bg:#080b16;--rx-surface:#11182a;--rx-surface-2:#17223a;--rx-line:#293957;
+ --rx-text:#f4f7ff;--rx-muted:#9ba9c4;--rx-accent:#7c8cff;--rx-accent-2:#42d9e8;
+ --rx-shadow:0 18px 48px rgba(0,0,0,.28);--rx-radius:22px;
+}
+html,body{background:var(--rx-bg)!important;color:var(--rx-text)!important}
+body{font-family:Inter,Manrope,system-ui,sans-serif!important;background-image:radial-gradient(ellipse at 12% 0%,#6478ff20,transparent 34%),radial-gradient(ellipse at 92% 78%,#32d7d414,transparent 32%)!important;background-attachment:fixed!important}
+body:before{opacity:.7;background:radial-gradient(circle at 50% 50%,#ffffff08 1px,transparent 1.6px) 0 0/24px 24px!important}
+.layout,main,.page{background:transparent!important;color:var(--rx-text)!important}
+main{padding-top:clamp(18px,3vw,38px)!important;padding-bottom:125px!important}
+.sidebar{background:linear-gradient(180deg,#111a2dF5,#090e1bf7)!important;border-right:1px solid #ffffff18!important;box-shadow:18px 0 55px #0005!important}
+.brand{display:flex!important;align-items:center;gap:4px;padding:7px 12px 22px!important;font-size:21px!important;letter-spacing:2px!important}
+.brand .renox-mark{width:36px;height:36px;display:grid;place-items:center;margin-right:7px;border-radius:12px;background:linear-gradient(145deg,#8b9bff,#3bd8e7);color:#071321;font-size:19px;font-weight:1000;box-shadow:0 7px 20px #627cff55}
+.brand>span:not(.renox-mark){color:#f5f7ff!important;text-shadow:none!important}
+.brand small{display:block!important;position:absolute;margin:44px 0 0 49px!important;font-size:8px!important;letter-spacing:2.2px!important;color:#8495b5!important}
+.sidebar-profile{border:1px solid #ffffff1c!important;background:linear-gradient(135deg,#ffffff12,#ffffff04)!important;border-radius:17px!important}
+.navtitle{color:#7585a6!important;font-size:9px!important;letter-spacing:2px!important;font-weight:900!important}
+.sidebar .nav{min-height:46px!important;padding:10px 12px!important;gap:12px!important;border:1px solid transparent!important;border-radius:14px!important;background:transparent!important;color:#aab6d0!important;font-size:12px!important;font-weight:700!important;box-shadow:none!important}
+.sidebar .nav i{width:22px!important;height:22px!important;display:grid!important;place-items:center!important;flex:0 0 22px!important;font-size:0!important;color:#93a7ff!important}
+.sidebar .nav i svg{width:20px;height:20px;display:block;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sidebar .nav:hover,.sidebar .nav.active{background:linear-gradient(100deg,#7187ff2b,#43dbe51a)!important;border-color:#9caeff38!important;color:#fff!important;transform:translateX(3px)!important;box-shadow:inset 3px 0 #8c9cff,0 8px 22px #0002!important}
+.sidebar .nav.active i{color:#65e7ed!important}
+.sidebar-bottom{background:linear-gradient(145deg,#17243a,#101728)!important;border:1px solid #ffffff1b!important;border-radius:18px!important}
+.hero{background:radial-gradient(circle at 90% 10%,#8294ff30,transparent 35%),linear-gradient(125deg,#1a2a49,#15172d 65%,#102b37)!important;border:1px solid #879bff45!important;border-radius:26px!important;box-shadow:var(--rx-shadow)!important;padding:clamp(22px,4vw,36px)!important}
+.hero h1 span{color:#7ee8ed!important;text-shadow:0 0 24px #42d9e855!important}
+.hero p,.topbar p,.hint{color:var(--rx-muted)!important}
+.topbar{margin-bottom:26px!important}.topbar h2{font-size:clamp(18px,2vw,23px)!important;font-weight:850!important;letter-spacing:-.4px}
+.tag{background:#7e91ff18!important;border:1px solid #899dff42!important;color:#b8c4ff!important;border-radius:999px!important}
+.card,.stat,.panel-card,.feed-item,.data,.history-row,.profile,.profile-hero-card,.home-feature-tile,.settings-card,.home-announcement,.home-hadith-card,.phone-info-tile,.chat-shell,.nexo-shell,.map-result,.status-compose-card,.maintenance-box,.nav-drawer{background:linear-gradient(145deg,#172139f2,#0f1729f5)!important;border:1px solid #ffffff18!important;border-radius:20px!important;box-shadow:var(--rx-shadow),inset 0 1px #ffffff0d!important;color:var(--rx-text)!important}
+.stat,.data,.phone-info-tile{border-radius:17px!important}
+.section-head{margin-top:26px!important}.section-head h3{font-weight:850!important;letter-spacing:.1px}
+.searchbox{background:#0d1526!important;border:1px solid #344564!important;border-radius:17px!important;box-shadow:inset 0 1px #ffffff0c!important}
+input,textarea,select,.field,.searchbox input{background:#0b1323!important;color:#f3f6ff!important;border:1px solid #34445f!important;border-radius:12px!important}
+input::placeholder,textarea::placeholder{color:#71809e!important}
+input:focus,textarea:focus,select:focus,.field:focus{outline:2px solid #8395ff55!important;border-color:#8395ff!important}
+button,.primary,.searchbox button,.actions a{border-radius:13px!important;transition:transform .18s ease,filter .18s ease,box-shadow .18s ease!important}
+.primary,.searchbox button{background:linear-gradient(110deg,#647eff,#8167e8 58%,#28bfcf)!important;color:#fff!important;border:1px solid #ffffff28!important;box-shadow:0 9px 24px #536bdb38!important}
+.primary:hover,.searchbox button:hover{filter:brightness(1.1)!important;transform:translateY(-2px)!important}
+.home-feature-grid{gap:13px!important}
+.home-feature-tile{min-height:132px!important;text-align:left!important;padding:17px!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:8px!important}
+.tile-icon{width:44px!important;height:44px!important;display:grid!important;place-items:center!important;border-radius:15px!important;background:linear-gradient(145deg,#7187ff35,#35d9df1e)!important;color:#9fafff!important}
+.tile-icon svg,.global-chat-mark svg,.owner-pin-icon svg,.nav-icon svg{width:23px;height:23px;display:block;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.home-feature-tile b{font-size:13px!important;color:#f5f7ff!important}.home-feature-tile small{font-size:10px!important;color:#91a1bd!important}
+.home-feature-tile:hover{transform:translateY(-4px)!important;border-color:#879bff66!important}
+.global-chat-launch{border:1px solid #657bff55!important;background:linear-gradient(110deg,#27355a,#172c3d)!important;border-radius:17px!important}
+.global-chat-mark{display:grid!important;place-items:center!important;width:40px;height:40px;border-radius:13px;background:#7b8fff25;color:#aebaff!important;font-size:0!important}
+.owner-pin-icon{display:grid!important;place-items:center!important;font-size:0!important}
+.status-section{border-radius:22px!important}.status-ring{border-color:#6e8aff!important}.status-add>span{border-color:#6e8aff!important;color:#a9b8ff!important;background:#6e8aff14!important}
+.status-viewer{background:#101a2d!important;border:1px solid #ffffff24!important;border-radius:20px!important}
+.chat-toolbar,.chat-members,.chat-messages-wrap,.chat-bubble,.chat-message{border-color:#ffffff18!important}
+.chat-bubble{background:#192640!important;color:#f5f7ff!important}
+.chat-message.mine .chat-bubble{background:linear-gradient(120deg,#384b88,#263b58)!important}
+.noxchat-placeholder{background:linear-gradient(145deg,#1b2947,#10172a)!important;border:1px solid #8a9cff42!important;border-radius:24px!important}
+.noxchat-placeholder-icon{background:linear-gradient(145deg,#7187ff,#36c8d7)!important;color:#071522!important}
+.liquid-bottom-nav{background:linear-gradient(120deg,#0b1324f5,#17152df5)!important;border:1px solid #ffffff25!important;border-radius:24px!important;box-shadow:0 18px 55px #000b,0 0 28px #7086ff18!important}
+.liquid-bottom-nav button{color:#aab6d0!important}.liquid-bottom-nav button .nav-icon{width:38px!important;height:36px!important;display:grid!important;place-items:center!important;border-radius:12px!important;background:#ffffff0b!important;border:1px solid #ffffff12!important;font-size:0!important;color:#9eafff!important}
+.liquid-bottom-nav button .nav-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.liquid-bottom-nav button.active .nav-icon{background:linear-gradient(145deg,#627cff,#34cbd8)!important;color:#071421!important;box-shadow:0 6px 18px #637cff55!important}
+.liquid-bottom-nav button small{font-size:9px!important;letter-spacing:.7px!important}
+.nav-drawer{background:linear-gradient(160deg,#17233cf7,#0d1426f7)!important}
+.nav-drawer-link{background:#ffffff08!important;border:1px solid #ffffff16!important;color:#eaf0ff!important;border-radius:14px!important}
+.footer{color:#7f8eaa!important;border-color:#ffffff17!important}
+.auth-card{background:linear-gradient(145deg,#17243df2,#0b1120f5)!important;border:1px solid #ffffff2c!important}
+.auth-login{background:linear-gradient(110deg,#7187ff,#35cbd8)!important;color:#081321!important}
+@media(max-width:760px){
+ main{padding:18px 15px 130px!important}.topbar{align-items:flex-start;gap:10px}.tag{font-size:8px!important;padding:7px 9px!important}
+ .sidebar{background:#0b1222!important}.home-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .home-feature-tile{min-height:122px!important;padding:13px!important}.liquid-bottom-nav{height:78px!important}
+}
+@media(prefers-reduced-motion:reduce){.home-feature-tile,.sidebar .nav,.primary{transition:none!important}}
+
+/* COMIC is a separate art direction, not a color filter over the dark theme. */
+body.renox-comic-theme{
+ --rx-bg:#fff7e8;--rx-surface:#fffdf5;--rx-surface-2:#fff0cf;--rx-line:#24201c;
+ --rx-text:#201c18;--rx-muted:#5f574d;--rx-accent:#ff593d;--rx-accent-2:#168eaa;
+ background:#fff7e8!important;color:#201c18!important;
+ font-family:"Trebuchet MS", "Arial Rounded MT Bold",system-ui,sans-serif!important;
+}
+body.renox-comic-theme:before{
+ opacity:1!important;background:radial-gradient(#29231d 1px,transparent 1.5px) 0 0/15px 15px,linear-gradient(135deg,#fff8e9,#ffefcf)!important
+}
+body.renox-comic-theme:after{content:"";position:fixed;pointer-events:none;z-index:-1;inset:0;background:linear-gradient(125deg,transparent 0 72%,#ff593d12 72% 78%,transparent 78%),linear-gradient(35deg,transparent 0 80%,#168eaa12 80% 86%,transparent 86%)}
+body.renox-comic-theme .sidebar{background:#fffdf5!important;border-right:3px solid #201c18!important;box-shadow:7px 0 0 #ff593d!important}
+body.renox-comic-theme .brand>span:not(.renox-mark){color:#201c18!important}
+body.renox-comic-theme .brand small{color:#6a5e51!important}
+body.renox-comic-theme .brand .renox-mark{background:#ff593d!important;color:#fff!important;border:2px solid #201c18!important;box-shadow:4px 4px 0 #201c18!important;border-radius:10px!important}
+body.renox-comic-theme .sidebar-profile,body.renox-comic-theme .sidebar-bottom{background:#fff1d4!important;border:2px solid #201c18!important;box-shadow:4px 4px 0 #201c18!important;color:#201c18!important}
+body.renox-comic-theme .sidebar-profile b,body.renox-comic-theme .sidebar-bottom p{color:#201c18!important}
+body.renox-comic-theme .navtitle{color:#746657!important}
+body.renox-comic-theme .sidebar .nav{color:#29231d!important;border:2px solid transparent!important;background:transparent!important}
+body.renox-comic-theme .sidebar .nav i{color:#168eaa!important}
+body.renox-comic-theme .sidebar .nav:hover,body.renox-comic-theme .sidebar .nav.active{background:#ffe17a!important;border:2px solid #201c18!important;color:#201c18!important;box-shadow:4px 4px 0 #ff593d!important;transform:translate(-2px,-2px)!important}
+body.renox-comic-theme .sidebar .nav.active i{color:#ff593d!important}
+body.renox-comic-theme main,body.renox-comic-theme .layout,body.renox-comic-theme .page{background:transparent!important;color:#201c18!important}
+body.renox-comic-theme .hero{background:linear-gradient(115deg,#ffe17a,#ffb9a4 58%,#b8e8e8)!important;border:3px solid #201c18!important;box-shadow:7px 7px 0 #201c18!important;border-radius:8px 24px 8px 24px!important}
+body.renox-comic-theme .hero:after{color:#201c1812!important}
+body.renox-comic-theme .hero h1,body.renox-comic-theme .hero h1 span,body.renox-comic-theme .hero p,body.renox-comic-theme .hero .mini{color:#201c18!important;text-shadow:none!important}
+body.renox-comic-theme .card,body.renox-comic-theme .stat,body.renox-comic-theme .panel-card,body.renox-comic-theme .feed-item,body.renox-comic-theme .data,body.renox-comic-theme .history-row,body.renox-comic-theme .profile,body.renox-comic-theme .profile-hero-card,body.renox-comic-theme .home-feature-tile,body.renox-comic-theme .settings-card,body.renox-comic-theme .home-announcement,body.renox-comic-theme .home-hadith-card,body.renox-comic-theme .phone-info-tile,body.renox-comic-theme .chat-shell,body.renox-comic-theme .nexo-shell,body.renox-comic-theme .map-result,body.renox-comic-theme .status-compose-card,body.renox-comic-theme .maintenance-box{
+ background:#fffdf5!important;color:#201c18!important;border:2px solid #201c18!important;border-radius:9px 19px 9px 19px!important;box-shadow:5px 5px 0 #201c18!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+body.renox-comic-theme .section-head h3,body.renox-comic-theme .topbar h2,body.renox-comic-theme .home-feature-tile b,body.renox-comic-theme .stat strong,body.renox-comic-theme .data strong,body.renox-comic-theme .panel-card h3{color:#201c18!important}
+body.renox-comic-theme .section-head span,body.renox-comic-theme .topbar p,body.renox-comic-theme .hint,body.renox-comic-theme .home-feature-tile small,body.renox-comic-theme .hero p{color:#62574b!important}
+body.renox-comic-theme .tile-icon{background:#b8e8e8!important;color:#126b80!important;border:2px solid #201c18!important;border-radius:10px!important;box-shadow:3px 3px 0 #201c18!important}
+body.renox-comic-theme .global-chat-launch{background:#b8e8e8!important;color:#201c18!important;border:2px solid #201c18!important;box-shadow:4px 4px 0 #201c18!important}
+body.renox-comic-theme .global-chat-mark{background:#ffe17a!important;color:#201c18!important;border:2px solid #201c18!important}
+body.renox-comic-theme input,body.renox-comic-theme textarea,body.renox-comic-theme select,body.renox-comic-theme .field,body.renox-comic-theme .searchbox{background:#fff!important;color:#201c18!important;border:2px solid #201c18!important;box-shadow:inset 2px 2px 0 #201c1810!important}
+body.renox-comic-theme input::placeholder,body.renox-comic-theme textarea::placeholder{color:#887b6c!important}
+body.renox-comic-theme .primary,body.renox-comic-theme .searchbox button{background:#ff593d!important;color:#fff!important;border:2px solid #201c18!important;box-shadow:4px 4px 0 #201c18!important;border-radius:8px!important}
+body.renox-comic-theme .primary:active,body.renox-comic-theme .searchbox button:active{transform:translate(2px,2px)!important;box-shadow:2px 2px 0 #201c18!important}
+body.renox-comic-theme .tag{background:#ffe17a!important;color:#201c18!important;border:2px solid #201c18!important}
+body.renox-comic-theme .status-section,body.renox-comic-theme .status-viewer{background:#fffdf5!important;color:#201c18!important;border:2px solid #201c18!important;box-shadow:5px 5px 0 #201c18!important}
+body.renox-comic-theme .status-item,body.renox-comic-theme .status-add{color:#201c18!important}
+body.renox-comic-theme .status-ring{border:3px solid #ff593d!important}
+body.renox-comic-theme .status-viewer-name,body.renox-comic-theme .status-viewer-text,body.renox-comic-theme .status-viewer-description{color:#201c18!important}
+body.renox-comic-theme .chat-toolbar,body.renox-comic-theme .chat-members,body.renox-comic-theme .chat-messages-wrap,body.renox-comic-theme .chat-bubble,body.renox-comic-theme .chat-message{background:#fff!important;color:#201c18!important;border:1px solid #201c18!important}
+body.renox-comic-theme .chat-message.mine .chat-bubble{background:#b8e8e8!important}
+body.renox-comic-theme .noxchat-placeholder{background:#ffe17a!important;color:#201c18!important;border:3px solid #201c18!important;box-shadow:6px 6px 0 #201c18!important}
+body.renox-comic-theme .noxchat-placeholder p{color:#51483e!important}
+body.renox-comic-theme .noxchat-placeholder-icon{background:#ff593d!important;color:#fff!important;border:2px solid #201c18!important;box-shadow:3px 3px 0 #201c18!important}
+body.renox-comic-theme .liquid-bottom-nav{background:#fffdf5!important;border:2px solid #201c18!important;box-shadow:5px 5px 0 #ff593d!important}
+body.renox-comic-theme .liquid-bottom-nav button{color:#201c18!important}
+body.renox-comic-theme .liquid-bottom-nav button .nav-icon{background:#fff1d4!important;color:#168eaa!important;border:1.5px solid #201c18!important}
+body.renox-comic-theme .liquid-bottom-nav button.active .nav-icon{background:#ffe17a!important;color:#201c18!important;box-shadow:3px 3px 0 #201c18!important}
+body.renox-comic-theme .nav-drawer{background:#fff7e8!important;color:#201c18!important;border:2px solid #201c18!important;box-shadow:6px 6px 0 #201c18!important}
+body.renox-comic-theme .nav-drawer-link{background:#fffdf5!important;color:#201c18!important;border:2px solid #201c18!important;box-shadow:2px 2px 0 #201c18!important}
+body.renox-comic-theme .footer{color:#62574b!important;border-color:#201c1833!important}
+body.renox-comic-theme .auth-card,body.renox-comic-theme .developer-login-card{background:#fffdf5!important;color:#201c18!important;border:3px solid #201c18!important;box-shadow:7px 7px 0 #ff593d!important}
+body.renox-comic-theme .auth-heading h1,body.renox-comic-theme .auth-card label,body.renox-comic-theme .auth-card .remember-text,body.renox-comic-theme .developer-login-card label,body.renox-comic-theme .developer-login-card p{color:#201c18!important}
+body.renox-comic-theme .auth-login{background:#168eaa!important;color:#fff!important;border:2px solid #201c18!important;box-shadow:4px 4px 0 #201c18!important}
+body.renox-comic-theme .auth-register{background:#ffe17a!important;color:#201c18!important;border:2px solid #201c18!important}
+body.renox-comic-theme .auth-pill{background:#b8e8e8!important;color:#201c18!important;border:1px solid #201c18!important}
+body.renox-comic-theme .developer-contact-modal{background:#201c18cc!important}
+@media(max-width:760px){body.renox-comic-theme .sidebar{background:#fffdf5!important}.home-feature-grid{gap:11px!important}body.renox-comic-theme .liquid-bottom-nav{bottom:max(8px,env(safe-area-inset-bottom))!important}}
+</style>
+<script id="renox-icon-system">
+(function(){
+ const paths={
+  home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
+  favorites:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/>',
+  lookup:'<circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/>',
+  nexoai:'<path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="m19 14 1.1 2.9L23 18l-2.9 1.1L19 22l-1.1-2.9L15 18l2.9-1.1z"/>',
+  noxmaps:'<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
+  freefire:'<path d="M12 22c4.5 0 7-3.1 7-7.1 0-2.7-1.5-5.2-4.3-8.4.1 3-1 4.2-2.1 4.9C12.5 7.1 10.7 4.5 8 2c.4 5.5-3 8.3-3 13 0 4 2.7 7 7 7Z"/><path d="M12 22c-2.1-1.2-2.7-3.1-1.5-5.1.7-1.1 1.4-1.7 1.8-3.1 2.1 2.1 3.1 4.7-.3 8.2Z"/>',
+  mobilelegends:'<path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/>',
+  community:'<path d="M21 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-6.5A7.5 7.5 0 0 1 10.5 7H13"/><path d="M15 3h6v6"/><path d="m21 3-8 8"/>',
+  pinterest:'<path d="M8 21c1.2-2 1.8-4.5 2.2-6.3"/><path d="M14.5 14.5c-.8 1-2 1.5-3.5 1.5-3 0-5-2.2-5-5.1C6 6.9 8.8 4 13 4c3.7 0 6 2.5 6 5.6 0 3.8-2.1 6.4-5.2 6.4-1.2 0-2.3-.7-2.7-1.6"/><path d="M10 14 8 21"/>',
+  tiktok:'<path d="M14 4v11.5a4.5 4.5 0 1 1-4-4.5"/><path d="M14 4c.7 3 2.7 4.8 6 5"/>',
+  telegramlookup:'<path d="m22 3-7 18-4-8-8-4Z"/><path d="M22 3 11 13"/>',
+  calculator:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2m4 0h2M8 15h2m4 0h2M8 19h2m4 0h2"/>',
+  animestream:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 8 6 4-6 4zM7 4v16M17 4v16"/>',
+  apps:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  renoxgame:'<path d="M6 9h12a4 4 0 0 1 3.8 5l-1 3a2 2 0 0 1-3.2 1l-2.6-2H9l-2.6 2a2 2 0 0 1-3.2-1l-1-3A4 4 0 0 1 6 9Z"/><path d="M8 12v4m-2-2h4m5-1h.01M18 15h.01"/>',
+  announcements:'<path d="m3 11 18-5v12L3 13z"/><path d="M11 15 13 22H8l-2-8M5 10v4"/>',
+  leaks:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+  memes:'<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 3 4 3 4-3 4-3M9 9h.01M15 9h.01"/>',
+  music:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  amfinder:'<path d="m15 4 5 5M4 20l10.5-10.5M13 6l5 5M3 21l4-.8L19.5 7.7a2.1 2.1 0 0 0-3-3L4 17.2z"/>',
+  'temp-mail':'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  checkban:'<path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/>',
+  videodownloader:'<path d="M12 3v12m-5-5 5 5 5-5"/><path d="M5 17v4h14v-4"/>',
+  gethtml:'<path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 4l-4 16"/>',
+  profile:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  history:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/>',
+  owner:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.5.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.5-.9l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.8l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.5-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.5.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1 0 1.7Z"/>',
+  phoneinfo:'<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/>',
+  noxchat:'<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H5l-2 2v-6.5A8.5 8.5 0 0 1 11.5 7H13"/><path d="M15 3h6v6M21 3l-8 8"/>',
+  more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+  download:'<path d="M12 3v12m-5-5 5 5 5-5M5 17v4h14v-4"/>'
+ };
+ const keyFrom=(el)=>{
+  const onclick=el.getAttribute('onclick')||'';
+  const match=onclick.match(/(?:showPage|bottomNavigate)\('([^']+)'/);
+  if(match)return match[1];
+  const label=(el.innerText||el.textContent||'').toLowerCase();
+  if(label.includes('saved friends'))return 'favorites';
+  if(label.includes('dashboard')||label.includes('home'))return 'home';
+  if(label.includes('roblox'))return 'lookup';
+  if(label.includes('nexo'))return 'nexoai';
+  if(label.includes('map'))return 'noxmaps';
+  if(label.includes('free fire'))return 'freefire';
+  if(label.includes('mobile legends'))return 'mobilelegends';
+  if(label.includes('global chat')||label==='chat')return 'community';
+  if(label.includes('pinterest'))return 'pinterest';
+  if(label.includes('tiktok'))return 'tiktok';
+  if(label.includes('telegram'))return 'telegramlookup';
+  if(label.includes('kalkulator'))return 'calculator';
+  if(label.includes('anime'))return 'animestream';
+  if(label.includes('app directory'))return 'apps';
+  if(label.includes('game'))return 'renoxgame';
+  if(label.includes('announcement'))return 'announcements';
+  if(label.includes('leak'))return 'leaks';
+  if(label.includes('meme'))return 'memes';
+  if(label.includes('music'))return 'music';
+  if(label.includes('am finder'))return 'amfinder';
+  if(label.includes('temp mail'))return 'temp-mail';
+  if(label.includes('unban'))return 'checkban';
+  if(label.includes('video downloader'))return 'videodownloader';
+  if(label.includes('get html'))return 'gethtml';
+  if(label.includes('profile')||label.includes('owner'))return 'profile';
+  if(label.includes('history'))return 'history';
+  if(label.includes('developer console'))return 'owner';
+  if(label.includes('setting'))return 'settings';
+  if(label.includes('phone'))return 'phoneinfo';
+  if(label.includes('nox chat'))return 'noxchat';
+  if(label.includes('more'))return 'more';
+  return 'apps';
+ };
+ const svg=(key)=>'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'+(paths[key]||paths.apps)+'</svg>';
+ function paint(){
+  document.querySelectorAll('.sidebar .nav').forEach(el=>{const i=el.querySelector('i');if(i){i.innerHTML=svg(keyFrom(el));i.setAttribute('aria-hidden','true')}});
+  document.querySelectorAll('.home-feature-tile').forEach(el=>{const i=el.querySelector('.tile-icon');if(i){i.innerHTML=svg(keyFrom(el));i.setAttribute('aria-hidden','true')}});
+  document.querySelectorAll('.liquid-bottom-nav .nav-icon').forEach(el=>{const b=el.closest('button');if(!b)return;const k=keyFrom(b);el.classList.remove('nav-html-logo');el.innerHTML=svg(k==='gethtml'?'gethtml':k)});
+  const global=document.querySelector('.global-chat-mark');if(global)global.innerHTML=svg('community');
+  const owner=document.querySelector('.owner-pin-icon');if(owner)owner.innerHTML=svg('apps');
+  const brand=document.querySelector('.brand');if(brand&&!brand.querySelector('.renox-mark'))brand.innerHTML='<span class="renox-mark">R</span><span>ENOX</span><small>OBSIDIAN PROJECT</small>';
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paint,{once:true});else paint();
+})();
+</script>
+</body>
 
 <style>
 /* RENOX V10 — immersive status and liquid navigation */
