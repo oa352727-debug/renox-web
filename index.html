@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Renox Project</title><meta name="renox-build" content="2026.11.08.8">
+<title>Renox Project</title><meta name="renox-build" content="2026.11.08.9">
 <style>
 /* Home status stacking: keep the status card above following dashboard cards. */
 .status-section{position:relative;z-index:2;isolation:isolate;overflow:visible}
@@ -707,7 +707,18 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
 </section>
 <section class="page" id="temp-mail"><div class="hero"><div class="mini">PRIVACY TOOL</div><h1>TEMP <span>MAIL</span></h1><p>Buat alamat email sementara sungguhan melalui Mail.tm, terima pesan dan baca inbox langsung di sini. Jangan gunakan untuk akun penting.</p></div><div class="card"><button class="primary" onclick="createTempMail()">BUAT EMAIL SEMENTARA</button><div id="tempMailAddress" class="temp-mail-address">Belum ada alamat email.</div><button class="orbit-toggle" onclick="copyTempMail()">SALIN ALAMAT</button><div class="section-head"><h3>INBOX</h3><button class="clear" onclick="refreshTempMail()">REFRESH ↻</button></div><div id="tempMailInbox" class="feed-list"><p class="empty">Buat alamat email terlebih dahulu.</p></div></div></section>
 <section class="page" id="favorites"><div class="hero"><div class="mini">YOUR COMMUNITY / COLLECTION</div><h1>SAVED <span>FRIENDS</span></h1><p>Profil Roblox yang kamu simpan tersedia di perangkat/browser ini.</p></div><div class="section-head"><h3>Daftar teman tersimpan</h3><span id="favoriteCount">0 SAVED</span></div><div id="favoriteList" class="favorite-grid"></div></section>
-<section class="page" id="checkban"><div class="hero"><div class="mini">RENОX PROJECT · ACCOUNT SUPPORT</div><h1>UNBAN <span>METHOD</span></h1><p>Periksa status nomor terlebih dahulu. Jika API mengindikasikan akun sedang dalam peninjauan, Renox akan membantu menyiapkan surat banding yang jujur dan sopan.</p></div><div class="card"><label>NOMOR WHATSAPP (KODE NEGARA)</label><input id="checkbanNumber" class="field" inputmode="numeric" placeholder="628xxxxxxxxxx"><button class="primary" onclick="checkWhatsAppBan()">PERIKSA STATUS NOMOR</button><div id="checkbanResult" class="hint">Hasil pemeriksaan akan muncul di sini.</div></div><div class="card" style="margin-top:16px"><h3 style="margin-bottom:12px">FORMULIR BANDING</h3><p class="hint">Isi tanggal banned dan alasan dengan benar. Permohonan akan ditinjau developer RENOX; bukan jaminan pemulihan akun.</p><label>TANGGAL DIBANNED</label><input id="appealBannedDate" class="field" type="date"><label>METODE / APLIKASI</label><select id="appealMethod" class="field"><option value="WhatsApp Messenger resmi">WhatsApp Messenger resmi</option><option value="WhatsApp Business resmi">WhatsApp Business resmi</option><option value="WhatsApp Web/Desktop">WhatsApp Web/Desktop</option></select><label>ALASAN PENGAJUAN</label><textarea id="appealReason" class="field" rows="4" maxlength="1000" placeholder="Tuliskan alasan banding secara jelas (minimal 15 karakter)..."></textarea><label>DETAIL TAMBAHAN (OPSIONAL)</label><textarea id="appealDetails" class="field" rows="4" maxlength="1200" placeholder="Jelaskan kronologi secara jujur. Jangan tulis kode OTP atau PIN verifikasi."></textarea><div id="appealStatus" class="hint">Lakukan pemeriksaan nomor terlebih dahulu.</div><button id="appealPrepare" class="primary" disabled onclick="submitRenoxUnban()">KIRIM PENGAJUAN UNBAN</button><div id="appealPreview" style="display:none;margin-top:14px"><label>PRATINJAU SURAT</label><textarea id="appealLetter" class="field" rows="12" readonly></textarea><button class="secondary" onclick="copyWhatsAppAppeal()">SALIN SURAT</button><button class="secondary" style="margin-top:8px" onclick="openGmailAppealDraft()">BUKA DRAFT GMAIL ↗</button><a id="appealOfficialLink" class="tiktok-open" href="https://www.whatsapp.com/contact?eea=1&amp;form_type=accessi&amp;lang=id&amp;subject=messenger" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;margin-top:10px">BUKA FORMULIR DUKUNGAN WHATSAPP ↗</a><p class="hint">WhatsApp menyarankan permintaan review langsung dari aplikasi. Tombol di atas membuka kanal dukungan resmi; Renox tidak dapat mengirim banding atau menjamin akun dipulihkan.</p></div></div></section>
+<section class="page" id="checkban">
+ <div class="hero"><div class="mini">RENOX ACCOUNT SUPPORT</div><h1>UNBAN <span>PROJECT</span></h1><p>Kirim permohonan banding untuk ditinjau. Pengajuan tidak menjamin nomor akan dipulihkan.</p></div>
+ <div class="card unban-project-card">
+  <h3>FORMULIR BANDING</h3>
+  <label for="checkbanNumber">NOMOR TARGET</label>
+  <input id="checkbanNumber" class="field" inputmode="tel" autocomplete="tel" placeholder="+62xxxxxxxxxx">
+  <label for="appealReason">ALASAN</label>
+  <textarea id="appealReason" class="field" rows="5" maxlength="1200" placeholder="Tuliskan alasan banding secara jujur dan jelas..."></textarea>
+  <div id="appealStatus" class="hint" aria-live="polite">Masukkan nomor target dan alasan banding.</div>
+  <button id="appealPrepare" class="primary" onclick="submitRenoxUnban()">KIRIM BANDING ↗</button>
+ </div>
+</section>
 <section class="page" id="pinterest">
  <div class="hero"><div class="mini">PUBLIC IMAGE DISCOVERY</div><h1>PINTEREST <span>SEARCH</span></h1><p>Cari inspirasi gambar publik berdasarkan kata kunci. Hasil dapat dibuka dan disimpan dari sumbernya.</p></div>
  <div class="card"><div class="searchbox"><input id="pinterestQuery" maxlength="120" placeholder="Contoh: anime wallpaper, gaming setup..." onkeydown="if(event.key==='Enter')searchPinterest()"><button onclick="searchPinterest()">CARI GAMBAR ↗</button></div><p class="hint" id="pinterestStatus">Pencarian langsung melalui Pinterest API resmi. Memerlukan akses Pinterest Search Partner Pins.</p><div id="pinterestResults" class="pinterest-grid"></div><div style="display:flex;justify-content:center;margin-top:16px"><button id="pinterestMore" class="secondary" style="display:none" onclick="loadMorePinterest()">MUAT LEBIH BANYAK</button></div></div>
@@ -747,7 +758,7 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
 <div class="section-head"><h3>Custom Title</h3><span>SHOP OWNED TITLES</span></div><select id="equippedTitle" class="field"><option value="">No title</option></select><div style="display:flex;gap:9px;flex-wrap:wrap;margin:10px 0"><button class="secondary" onclick="setTitleColor('#b879ff')">Purple</button><button class="secondary" onclick="setTitleColor('#42e8ff')">Cyan</button><button class="secondary" onclick="setTitleColor('#62e6ad')">Mint</button><button class="secondary" onclick="setTitleColor('#ffbd59')">Gold</button><button class="secondary" onclick="setTitleColor('#ff6e9f')">Pink</button></div><button class="primary" onclick="saveEquippedTitle()">APPLY TITLE ✦</button><div id="titleStatus" class="hint"></div>
   <div class="account-session-card"><div class="section-head"><h3>Akun Renox</h3><span>SESSION AKTIF</span></div><div id="authStatus" class="hint">Memeriksa sesi akun...</div><button class="secondary" onclick="accountLogout()">LOGOUT</button></div>
   <div class="section-head"><h3>Profile Banner</h3><span>BACKGROUND</span></div><div id="profileBannerPreview" class="profile-banner-preview" aria-label="Pratinjau banner profil"></div>
-  <input id="profileBannerInput" class="field" type="file" accept="video/mp4,video/webm" onchange="handleProfileBannerUpload(this)" aria-label="Upload video banner 16:9"><p class="hint">Video MP4/WebM rasio 16:9, maksimal 4 MB. Banner akan tampil di profil publik jika backend menerima media tersebut.</p><select id="profileBannerSelect" hidden><option value=""></option></select>
+  <input id="profileBannerInput" class="field" type="file" accept="image/png,image/jpeg,image/webp" onchange="handleProfileBannerUpload(this)" aria-label="Upload foto banner 16:9"><p class="hint">Foto PNG/JPG/WebP rasio 16:9, maksimal 4 MB. Banner akan tampil di profil publik jika backend menerima media tersebut.</p><select id="profileBannerSelect" hidden><option value=""></option></select>
   <div class="section-head"><h3>Announcement Pinned</h3><span>PROFILE NOTICE</span></div><div id="profilePinnedAnnouncement" class="profile-pinned">Memuat pengumuman terbaru...</div>
   <div id="developerTools" style="display:none"><div class="section-head"><h3>Developer Control</h3><span>GLOBAL THEME</span></div><input id="globalThemeColor" type="color" value="#42e8ff" onchange="setGlobalTheme(this.value)"><input id="developerCustomTitle" class="field" maxlength="28" placeholder="Custom developer title" oninput="previewDevTitle()"><label style="display:block;margin:8px 0 4px">Warna teks title developer</label><input id="developerTitleColor" type="color" value="#42e8ff" oninput="previewDevTitle()" style="width:64px;height:42px;background:transparent;border:0"><label style="display:block;margin:8px 0 4px">Warna latar title developer</label><input id="developerTitleBackground" type="color" value="#243b60" oninput="previewDevTitle()" style="width:64px;height:42px;background:transparent;border:0"><div id="developerTitlePreview" class="developer-badge" style="display:inline-block;margin:10px">✦ RENOX DEVELOPER</div><button class="secondary" onclick="saveDevTitle()">Simpan custom title</button><div class="section-head"><h3>Maintenance Staff Access</h3><span>LOGIN ALLOWLIST</span></div><div class="owner-inline"><input id="staffUsername" class="field" maxlength="24" placeholder="Username staff"><button class="secondary" onclick="manageStaff(false)">TAMBAH STAFF</button></div><div id="staffList" class="owner-list"></div>
   <div class="section-head"><h3>Security / IP Monitor</h3><span>PRIVATE · DEVELOPER ONLY</span></div><p class="hint">IP dicatat saat login untuk keamanan akun. Gunakan hanya untuk moderasi dan pencegahan penyalahgunaan.</p><button class="secondary" onclick="loadOwnerSecurity()">REFRESH IP USERS</button><div id="ownerIpList" class="owner-list"></div>
@@ -936,7 +947,7 @@ function updateGuestPreview(){
  if($('guestAvatarPreview')&&guestProfile.avatar)$('guestAvatarPreview').src=guestProfile.avatar;
  const titleNames={neon:'NEON ELITE',royal:'ROYAL RENOX',cyber:'CYBER PHANTOM'};const title=guestProfile.developerTitle||titleNames[guestProfile.equippedTitle]||'';const titleColor=guestProfile.developerTitle?guestProfile.developerTitleColor:(guestProfile.titleColor||'#b879ff');
  const isRenoxDeveloper=String(guestProfile.name||'').trim().toLowerCase()==='noxxd';
- const developerTitle=isRenoxDeveloper?'<span class="developer-badge profile-developer-title" style="color:'+escapeText(guestProfile.developerTitleColor||'#42e8ff')+';background:'+escapeText(guestProfile.developerTitleBackground||localStorage.getItem('renoxDevTitleBackground')||'#243b60')+'">✦ '+escapeText(guestProfile.developerTitle||'DEVELOPER')+'</span><span class="renox-blue-check">✓</span>':'';
+ const developerTitle=isRenoxDeveloper?'<span class="developer-badge profile-developer-title">✦ '+escapeText(guestProfile.developerTitle||'DEV NI BOUZ')+'</span><span class="renox-blue-check">✓</span>':'';
  if($('homeProfileName'))$('homeProfileName').innerHTML=escapeText(guestProfile.name)+developerTitle+(title?'<span class="v7-title-chip" style="color:'+escapeText(titleColor)+'">'+escapeText(title)+'</span>':'');
  if($('homeProfileAvatar')&&guestProfile.avatar)$('homeProfileAvatar').src=guestProfile.avatar;
  if($('equippedTitle'))$('equippedTitle').value=guestProfile.equippedTitle||'';
@@ -1446,12 +1457,23 @@ async function checkWhatsAppBan(){
 }
 
 async function submitRenoxUnban(){
- if(!waAppealCheck||waAppealCheck.eligibility!=='review')return;
- const bannedAt=$('appealBannedDate').value,reason=$('appealReason').value,details=$('appealDetails').value.trim();
- if(!bannedAt){$('appealStatus').textContent='Pilih tanggal banned terlebih dahulu.';return}if(reason.trim().length<15){$('appealStatus').textContent='Alasan banding minimal 15 karakter.';return}
- const btn=$('appealPrepare');btn.disabled=true;btn.textContent='MENGIRIM...';
- try{const d=await apiJSON('/api/unban-request',{method:'POST',body:JSON.stringify({number:waAppealCheck.number,bannedAt,reason:reason+(details?'\n\nDetail tambahan: '+details:'')})});$('appealStatus').textContent=d.message||'Pengajuan terkirim. Silakan tinjau dan mohon tunggu hingga 6 jam.';btn.textContent='PENGAJUAN TERKIRIM'}
- catch(e){$('appealStatus').textContent=e.message;btn.disabled=false;btn.textContent='KIRIM PENGAJUAN UNBAN'}
+ const number=$('checkbanNumber').value.replace(/[^0-9]/g,'');
+ const reason=$('appealReason').value.trim();
+ const status=$('appealStatus'),btn=$('appealPrepare');
+ if(!/^\d{8,15}$/.test(number)){status.textContent='Masukkan nomor target dengan kode negara, 8–15 digit.';return}
+ if(reason.length<15){status.textContent='Alasan banding minimal 15 karakter.';return}
+ btn.disabled=true;btn.textContent='MEMERIKSA & MENGIRIM...';status.textContent='Memeriksa status nomor secara otomatis...';
+ try{
+  let check=null;
+  try{check=await apiJSON('/api/checkban?number='+encodeURIComponent(number))}catch(e){throw new Error('Status nomor belum dapat diverifikasi. Coba lagi nanti.')}
+  const all=[check.status,check.reason,check.violation_type].join(' ').toLowerCase();
+  const permanent=/permanent|permanently|permanent.?ban|permanen|final.?ban|final/.test(all);
+  if(permanent&&check.banned){status.textContent='✕ BANDING DITOLAK — nomor '+number+' terdeteksi terbanned permanen.';alert('✕ Banding ditolak karena nomor '+number+' terbanned permanen.');return}
+  const d=await apiJSON('/api/unban-request',{method:'POST',body:JSON.stringify({number,bannedAt:'',reason})});
+  status.textContent='✓ Banding berhasil dikirim untuk ditinjau. Mohon tunggu hingga 6 jam. Ini belum berarti nomor sudah dipulihkan.';
+  alert('✓ Banding berhasil dikirim. Silakan tunggu proses peninjauan hingga 6 jam.');
+  btn.textContent='BANDING TERKIRIM';
+ }catch(e){status.textContent='Gagal mengirim banding: '+e.message;btn.disabled=false;btn.textContent='KIRIM BANDING ↗'}
 }
 async function loadOwnerUnbanRequests(){
  const box=$('ownerUnbanRequests');if(!box)return;box.textContent='Memuat...';
@@ -1565,13 +1587,11 @@ function renderProfileBanner(media){
 }
 async function handleProfileBannerUpload(input){
  const file=input.files&&input.files[0];if(!file)return;
- if(!['video/mp4','video/webm'].includes(file.type)){alert('Pilih video MP4 atau WebM.');input.value='';return}
- if(file.size>4*1024*1024){alert('Ukuran video maksimal 4 MB.');input.value='';return}
- const url=URL.createObjectURL(file),v=document.createElement('video');v.preload='metadata';v.onloadedmetadata=()=>{
-  URL.revokeObjectURL(url);const ratio=v.videoWidth/v.videoHeight;
-  if(!v.videoWidth||Math.abs(ratio-16/9)>0.035){alert('Rasio video harus 16:9.');input.value='';return}
-  const reader=new FileReader();reader.onload=()=>applyProfileBanner(reader.result);reader.onerror=()=>alert('Video gagal dibaca.');reader.readAsDataURL(file);
- };v.onerror=()=>{URL.revokeObjectURL(url);alert('Video tidak dapat dibaca.');input.value=''};v.src=url;
+ if(!['image/png','image/jpeg','image/webp'].includes(file.type)){alert('Pilih foto PNG, JPG, atau WebP.');input.value='';return}
+ if(file.size>4*1024*1024){alert('Ukuran foto maksimal 4 MB.');input.value='';return}
+ const url=URL.createObjectURL(file),img=new Image();
+ img.onload=()=>{URL.revokeObjectURL(url);if(!img.naturalWidth||Math.abs(img.naturalWidth/img.naturalHeight-16/9)>0.035){alert('Rasio foto banner harus 16:9.');input.value='';return}const reader=new FileReader();reader.onload=()=>applyProfileBanner(reader.result);reader.onerror=()=>alert('Foto gagal dibaca.');reader.readAsDataURL(file)};
+ img.onerror=()=>{URL.revokeObjectURL(url);alert('Foto tidak dapat dibaca.');input.value=''};img.src=url;
 }
 function applyProfileBanner(media){
  if(media&&!String(media).startsWith('data:video/')){try{const u=new URL(media);if(u.protocol!=='https:'||!['files.catbox.moe','catbox.moe'].includes(u.hostname))throw 0;media=u.href}catch{$('profileMessage').textContent='Media banner tidak valid.';return}}
@@ -1861,7 +1881,7 @@ function showWifiGuide(kind){
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paint,{once:true});else paint();
 })();
-const RENOX_BUILD_VERSION='2026.11.08.8';let renoxUpdateBusy=false;
+const RENOX_BUILD_VERSION='2026.11.08.9';let renoxUpdateBusy=false;
 function checkRenoxUpdate(){if(renoxUpdateBusy||document.visibilityState==='hidden'||$('renoxUpdateModal'))return;const u=new URL(location.href);u.searchParams.set('_renox_check',Date.now());fetch(u.href,{cache:'no-store',credentials:'same-origin'}).then(r=>r.ok?r.text():'').then(html=>{const m=html.match(/<meta\\s+name=["']renox-build["']\\s+content=["']([^"']+)["']/i);if(m&&m[1]!==RENOX_BUILD_VERSION&&m[1]!==localStorage.getItem('renoxDismissedBuild')){const box=document.createElement('div');box.id='renoxUpdateModal';box.innerHTML='<div class="renox-update-card"><div class="renox-update-mark">🚀</div><h2>Update Tersedia!</h2><p>Versi baru sudah siap dipasang.</p><div class="renox-update-section"><b># INFORMASI</b><div class="renox-update-version latest">↑ Versi Terbaru <strong>'+m[1]+'</strong></div><div class="renox-update-version">♧ Versi Saat Ini <strong>'+RENOX_BUILD_VERSION+'</strong></div><b># APA YANG BARU</b><div class="renox-update-log"><strong>(NEW) v'+m[1]+'</strong><small>08 November 2026</small><p>🔵 Form banding memakai alasan teks bebas, nomor, dan tanggal banned.</p><p>🔴 Pengajuan tercatat di server; permanent ban otomatis ditolak.</p><p>🟢 Developer dapat mengatur alasan maintenance dan daftar fitur yang sedang dikerjakan.</p><p>🟣 Profile, status, dan elemen UI dirapikan.</p></div></div><ol class="renox-update-steps"><li>Tekan tombol "Update Now" di bawah</li><li>Cache dan resource dimuat ulang</li><li>Web akan reload dengan versi baru</li></ol><div class="renox-update-progress"><span id="renoxUpdateBar"></span></div><div class="renox-update-percent" id="renoxUpdatePercent">0%</div><button class="renox-update-action" id="renoxUpdateButton" onclick="applyRenoxUpdate()">⬇ Update Now</button><p class="renox-update-note">ⓘ Proses update membutuhkan waktu. Jangan refresh saat proses berlangsung.</p></div>';document.body.appendChild(box);box.dataset.version=m[1]}}).catch(()=>{})}
 
 async function applyRenoxUpdate(){if(renoxUpdateBusy)return;renoxUpdateBusy=true;const btn=$('renoxUpdateButton'),bar=$('renoxUpdateBar'),pct=$('renoxUpdatePercent');btn.disabled=true;btn.textContent='MEMUAT UPDATE...';try{const u=new URL(location.href);u.searchParams.set('_renox_update',Date.now());const r=await fetch(u.href,{cache:'reload',credentials:'same-origin'});if(!r.ok)throw new Error('Versi baru belum tersedia.');const total=Number(r.headers.get('content-length'))||0,reader=r.body?.getReader();let n=0;if(reader){while(true){const part=await reader.read();if(part.done)break;n+=part.value.length;const p=total?Math.min(99,Math.floor(n/total*100)):Math.min(90,Math.floor(n/(n+90000)*100));bar.style.width=p+'%';pct.textContent=p+'%'}}bar.style.width='100%';pct.textContent='100%';btn.textContent='BERHASIL · MEMUAT ULANG';localStorage.setItem('renoxDismissedBuild',$('renoxUpdateModal').dataset.version||'');setTimeout(()=>location.reload(),450)}catch(e){renoxUpdateBusy=false;btn.disabled=false;btn.textContent='COBA LAGI';pct.textContent='Gagal memuat update';bar.style.width='0%';alert('Update gagal: '+e.message)}}
@@ -2067,6 +2087,36 @@ body.renox-comic-theme .home-hadith-card blockquote{
   border-left:4px solid #ff593d!important;
 }
 body.renox-comic-theme .home-announcement-mark svg{stroke:#17130f!important}
+/* RENOX 9.4 mobile contrast and layout repair */
+#profile .card,#profile .profile,#profile .profile-hero-card{max-width:100%;min-width:0;overflow:hidden}
+#profile .profile{grid-template-columns:minmax(76px,110px) minmax(0,1fr)!important;gap:14px!important}
+#profile .profile>*{min-width:0;overflow-wrap:anywhere}
+#profile .section-head{gap:12px;flex-wrap:wrap}
+#profile .section-head h3,#profile .section-head span{color:#171717!important}
+#profile .hint,#profile label,#profile p,#profile h2,#profile h3{overflow-wrap:anywhere}
+#profile input,#profile textarea,#profile select{max-width:100%;min-width:0;background:#fff!important;color:#111!important;border:1.5px solid #777!important}
+#profile input::placeholder,#profile textarea::placeholder{color:#555!important;opacity:1}
+#profile .primary,#profile .secondary{max-width:100%;white-space:normal}
+#statusStrip{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));overflow:visible!important;gap:12px!important}
+#statusStrip .status-item,#statusStrip .status-add{flex:initial!important;min-width:0!important}
+.auth-card label,.auth-card .auth-input-wrap,.auth-card input,.auth-card input::placeholder{color:#111!important}
+.auth-card input{background:#fff!important;-webkit-text-fill-color:#111!important}
+#community .chat-shell{position:relative;z-index:2;pointer-events:auto}
+#community .chat-shell *{pointer-events:auto}
+#community .chat-messages{position:relative;z-index:1}
+#community .chat-composer{position:relative;z-index:3}
+#community .chat-shell input{color:#111!important;background:#fff!important}
+.developer-badge.profile-developer-title{background:rgba(255,255,255,.18)!important;color:#111!important;border:1px solid rgba(255,255,255,.48)!important;backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 #ffffff66}
+#profile .profile-banner-preview{aspect-ratio:16/9;height:auto!important;max-height:220px;background-size:cover;background-position:center}
+#profile .profile-banner-preview video,.renox-profile-banner-video{display:none!important}
+.unban-project-card{max-width:680px;margin:0 auto;padding:clamp(18px,4vw,30px)}
+.unban-project-card label{display:block;margin:14px 0 6px;color:var(--white)}
+.unban-project-card .field{width:100%;background:#fff!important;color:#111!important}
+.unban-project-card .field::placeholder{color:#555!important}
+.renox-announcement-modal{z-index:100800!important;pointer-events:auto}
+.renox-announcement-card{position:relative}
+.renox-announcement-card:before{content:"NoxXd  ✓";display:block;text-align:left;color:#1688ee;font-weight:900;margin-bottom:12px}
+@media(max-width:600px){#profile .profile{grid-template-columns:1fr!important;text-align:center}#profile .profile .avatar{margin:0 auto}.unban-project-card{padding:16px}}
 </style>
 <style id="renox-requested-polish">
 #community .chat-shell{background:#fff!important;color:#111!important;border:2px solid #111!important}
