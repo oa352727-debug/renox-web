@@ -378,7 +378,10 @@ input,.field,textarea,select{background:rgba(8,12,25,.38)!important;border:1px s
 /* Login gate: hide all app navigation/content until authenticated */
 body.auth-locked .layout,
 body.auth-locked #projectAudioToggle,
-body.auth-locked .project-audio-toggle{display:none!important;visibility:hidden!important;pointer-events:none!important}
+body.auth-locked .project-audio-toggle,
+body.auth-locked .liquid-bottom-nav,
+body.auth-locked #navDrawer,
+body.auth-locked .nav-drawer{display:none!important;visibility:hidden!important;pointer-events:none!important}
 .remember-login{display:flex!important;align-items:center;gap:10px;margin:12px 0 0!important;cursor:pointer;user-select:none}
 .remember-login input{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
 .remember-login .remember-switch{position:relative;display:inline-block!important;flex:0 0 42px;width:42px;height:24px;border-radius:999px;background:#46506a;border:1px solid #75809a;transition:background .2s,border-color .2s;box-sizing:border-box}
