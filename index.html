@@ -1089,7 +1089,11 @@ function playMusicResult(i){
  $('musicStatus').textContent='Hasil ini tidak menyediakan preview audio. Buka melalui YouTube.';
 }
 function extractYouTubeId(raw){
- try{const u=new URL(raw);if(!/(^|\\.)((youtube\\.com)|(youtu\\.be))$/i.test(u.hostname))return '';return u.hostname==='youtu.be'?u.pathname.slice(1):u.searchParams.get('v')||((u.pathname.match(/\\/(?:embed|shorts)\\/([^/?]+)/)||[])[1])||''}catch{return ''}
+ try{
+  const u=new URL(raw);
+  if(!/(^|\.)((youtube\.com)|(youtu\.be))$/i.test(u.hostname))return '';
+  return u.hostname==='youtu.be'?u.pathname.slice(1):u.searchParams.get('v')||((u.pathname.match(/\/(?:embed|shorts)\/([^/?]+)/)||[])[1])||'';
+ }catch{return ''}
 }
 function playYouTubeVideoId(id,title){
  if(!/^[A-Za-z0-9_-]{11}$/.test(id)){$('musicStatus').textContent='ID video YouTube tidak valid.';return}
