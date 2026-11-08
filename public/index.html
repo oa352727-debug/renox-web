@@ -932,7 +932,7 @@ function updateGuestPreview(){
  if($('guestIdPreview'))$('guestIdPreview').textContent='GUEST ID: '+guestId;
  
  if($('guestAvatarPreview')&&guestProfile.avatar)$('guestAvatarPreview').src=guestProfile.avatar;
- const titleNames={neon:'NEON ELITE',royal:'ROYAL RENOX',cyber:'CYBER PHANTOM'};const title=guestProfile.developerTitle||titleNames[guestProfile.equippedTitle]||'';const titleColor=guestProfile.developerTitle?guestProfile.developerTitleColor:(guestProfile.titleColor||'#b879ff');
+ const titleNames={neon:'NEON ELITE',royal:'ROYAL RENOX',cyber:'CYBER PHANTOM'};const title=isRenoxDeveloper?'':(guestProfile.developerTitle||titleNames[guestProfile.equippedTitle]||'');const titleColor=guestProfile.developerTitle?guestProfile.developerTitleColor:(guestProfile.titleColor||'#b879ff');
  const isRenoxDeveloper=String(guestProfile.name||'').trim().toLowerCase()==='noxxd';
  const developerTitle=isRenoxDeveloper?'<span class="developer-badge profile-developer-title">✦ '+escapeText(guestProfile.developerTitle||'DEV NI BOUZ')+'</span><span class="renox-blue-check">✓</span>':'';
  if($('homeProfileName'))$('homeProfileName').innerHTML=escapeText(guestProfile.name)+developerTitle+(title?'<span class="v7-title-chip" style="color:'+escapeText(titleColor)+'">'+escapeText(title)+'</span>':'');
@@ -1121,15 +1121,15 @@ function showAnnouncementPopup(item){
  const modal=document.createElement('div');modal.id='renoxAnnouncementModal';modal.className='renox-announcement-modal';
  const card=document.createElement('section');card.className='renox-announcement-card';
  const mark=document.createElement('div');mark.className='renox-announcement-mark';mark.setAttribute('aria-label','Live announcement');
- const tag=document.createElement('small');tag.textContent='LIVE ANNOUNCEMENT FROM NOXXD';
+ const tag=document.createElement('small');tag.textContent='NoxXd  ✓  ·  LIVE ANNOUNCEMENT';tag.style.cssText='display:block;text-align:left;color:#1688ee;font-weight:900;margin-bottom:10px';
  const title=document.createElement('h2');title.textContent=item.title||'Pengumuman terbaru';
  const body=document.createElement('p');body.textContent=item.content||'Ada pengumuman baru dari tim RENOX.';
  const meta=document.createElement('small');meta.className='renox-announcement-date';meta.textContent=item.createdAt?new Date(item.createdAt).toLocaleString('id-ID'):'PENGUMUMAN RESMI';
  const actions=document.createElement('div');actions.className='renox-announcement-actions';
  const close=document.createElement('button');close.className='secondary';close.textContent='NANTI';close.onclick=()=>modal.remove();
  const open=document.createElement('button');open.className='primary';open.textContent='BACA PENGUMUMAN';open.onclick=()=>{modal.remove();showPage('announcements')};
- actions.append(close,open);card.append(mark,tag,title,body,meta,actions);modal.appendChild(card);
- modal.addEventListener('click',e=>{if(e.target===modal)modal.remove()});document.body.appendChild(modal);playRenoxChime();
+ actions.append(close,open);card.append(tag,mark,title,body,meta,actions);modal.appendChild(card);
+ modal.addEventListener('click',e=>{if(e.target===modal)modal.remove()});document.body.appendChild(modal);playRenoxChime();setTimeout(()=>{if(modal.isConnected)modal.remove()},10000);
 }
 async function loadPublicContent(){
  try{
@@ -2093,7 +2093,7 @@ body.renox-comic-theme .home-announcement-mark svg{stroke:#17130f!important}
 #community .chat-messages{position:relative;z-index:1}
 #community .chat-composer{position:relative;z-index:3}
 #community .chat-shell input{color:#111!important;background:#fff!important}
-.developer-badge.profile-developer-title{background:rgba(255,255,255,.18)!important;color:#111!important;border:1px solid rgba(255,255,255,.48)!important;backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 #ffffff66}
+.developer-badge.profile-developer-title{background:rgba(255,255,255,.18)!important;color:inherit!important;border:1px solid rgba(255,255,255,.48)!important;backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 #ffffff66}
 #profile .profile-banner-preview{aspect-ratio:16/9;height:auto!important;max-height:220px;background-size:cover;background-position:center}
 #profile .profile-banner-preview video,.renox-profile-banner-video{display:none!important}
 .unban-project-card{max-width:680px;margin:0 auto;padding:clamp(18px,4vw,30px)}
