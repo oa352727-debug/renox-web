@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Renox Project</title><meta name="renox-build" content="2026.11.08.2">
+<title>Renox Project</title><meta name="renox-build" content="2026.11.08.3">
 <style>
 /* Home status stacking: keep the status card above following dashboard cards. */
 .status-section{position:relative;z-index:2;isolation:isolate;overflow:visible}
@@ -1734,7 +1734,7 @@ function showWifiGuide(kind){
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paint,{once:true});else paint();
 })();
-const RENOX_BUILD_VERSION='2026.11.08.2';let renoxUpdateBusy=false;
+const RENOX_BUILD_VERSION='2026.11.08.3';let renoxUpdateBusy=false;
 function checkRenoxUpdate(){if(renoxUpdateBusy||document.visibilityState==='hidden'||$('renoxUpdateModal'))return;const u=new URL(location.href);u.searchParams.set('_renox_check',Date.now());fetch(u.href,{cache:'no-store',credentials:'same-origin'}).then(r=>r.ok?r.text():'').then(html=>{const m=html.match(/<meta\s+name=["']renox-build["']\s+content=["']([^"']+)["']/i);if(m&&m[1]!==RENOX_BUILD_VERSION&&m[1]!==localStorage.getItem('renoxDismissedBuild')){const box=document.createElement('div');box.id='renoxUpdateModal';box.innerHTML='<div class="renox-update-card"><div class="renox-update-mark">↻</div><h2>UPDATE RENOX TERSEDIA!</h2><p>Versi baru sudah dipublikasikan. Tekan tombol untuk memuat versi terbaru.</p><div class="renox-update-progress"><span id="renoxUpdateBar"></span></div><div class="renox-update-percent" id="renoxUpdatePercent">0%</div><button class="renox-update-action" id="renoxUpdateButton" onclick="applyRenoxUpdate()">UPDATE SEKARANG</button></div>';document.body.appendChild(box);box.dataset.version=m[1]}}).catch(()=>{})}
 async function applyRenoxUpdate(){if(renoxUpdateBusy)return;renoxUpdateBusy=true;const btn=$('renoxUpdateButton'),bar=$('renoxUpdateBar'),pct=$('renoxUpdatePercent');btn.disabled=true;btn.textContent='MEMUAT UPDATE...';try{const u=new URL(location.href);u.searchParams.set('_renox_update',Date.now());const r=await fetch(u.href,{cache:'reload',credentials:'same-origin'});if(!r.ok)throw new Error('Versi baru belum tersedia.');const total=Number(r.headers.get('content-length'))||0,reader=r.body?.getReader();let n=0;if(reader){while(true){const part=await reader.read();if(part.done)break;n+=part.value.length;const p=total?Math.min(99,Math.floor(n/total*100)):Math.min(90,Math.floor(n/(n+90000)*100));bar.style.width=p+'%';pct.textContent=p+'%'}}bar.style.width='100%';pct.textContent='100%';btn.textContent='BERHASIL · MEMUAT ULANG';localStorage.setItem('renoxDismissedBuild',$('renoxUpdateModal').dataset.version||'');setTimeout(()=>location.reload(),450)}catch(e){renoxUpdateBusy=false;btn.disabled=false;btn.textContent='COBA LAGI';pct.textContent='Gagal memuat update';bar.style.width='0%';alert('Update gagal: '+e.message)}}
 </script>
