@@ -391,6 +391,7 @@ body.auth-locked .nav-drawer{display:none!important;visibility:hidden!important;
 .remember-login .remember-text{display:inline!important;color:#c4cce0;font-size:11px!important;letter-spacing:.2px!important}
 .remember-login input:focus-visible+.remember-switch{outline:2px solid #b49cff;outline-offset:3px}
 
+.pinterest-card .pinterest-share{display:inline-flex;justify-content:center;align-items:center;min-height:34px;padding:7px 9px;border-radius:10px;background:#ffffff0b;border:1px solid #ffffff18;color:#c8c3ff;font-size:10px;font-weight:800}
 </style>
 </head>
 <body class="auth-locked">
@@ -799,7 +800,16 @@ function setAccent(c){if(!/^#[0-9a-f]{6}$/i.test(c))return;document.documentElem
 function setFont(f){let v=f==='system'?'system-ui, sans-serif':f+', Inter, sans-serif';document.body.style.fontFamily=v;document.documentElement.style.setProperty('--font-ui',v);localStorage.setItem('renoxFont',f)}
 function renderSchedule(){const days=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];const data=JSON.parse(localStorage.getItem('renoxSchedule')||'{}');$('scheduleInputs').innerHTML=days.map(d=>`<div class="panel-card"><h3>${d.toUpperCase()}</h3><textarea class="field schedule-day" data-day="${d}" rows="3" placeholder="Contoh: Matematika, IPA, Bahasa Indonesia">${escapeText(data[d]||'')}</textarea></div>`).join('')}
 function saveSchedule(){const data={};document.querySelectorAll('.schedule-day').forEach(x=>data[x.dataset.day]=x.value.trim());localStorage.setItem('renoxSchedule',JSON.stringify(data));$('scheduleStatus').textContent='✓ Jadwal berhasil disimpan di perangkat ini.'}
-let calcExpression='';function calcKey(k){if(k==='C')calcExpression='';else if(/[0-9.+*/()\-]/.test(k)&&k.length===1)calcExpression+=k;$('calcDisplay').value=calcExpression||'0'}function calculate(){try{if(!/^[0-9+*/().\- ]+$/.test(calcExpression))throw 0;const result=Function('"use strict";return ('+calcExpression+')')();if(!Number.isFinite(result))throw 0;calcExpression=String(result);$('calcDisplay').value=calcExpression}catch{$('calcDisplay').value='Input tidak valid';calcExpression=''}}
+let calcExpression='';function calcKey(k){if(k==='C')calcExpression='';else if(k==='⌫')calcExpression=calcExpression.slice(0,-1);else if(/[0-9.+*/()\-]/.test(k)&&k.length===1)calcExpression+=k;$('calcDisplay').value=calcExpression||'0'}
+function calculate(){
+ try{
+  const input=calcExpression.replace(/\s+/g,'');let pos=0;
+  function expr(){let v=term();while(input[pos]==='+'||input[pos]==='-'){const op=input[pos++],n=term();v=op==='+'?v+n:v-n}return v}
+  function term(){let v=factor();while(input[pos]==='*'||input[pos]==='/'){const op=input[pos++],n=factor();if(op==='/'&&n===0)throw Error();v=op==='*'?v*n:v/n}return v}
+  function factor(){if(input[pos]==='+'){pos++;return factor()}if(input[pos]==='-'){pos++;return -factor()}if(input[pos]==='('){pos++;const v=expr();if(input[pos++]!==')')throw Error();return v}const m=input.slice(pos).match(/^(?:\d+(?:\.\d*)?|\.\d+)/);if(!m)throw Error();pos+=m[0].length;return Number(m[0])}
+  if(!input)throw Error();const result=expr();if(pos!==input.length||!Number.isFinite(result))throw Error();calcExpression=String(Number(result.toPrecision(12)));$('calcDisplay').value=calcExpression;
+ }catch{$('calcDisplay').value='Input tidak valid';calcExpression=''}
+}
 async function telegramLookup(){
  const input=$('telegramUsername'),box=$('telegramResult');
  let username=input.value.trim().replace(/^@+/, '').replace(/^https?:\/\/(www\.)?t\.me\//i,'').replace(/\/$/,'').split('/')[0];
@@ -836,9 +846,14 @@ function addNexoMessage(role,content){
 let pinterestBookmark=null,pinterestLastQuery='';let pinterestSeenImages=new Set();
 function renderPinterestResults(results,q){
  const out=$('pinterestResults');
- const unique=(results||[]).filter(x=>{const key=x.image||x.thumb;if(!key||pinterestSeenImages.has(key))return false;pinterestSeenImages.add(key);return true});
- const cards=unique.map(x=>`<article class="pinterest-card"><a href="${escapeText(x.source||x.image)}" target="_blank" rel="noopener"><img loading="lazy" src="${escapeText(x.thumb||x.image)}" alt="${escapeText(x.title||q)}"></a><div><b>${escapeText(x.title||'Pinterest Pin')}</b><a class="pinterest-download" href="/api/pinterest-download?url=${encodeURIComponent(x.image)}" target="_blank" rel="noopener">DOWNLOAD ↧</a><a class="pinterest-source" href="${escapeText(x.source||'#')}" target="_blank" rel="noopener">BUKA PIN ↗</a></div></article>`).join('');
- out.insertAdjacentHTML('beforeend',cards);
+ const unique=(results||[]).filter(x=>{const key=String(x.pinId||x.pin_id||x.id||x.image||x.thumb||'');if(!key||pinterestSeenImages.has(key))return false;pinterestSeenImages.add(key);return true});
+ const cards=unique.map(x=>{const image=x.image||x.thumb||'',source=x.source||image,title=x.title||'Pinterest Pin';return `<article class="pinterest-card"><a href="${escapeText(source)}" target="_blank" rel="noopener"><img loading="lazy" src="${escapeText(x.thumb||image)}" alt="${escapeText(title||q)}"></a><div><b>${escapeText(title)}</b><a class="pinterest-download" href="/api/pinterest-download?url=${encodeURIComponent(image)}" target="_blank" rel="noopener">DOWNLOAD ↧</a><a class="pinterest-source" href="${escapeText(source||'#')}" target="_blank" rel="noopener">BUKA PIN ↗</a><button type="button" class="pinterest-share" onclick="sharePinterestPin(decodeURIComponent('${encodeURIComponent(source)}'),decodeURIComponent('${encodeURIComponent(title)}'))">BAGIKAN ↗</button></div></article>`}).join('');
+ if(cards)out.insertAdjacentHTML('beforeend',cards);
+}
+async function sharePinterestPin(url,title){
+ const data={title:title||'Pinterest Pin',text:title||'Lihat pin ini',url};
+ try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard){await navigator.clipboard.writeText(url);$('pinterestStatus').textContent='Tautan pin disalin.'}else window.open(url,'_blank','noopener');}
+ catch(e){if(e.name!=='AbortError')$('pinterestStatus').textContent='Tidak dapat membagikan tautan.'}
 }
 async function searchPinterest(){
  const q=$('pinterestQuery').value.trim(),out=$('pinterestResults'),status=$('pinterestStatus'),more=$('pinterestMore');
