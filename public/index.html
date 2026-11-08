@@ -616,6 +616,18 @@ html.renox-no-shadows .sidebar,html.renox-no-shadows .hero,html.renox-no-shadows
  </div>
 </section>
 <section class="page" id="noxchat"><div class="hero"><div class="mini">RENOX COMMUNITY / MESSAGING</div><h1>NOX <span>CHAT</span></h1><p>Chat antar pengguna Renox dan balasan status akan hadir di sini.</p></div><div class="noxchat-placeholder"><div class="noxchat-placeholder-icon">✉</div><b>Nox Chat</b><p>Fitur chat dan balasan status sedang disiapkan.</p><span class="coming-pill">COMING SOON</span></div></section>
+<section class="page" id="wifi-lookup-page">
+ <div class="hero"><div class="mini">PERSONAL NETWORK HELP</div><h1>LOOKUP <span>WIFI</span></h1><p>Panduan melihat sandi jaringan Wi-Fi milikmu sendiri melalui pengaturan perangkat.</p></div>
+ <div class="card wifi-lookup-card">
+  <div class="wifi-privacy-note"><b>🔒 Privasi & keamanan</b><p>Renox tidak memindai jaringan sekitar atau mengambil password Wi-Fi. Izin lokasi browser tidak dapat membaca sandi Wi-Fi. Password hanya bisa ditampilkan oleh perangkat untuk jaringan tersimpan setelah verifikasi pemilik.</p></div>
+  <div class="section-head"><h3>Pilih perangkat</h3><span>PANDUAN PERANGKAT</span></div>
+  <div class="wifi-guide-tabs"><button class="primary" id="wifiAndroidTab" onclick="showWifiGuide('android')">ANDROID</button><button class="secondary" id="wifiIphoneTab" onclick="showWifiGuide('iphone')">IPHONE</button><button class="secondary" id="wifiWindowsTab" onclick="showWifiGuide('windows')">WINDOWS</button></div>
+  <div id="wifiAndroidGuide" class="wifi-guide-content"><h3>Android 10 atau lebih baru</h3><ol><li>Buka <b>Setelan / Settings</b>.</li><li>Pilih <b>Jaringan & Internet</b> atau <b>Koneksi</b>, lalu Wi-Fi / Internet.</li><li>Ketuk jaringan yang sedang tersambung atau jaringan tersimpan.</li><li>Pilih <b>Bagikan / Share</b>, lalu verifikasi dengan PIN, sidik jari, atau kunci layar.</li><li>Perangkat menampilkan QR code. Pada beberapa versi Android, password juga tampil di bawah QR code.</li></ol><p>Jika password tidak terlihat, gunakan QR code dari perangkatmu untuk menyambungkan perangkat lain. Jangan bagikan QR atau password di ruang publik.</p></div>
+  <div id="wifiIphoneGuide" class="wifi-guide-content" hidden><h3>iPhone (iOS 16 atau lebih baru)</h3><ol><li>Buka <b>Settings</b> lalu <b>Wi-Fi</b>.</li><li>Ketuk tombol informasi (ⓘ) di samping jaringan tersimpan.</li><li>Ketuk kolom <b>Password</b>.</li><li>Verifikasi dengan Face ID, Touch ID, atau kode sandi perangkat.</li></ol></div>
+  <div id="wifiWindowsGuide" class="wifi-guide-content" hidden><h3>Windows 10 / 11</h3><ol><li>Buka <b>Settings</b> lalu <b>Network & Internet</b>.</li><li>Buka pengaturan jaringan Wi-Fi dan properti jaringan yang tersambung.</li><li>Pilih <b>Wireless Properties</b>, lalu tab <b>Security</b>, jika tersedia.</li><li>Centang <b>Show characters</b> jika akun Windows memiliki izin.</li></ol></div>
+  <p class="hint" id="wifiLookupStatus" aria-live="polite">Pilih sistem operasi. Renox tidak meminta izin lokasi karena izin tersebut tidak dapat mendeteksi password Wi-Fi.</p>
+ </div>
+</section>
 <section class="page" id="music"><div class="hero"><div class="mini">RENOX AUDIO EXPERIENCE</div><h1>MUSIC <span>PLAYER</span></h1><p>Cari lagu di YouTube dan putar langsung di dalam Renox.</p></div><div class="music-panel"><div class="music-art"><div class="music-disc">♫</div><span>RENOX PLAYER</span></div><label>CARI LAGU</label><div class="music-search-row"><input id="youtubeSearchInput" class="field" placeholder="Ketik judul lagu atau nama artis..." onkeydown="if(event.key==='Enter')searchYouTubeMusic()"><button class="primary" onclick="searchYouTubeMusic()">CARI</button></div><div id="musicResults" class="music-results"></div><label>PUTAR DARI URL</label><div class="music-search-row"><input id="youtubeUrlInput" class="field" placeholder="Tempel URL video YouTube..."><button class="primary" onclick="playYouTubeMusic()">PUTAR</button></div><div id="musicStatus" class="hint">Belum ada video yang diputar.</div><div class="project-video-feature"><div class="mini">RENOX PROJECT SOUNDTRACK</div><video id="projectMusicVideo" controls playsinline preload="metadata" src="https://files.catbox.moe/2s4p12.mp4"></video><p class="music-note">Putar soundtrack project di sini. Browser memerlukan sentuhan pengguna sebelum audio dapat dimainkan.</p></div><div class="music-player-frame" id="musicPlayerFrame"><div class="music-placeholder">♫<br>Your music, your space.</div></div><p class="music-note">Pencarian lagu diarahkan ke hasil YouTube. Tempel URL video YouTube untuk memutarnya melalui embed resmi.</p></div></section>
 <section class="page" id="videolounge"><div class="hero"><div class="mini">RENOX WATCH</div><h1>VIDEO <span>LOUNGE</span></h1><p>Tonton video YouTube atau buka layanan anime resmi yang tersedia di wilayahmu.</p></div><div class="card"><label>YOUTUBE VIDEO URL</label><div class="music-search-row"><input id="watchVideoUrl" class="field" placeholder="Tempel URL YouTube..."><button class="primary" onclick="playWatchVideo()">TONTON</button></div><div id="watchVideoStatus" class="hint">Pemutaran menggunakan embed resmi YouTube.</div><div id="watchVideoFrame" class="watch-frame"><div class="music-placeholder">▶<br>Video akan tampil di sini.</div></div></div><div class="card anime-sources"><h3>ANIME STREAMING RESMI</h3><p class="hint">Pilih layanan resmi atau kanal yang menyediakan anime secara legal. Katalog dan ketersediaan mengikuti wilayah.</p><div class="anime-source-grid"><a target="_blank" rel="noopener" href="https://www.crunchyroll.com/">Crunchyroll ↗</a><a target="_blank" rel="noopener" href="https://www.youtube.com/@MuseIndonesia">Muse Indonesia ↗</a><a target="_blank" rel="noopener" href="https://www.youtube.com/@MuseAsia">Muse Asia ↗</a><a target="_blank" rel="noopener" href="https://www.bilibili.tv/">Bstation / Bilibili ↗</a></div></div></section>
 <section class="page" id="amfinder"><div class="hero"><div class="mini">AFTER MOTION COMMUNITY TOOLS</div><h1>AM <span>PRESET FINDER</span></h1><p>Tempel link video TikTok atau YouTube. Renox akan membaca judul publik jika tersedia lalu mencari preset yang relevan.</p></div><div class="card am-finder-card"><label>URL VIDEO TIKTOK / YOUTUBE</label><div class="music-search-row"><input id="amQuery" class="field" placeholder="https://youtu.be/... atau https://www.tiktok.com/..." onkeydown="if(event.key==='Enter')findAMPreset()"><button class="primary" onclick="findAMPreset()">CARI PRESET</button></div><div id="amStatus" class="hint">Masukkan URL video publik. Video dan rekomendasi preset akan muncul di bawah.</div><div id="amVideoPreview"></div><h3 style="margin:16px 0 8px">PRESET TERKAIT VIDEO</h3><div id="amResults" class="music-results"></div></div>
@@ -698,7 +710,7 @@ function showPage(page,el){document.body.classList.remove('menu-open');
  if($(page))$(page).classList.add('active');
  document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
  if(el)el.classList.add('active');
- const titles={home:'Dashboard',shop:'Renox Shop',lookup:'Roblox Lookup',nexoai:'Nexo AI',noxmaps:'Nox Maps',history:'Search History',favorites:'Saved Friends',freefire:'Free Fire Lookup',mobilelegends:'Mobile Legends Lookup',community:'Global Chat',noxchat:'Nox Chat',pinterest:'Pinterest Search',privatechat:'Private Chat',schedule:'Jadwal Pelajaran',calculator:'Kalkulator',tiktok:'TikTok Lookup',animestream:'Anime Streaming',telegramlookup:'Telegram Lookup',apps:'App Directory',renoxgame:'Renox Game',profile:'Account Profile',gethtml:'Get HTML',videodownloader:'Video Downloader',videolounge:'Video Lounge',amfinder:'AM Finder', 'temp-mail':'Temp Mail',checkban:'Unban Method',music:'Music Player',announcements:'Announcements',leaks:'Game Leaks',memes:'Reddit Memes',owner:'Owner Console',settings:'Display Settings',phoneinfo:'Phone Information'};
+ const titles={'wifi-lookup-page':'Lookup WiFi',home:'Dashboard',shop:'Renox Shop',lookup:'Roblox Lookup',nexoai:'Nexo AI',noxmaps:'Nox Maps',history:'Search History',favorites:'Saved Friends',freefire:'Free Fire Lookup',mobilelegends:'Mobile Legends Lookup',community:'Global Chat',noxchat:'Nox Chat',pinterest:'Pinterest Search',privatechat:'Private Chat',schedule:'Jadwal Pelajaran',calculator:'Kalkulator',tiktok:'TikTok Lookup',animestream:'Anime Streaming',telegramlookup:'Telegram Lookup',apps:'App Directory',renoxgame:'Renox Game',profile:'Account Profile',gethtml:'Get HTML',videodownloader:'Video Downloader',videolounge:'Video Lounge',amfinder:'AM Finder', 'temp-mail':'Temp Mail',checkban:'Unban Method',music:'Music Player',announcements:'Announcements',leaks:'Game Leaks',memes:'Reddit Memes',owner:'Owner Console',settings:'Display Settings',phoneinfo:'Phone Information'};
  $('pageTitle').textContent=titles[page]||'Renox Project';
  if(page==='history')renderHistory();
  if(page==='favorites')renderFavorites();
@@ -1075,7 +1087,18 @@ setInterval(loadPublicContent,60000);
 setInterval(refreshDM,15000);
 
 renderHistory();
-let v7YTPlayer=null,v7MusicTimer=null;
+let v7YTPlayer=null,v7MusicTimer=null,v7PendingVideo=null,v7YtApiPromise=null;
+function ensureRenoxYouTubeAPI(){
+ if(window.YT&&window.YT.Player)return Promise.resolve();
+ if(v7YtApiPromise)return v7YtApiPromise;
+ v7YtApiPromise=new Promise(resolve=>{window.onYouTubeIframeAPIReady=()=>resolve();if(!document.querySelector('script[data-renox-youtube-api]')){const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.async=true;s.dataset.renoxYoutubeApi='1';document.head.appendChild(s)}});
+ return v7YtApiPromise;
+}
+function stopRenoxYouTubeTimer(){if(v7MusicTimer){clearInterval(v7MusicTimer);v7MusicTimer=null}}
+function startRenoxYouTubeTimer(){
+ stopRenoxYouTubeTimer();v7MusicTimer=setInterval(()=>{if(!v7YTPlayer||typeof v7YTPlayer.getCurrentTime!=='function')return;const d=Number(v7YTPlayer.getDuration())||0,t=Number(v7YTPlayer.getCurrentTime())||0,bar=$('v7SongProgress'),time=$('v7SongTime');if(bar)bar.style.width=d?Math.min(100,t/d*100)+'%':'0%';if(time)time.textContent=d?formatMusicTime(t)+' / '+formatMusicTime(d):'Memuat durasi…'},500);
+}
+function setRenoxMusicSpin(on){document.querySelector('.music-disc')?.classList.toggle('is-playing',!!on);document.querySelector('.v7-disc')?.classList.toggle('is-playing',!!on)}
 async function searchYouTubeMusic(){
  const q=$('youtubeSearchInput').value.trim();if(!q){$('musicStatus').textContent='Masukkan judul lagu.';return}
  $('musicStatus').textContent='Mencari di YouTube...';$('musicResults').innerHTML='';
@@ -1120,12 +1143,18 @@ function extractYouTubeId(raw){
 }
 function playYouTubeVideoId(id,title){
  if(!/^[A-Za-z0-9_-]{11}$/.test(id)){$('musicStatus').textContent='ID video YouTube tidak valid.';return}
- $('musicPlayerFrame').innerHTML='<iframe title="YouTube music player" loading="lazy" src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
- document.querySelector('.music-disc')?.classList.add('is-playing');document.querySelector('.v7-disc')?.classList.add('is-playing');
- $('v7SongName').textContent=title;$('v7SongTime').textContent='Kontrol progres tersedia di pemutar YouTube.';
- $('v7SongProgress').style.width='0%';$('musicStatus').textContent='Memutar melalui pemutar YouTube resmi. Gunakan kontrol di dalam pemutar untuk progres lagu.';
+ v7PendingVideo={id,title:title||'YouTube Music'};stopRenoxYouTubeTimer();setRenoxMusicSpin(false);$('musicPlayerFrame').innerHTML='<div id="renoxYoutubePlayer"></div>';
+ $('v7SongName').textContent=v7PendingVideo.title;$('v7SongTime').textContent='Menghubungkan pemutar YouTube…';$('v7SongProgress').style.width='0%';$('musicStatus').textContent='Memuat pemutar YouTube resmi…';
+ ensureRenoxYouTubeAPI().then(()=>{if(!v7PendingVideo)return;if(v7YTPlayer&&typeof v7YTPlayer.loadVideoById==='function'){v7YTPlayer.loadVideoById(v7PendingVideo.id);return}
+ v7YTPlayer=new YT.Player('renoxYoutubePlayer',{videoId:v7PendingVideo.id,playerVars:{autoplay:1,playsinline:1,rel:0,enablejsapi:1},events:{
+ onReady:e=>{e.target.playVideo();$('musicStatus').textContent='Pemutar YouTube siap. Progres lagu ditampilkan di mini player.'},
+ onStateChange:e=>{if(e.data===YT.PlayerState.PLAYING){setRenoxMusicSpin(true);startRenoxYouTubeTimer();$('musicStatus').textContent='Lagu sedang diputar.'}else if(e.data===YT.PlayerState.PAUSED){setRenoxMusicSpin(false);stopRenoxYouTubeTimer()}else if(e.data===YT.PlayerState.ENDED){setRenoxMusicSpin(false);stopRenoxYouTubeTimer();$('v7SongProgress').style.width='100%'}else if(e.data===YT.PlayerState.BUFFERING){$('musicStatus').textContent='Memuat audio…'}},
+ onError:()=>{$('musicStatus').textContent='Video tidak dapat diputar melalui embed. Coba video YouTube lain.';setRenoxMusicSpin(false);stopRenoxYouTubeTimer()}
+ }});
+ }).catch(()=>{$('musicStatus').textContent='Pemutar YouTube gagal dimuat. Periksa koneksi internet.'});
 }
 function playDirectMusic(url,title){
+ stopRenoxYouTubeTimer();setRenoxMusicSpin(false);v7YTPlayer=null;
  let u;try{u=new URL(url)}catch{$('musicStatus').textContent='URL preview tidak valid.';return}
  if(!['https:','http:'].includes(u.protocol)){$('musicStatus').textContent='URL audio harus menggunakan HTTP atau HTTPS.';return}
  $('musicPlayerFrame').innerHTML='<audio id="renoxAudio" controls autoplay preload="metadata" style="width:100%"></audio>';
@@ -1296,7 +1325,7 @@ function copyHtmlSource(){const v=$("htmlSourceOutput").value;if(!v){$("htmlSour
 
 document.addEventListener('DOMContentLoaded',()=>{applyGraphicsSettings();setRenoxTheme(localStorage.getItem('renoxTheme')||'current');if($('refreshRateSelect'))$('refreshRateSelect').value=localStorage.getItem('renoxRefreshPreference')||'60';if($('fontSelect')&&localStorage.getItem('renoxFont'))$('fontSelect').value=localStorage.getItem('renoxFont');checkAccount();checkDeveloper();refreshGlobalTheme();loadPublicContent();renderDailyHadith();loadPrayerTimes();loadStatuses();refreshChat();filterAnimeCatalog();setInterval(refreshGlobalTheme,4000);setInterval(loadStatuses,30000);setInterval(refreshChat,4500);setInterval(checkAccount,12000);setInterval(()=>{if($('accountGate').style.display==='none')refreshServerStats()},10000);if(guestProfile.banner){$('profileBannerSelect').value=guestProfile.banner;applyProfileBanner(guestProfile.banner)}});
 </script>
-<div id="navDrawer" class="nav-drawer" hidden><div class="nav-drawer-head"><b>RENOX NAVIGATION</b><button onclick="toggleNavDrawer()">×</button></div><div id="navDrawerItems" class="nav-drawer-items"></div></div><nav class="liquid-bottom-nav" aria-label="Navigasi utama"><button class="active" onclick="bottomNavigate('home',this)"><span class="nav-icon">⌂</span><small>HOME</small></button><button onclick="bottomNavigate('gethtml',this)"><span class="nav-icon nav-html-logo">&lt;/&gt;</span><small>GET HTML</small></button><button onclick="bottomNavigate('community',this)"><span class="nav-icon">▤</span><small>CHAT</small></button><button onclick="bottomNavigate('noxchat',this)"><span class="nav-icon">✉</span><small>NOX CHAT</small></button><button onclick="toggleNavDrawer()"><span class="nav-icon">☰</span><small>MORE</small></button><i class="liquid-indicator"></i></nav>
+<div id="navDrawer" class="nav-drawer" hidden><div class="nav-drawer-head"><b>RENOX NAVIGATION</b><button onclick="toggleNavDrawer()">×</button></div><div id="navDrawerItems" class="nav-drawer-items"></div></div><nav class="liquid-bottom-nav" aria-label="Navigasi utama"><button class="active" onclick="bottomNavigate('home',this)"><span class="nav-icon">⌂</span><small>HOME</small></button><button onclick="bottomNavigate('gethtml',this)"><span class="nav-icon nav-html-logo">&lt;/&gt;</span><small>GET HTML</small></button><button onclick="bottomNavigate('wifi-lookup-page',this)"><span class="nav-icon">⌁</span><small>LOOKUP WIFI</small></button><button onclick="bottomNavigate('noxchat',this)"><span class="nav-icon">✉</span><small>NOX CHAT</small></button><button onclick="toggleNavDrawer()"><span class="nav-icon">☰</span><small>MORE</small></button><i class="liquid-indicator"></i></nav>
 <style id="renox-identity-redesign">
 /* RENOX 11 — complete visual identity layer; feature logic remains untouched */
 :root{
@@ -1431,8 +1460,31 @@ body.renox-comic-theme .auth-login{background:#168eaa!important;color:#fff!impor
 body.renox-comic-theme .auth-register{background:#ffe17a!important;color:#201c18!important;border:2px solid #201c18!important}
 body.renox-comic-theme .auth-pill{background:#b8e8e8!important;color:#201c18!important;border:1px solid #201c18!important}
 body.renox-comic-theme .developer-contact-modal{background:#201c18cc!important}
+/* Comic-only typography */
+body.renox-comic-theme :is(h1,h2,h3,h4,h5,p,span,b,strong,small,label,button,a,li,td,th,blockquote,summary,figcaption,.hint,.mini,.empty,.section-head,.navtitle,.tag,.footer,.music-note){color:#17130f!important;font-weight:800!important;text-shadow:none!important}
+body.renox-comic-theme input,body.renox-comic-theme textarea,body.renox-comic-theme select{color:#17130f!important;font-weight:800!important}
+body.renox-comic-theme input::placeholder,body.renox-comic-theme textarea::placeholder{color:#51483e!important;font-weight:800!important;opacity:1!important}
+body.renox-comic-theme .tile-icon,body.renox-comic-theme .global-chat-mark,body.renox-comic-theme .owner-pin-icon,body.renox-comic-theme .nav-icon{color:#17130f!important}
 @media(max-width:760px){body.renox-comic-theme .sidebar{background:#fffdf5!important}.home-feature-grid{gap:11px!important}body.renox-comic-theme .liquid-bottom-nav{bottom:max(8px,env(safe-area-inset-bottom))!important}}
+ .wifi-lookup-card{margin-top:18px;padding:clamp(16px,3vw,24px)}
+ .wifi-privacy-note{padding:15px;border:1px solid #43b8a055;border-radius:15px;background:#168b6512;margin-bottom:20px}
+ .wifi-privacy-note p{margin:7px 0 0;font-size:12px;line-height:1.7;color:var(--rx-muted)}
+ .wifi-guide-tabs{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0 18px}.wifi-guide-tabs button{flex:1;min-width:90px;padding:12px}
+ .wifi-guide-content{padding:18px;border:1px solid var(--rx-line);border-radius:16px;background:var(--rx-surface-2);line-height:1.8}
+ .wifi-guide-content h3{margin:0 0 12px}.wifi-guide-content ol{padding-left:22px;margin:0}.wifi-guide-content li{padding:4px 0;font-size:13px}.wifi-guide-content p{font-size:12px;line-height:1.7;margin:14px 0 0}
+ .v7-disc{animation:none!important}.v7-disc.is-playing{animation:renoxDiscSpin 3.2s linear infinite!important}.music-disc.is-playing{animation:renoxDiscSpin 3.2s linear infinite!important}
+ .music-player-frame #renoxYoutubePlayer,.music-player-frame #renoxYoutubePlayer iframe{width:100%;height:100%;min-height:200px}
+ .v7-progress{height:6px!important;background:#ffffff25!important;border-radius:99px!important;overflow:hidden!important}.v7-progress i{height:100%!important;background:linear-gradient(90deg,#42d9e8,#8b79ff)!important;box-shadow:0 0 10px #42d9e877}
+ body.renox-comic-theme .wifi-lookup-card,body.renox-comic-theme .wifi-guide-content{background:#fffdf5!important;border:2px solid #201c18!important;box-shadow:4px 4px 0 #201c18!important}
+ body.renox-comic-theme .wifi-privacy-note{background:#d9f2e5!important;border:2px solid #201c18!important}
+ @media(max-width:600px){.wifi-guide-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.wifi-guide-tabs button{min-width:0;padding:10px 5px;font-size:10px}}
 </style>
+<script>
+function showWifiGuide(kind){
+ ['android','iphone','windows'].forEach(k=>{const cap=k[0].toUpperCase()+k.slice(1),panel=$('wifi'+cap+'Guide'),tab=$('wifi'+cap+'Tab');if(panel)panel.hidden=k!==kind;if(tab){tab.classList.toggle('primary',k===kind);tab.classList.toggle('secondary',k!==kind)}});
+ const status=$('wifiLookupStatus');if(status)status.textContent='Panduan '+kind.toUpperCase()+' dipilih. Password hanya ditampilkan oleh perangkat setelah verifikasi pemilik.';
+}
+</script>
 <script id="renox-icon-system">
 (function(){
  const paths={
@@ -1466,6 +1518,7 @@ body.renox-comic-theme .developer-contact-modal{background:#201c18cc!important}
   settings:'<circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.5.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.5-.9l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.8l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.5-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.5.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1 0 1.7Z"/>',
   phoneinfo:'<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/>',
   noxchat:'<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H5l-2 2v-6.5A8.5 8.5 0 0 1 11.5 7H13"/><path d="M15 3h6v6M21 3l-8 8"/>',
+  'wifi-lookup-page':'<path d="M2 8.8a15 15 0 0 1 20 0"/><path d="M5 12a10.5 10.5 0 0 1 14 0"/><path d="M8.5 15.5a5.5 5.5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/>',
   more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
   download:'<path d="M12 3v12m-5-5 5 5 5-5M5 17v4h14v-4"/>'
  };
@@ -1504,6 +1557,7 @@ body.renox-comic-theme .developer-contact-modal{background:#201c18cc!important}
   if(label.includes('setting'))return 'settings';
   if(label.includes('phone'))return 'phoneinfo';
   if(label.includes('nox chat'))return 'noxchat';
+  if(label.includes('lookup wifi'))return 'wifi-lookup-page';
   if(label.includes('more'))return 'more';
   return 'apps';
  };
