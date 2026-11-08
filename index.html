@@ -969,17 +969,31 @@ try{dmRecent=JSON.parse(localStorage.getItem('renoxDmRecent')||'[]')}catch{dmRec
 function renderDMRecent(){const box=$('dmRecentList');if(!box)return;box.innerHTML=dmRecent.length?dmRecent.map(id=>'<button class="nox-wa-recent-item" onclick="selectDM(\''+encodeURIComponent(id)+'\')"><span class="nox-wa-recent-avatar">R</span><span><b>'+escapeText(id)+'</b><small>Pesan pribadi</small></span></button>').join(''):'<div class="nox-wa-empty">Belum ada chat. Masukkan Guest ID untuk memulai.</div>'}
 function selectDM(id){$('dmPeer').value=decodeURIComponent(id);openDM()}
 let renoxDMUsers=[];
-async function searchDMUsers(){const q=$('dmPeer').value.trim().toLowerCase();try{const d=await apiJSON('/api/members');renoxDMUsers=d.members||[];const matches=renoxDMUsers.filter(x=>(x.name||'').toLowerCase().includes(q)).slice(0,80);$('dmRecentList').innerHTML=matches.map(x=>'<button class="nox-wa-recent-item" onclick="selectDM(\\''+encodeURIComponent(x.id)+'\\')"><img class="nox-wa-recent-avatar" src="'+escapeText(x.avatar||'')+'" onerror="this.outerHTML=\'<span class=nox-wa-recent-avatar>R</span>\'"><span><b>'+escapeText(x.name||'Member')+'</b><small>'+((Date.now()-(x.lastSeen||0)<90000)?'● Online':'Anggota RENOX')+'</small></span></button>').join('')||'<div class="nox-wa-empty">Tidak ada anggota yang cocok.</div>'}catch(e){$('dmRecentList').textContent='Gagal memuat anggota: '+e.message}}
-function selectDM(id){$('dmPeer').value=decodeURIComponent(id);openDM()}
-async function openDM(){
- const raw=$('dmPeer').value.trim();if(!raw){$('dmStatus').textContent='Cari nama anggota RENOX terlebih dahulu.';return}
- let member=renoxDMUsers.find(x=>x.id===raw)||renoxDMUsers.find(x=>(x.name||'').toLowerCase()===raw.toLowerCase());
+async function searchDMUsers(){
+ const q=$('dmPeer').value.trim().toLowerCase();
+ try{
+  const d=await apiJSON('/api/members');renoxDMUsers=d.members||[];
+  const matches=renoxDMUsers.filter(x=>(x.name||'').toLowerCase().includes(q)).slice(0,80),box=$('dmRecentList');box.textContent='';
+  if(!matches.length){box.textContent='Tidak ada anggota yang cocok.';return}
+  matches.forEach(member=>{
+   const button=document.createElement('button');button.className='nox-wa-recent-item';button.type='button';button.addEventListener('click',()=>{ $('dmPeer').value=member.name||'';openDM(member.id) });
+   const avatar=member.avatar?document.createElement('img'):document.createElement('span');avatar.className='nox-wa-recent-avatar';
+   if(member.avatar){avatar.src=member.avatar;avatar.alt='';avatar.onerror=()=>{const fallback=document.createElement('span');fallback.className='nox-wa-recent-avatar';fallback.textContent='R';avatar.replaceWith(fallback)}}else avatar.textContent=(member.name||'R').slice(0,1).toUpperCase();
+   const copy=document.createElement('span'),name=document.createElement('b'),meta=document.createElement('small');name.textContent=member.name||'Member';meta.textContent=Date.now()-(member.lastSeen||0)<90000?'● Online':'Anggota RENOX';copy.append(name,meta);button.append(avatar,copy);box.append(button);
+  });
+ }catch(e){$('dmRecentList').textContent='Gagal memuat anggota: '+e.message}
+}
+function selectDM(id){const member=renoxDMUsers.find(x=>x.id===decodeURIComponent(id));if(member){$('dmPeer').value=member.name||'';openDM(member.id)}}
+async function openDM(selectedId){
+ const raw=$('dmPeer').value.trim();
+ if(!selectedId&&!raw){$('dmStatus').textContent='Cari nama anggota RENOX terlebih dahulu.';return}
+ let member=renoxDMUsers.find(x=>x.id===selectedId)||renoxDMUsers.find(x=>(x.name||'').toLowerCase()===raw.toLowerCase());
  if(!member){await searchDMUsers();member=renoxDMUsers.find(x=>(x.name||'').toLowerCase()===raw.toLowerCase())}
  if(!member){$('dmStatus').textContent='Pilih anggota dari hasil pencarian.';return}
  const nextPeer=member.id;if(nextPeer===guestId){$('dmStatus').textContent='Ini akun kamu sendiri.';return}
  dmPeer=nextPeer;dmAfter=0;dmRenderedKeys.clear();$('dmMessages').innerHTML='<div class="nox-wa-welcome"><div>✉</div><b>Memuat percakapan...</b><span>Mohon tunggu sebentar.</span></div>';
  dmRecent=[dmPeer,...dmRecent.filter(x=>x!==dmPeer)].slice(0,20);localStorage.setItem('renoxDmRecent',JSON.stringify(dmRecent));renderDMRecent();
- $('dmContactName').textContent=member.name||'Member RENOX';$('dmContactAvatar').textContent=(member.name||'R').slice(0,1).toUpperCase();$('dmStatus').textContent=(Date.now()-(member.lastSeen||0)<90000?'● Online':'Anggota RENOX');$('dmInput').disabled=false;$('dmSendButton').disabled=false;
+ $('dmContactName').textContent=member.name||'Member RENOX';$('dmContactAvatar').textContent=(member.name||'R').slice(0,1).toUpperCase();$('dmStatus').textContent=Date.now()-(member.lastSeen||0)<90000?'● Online':'Anggota RENOX';$('dmInput').disabled=false;$('dmSendButton').disabled=false;
  try{await refreshDM(true)}catch(e){$('dmStatus').textContent='Gagal memuat: '+e.message;$('dmInput').disabled=true;$('dmSendButton').disabled=true}
 }
 
@@ -1402,10 +1416,50 @@ async function readTempMail(id){
 function copyTempMail(){if(tempMailAccount?.email)navigator.clipboard?.writeText(tempMailAccount.email).then(()=>alert('Alamat disalin.')).catch(()=>alert(tempMailAccount.email))}
 let waAppealCheck=null;
 function openOtherGmailDraft(){const to=$('mailToOther').value.trim(),subject=$('mailSubjectOther').value.trim(),body=$('mailBodyOther').value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)){$('mailOtherStatus').textContent='Masukkan alamat email tujuan yang valid.';return}if(!subject||!body){$('mailOtherStatus').textContent='Isi subjek dan pesan terlebih dahulu.';return}const url='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(to)+'&su='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);window.open(url,'_blank','noopener,noreferrer');$('mailOtherStatus').textContent='Draft Gmail dibuka. Tinjau alamat tujuan dan isi pesan, lalu kirim dari Gmail.'}
-async function checkWhatsAppBan(){const n=$('checkbanNumber').value.replace(/[^0-9]/g,'');const out=$('checkbanResult'),gate=$('appealPrepare'),status=$('appealStatus');waAppealCheck=null;$('appealPreview').style.display='none';gate.disabled=true;if(!/^\\d{8,15}$/.test(n)){out.textContent='Masukkan nomor 8–15 digit dengan kode negara.';status.textContent='Nomor belum valid.';return}out.textContent='Memeriksa nomor...';status.textContent='Menunggu hasil pemeriksaan...';try{const d=await apiJSON('/api/checkban?number='+encodeURIComponent(n));const all=[d.status,d.reason,d.violation_type].join(' ').toLowerCase();const permanent=/permanent|permanently|permanent.?ban|permanen|final.?ban|final/.test(all);const review=/review|under.?review|appeal|appealable|temporary|temporarily|tinjau|sementara|pending/.test(all);const banned=!!d.banned;let eligibility=permanent?'permanent':banned&&review?'review':!banned?'not_banned':'unknown';waAppealCheck={number:n,data:d,eligibility};out.innerHTML='<div class="checkban-status"><b>'+ (banned?'⚠ TERDETEKSI BANNED':'✓ TIDAK TERDETEKSI BANNED')+'</b><p>Nomor: '+escapeText(d.number||n)+'</p><p>Status: '+escapeText(d.status||'-')+' · Alasan: '+escapeText(d.reason||'-')+'</p><p>Jenis: '+escapeText(d.violation_type||'-')+'</p></div>';if(permanent){status.textContent='UNBAN DITOLAK — nomor ini tidak bisa dibuka karena banned Permanently.';gate.disabled=true}else if(banned&&review){gate.disabled=false;status.textContent='Isi nomor, alasan, dan tanggal banned untuk mengirim permohonan.'}else if(!banned){status.textContent='Nomor tidak terdeteksi banned. Pengajuan tidak diperlukan.'}else{status.textContent='Status ban tidak dapat dipastikan. Pengajuan belum dibuka.'}}catch(e){out.textContent='Gagal: '+e.message;status.textContent='Pemeriksaan gagal. Coba lagi nanti.'}}
+async function checkWhatsAppBan(){
+ const n=$('checkbanNumber').value.replace(/[^0-9]/g,'');const out=$('checkbanResult'),gate=$('appealPrepare'),status=$('appealStatus');waAppealCheck=null;$('appealPreview').style.display='none';gate.disabled=true;
+ if(!/^\d{8,15}$/.test(n)){out.textContent='Masukkan nomor 8–15 digit dengan kode negara.';status.textContent='Nomor belum valid.';return}
+ out.textContent='Memeriksa nomor...';status.textContent='Menunggu hasil pemeriksaan...';
+ try{
+  const d=await apiJSON('/api/checkban?number='+encodeURIComponent(n)),all=[d.status,d.reason,d.violation_type].join(' ').toLowerCase();
+  const permanent=/permanent|permanently|permanent.?ban|permanen|final.?ban|final/.test(all),review=/review|under.?review|appeal|appealable|temporary|temporarily|tinjau|sementara|pending/.test(all),banned=!!d.banned;
+  const eligibility=permanent?'permanent':banned&&review?'review':!banned?'not_banned':'unknown';waAppealCheck={number:n,data:d,eligibility};
+  out.textContent=(banned?'TERDETEKSI BANNED':'TIDAK TERDETEKSI BANNED')+' · Nomor '+(d.number||n)+' · Status '+(d.status||'-')+' · Alasan '+(d.reason||'-');
+  if(permanent){status.textContent='UNBAN DITOLAK — nomor ini tidak bisa dibuka karena banned Permanently.';gate.disabled=true}
+  else if(banned&&review){gate.disabled=false;status.textContent='Isi nomor, alasan, dan tanggal banned untuk mengirim permohonan.'}
+  else if(!banned){status.textContent='Nomor tidak terdeteksi banned. Pengajuan tidak diperlukan.'}
+  else{status.textContent='Status ban tidak dapat dipastikan. Pengajuan belum dibuka.'}
+ }catch(e){out.textContent='Gagal: '+e.message;status.textContent='Pemeriksaan gagal. Coba lagi nanti.'}
+}
 
-async function submitRenoxUnban(){if(!waAppealCheck||waAppealCheck.eligibility!=='review')return;const bannedAt=$('appealBannedDate').value,reason=$('appealReason').value,details=$('appealDetails').value.trim();if(!bannedAt){$('appealStatus').textContent='Pilih tanggal banned terlebih dahulu.';return}const btn=$('appealPrepare');btn.disabled=true;btn.textContent='MENGIRIM...';try{const d=await apiJSON('/api/unban',{method:'POST',body:JSON.stringify({guestId,number:waAppealCheck.number,bannedAt,reason,details})});$('appealStatus').textContent=d.message||'Pengajuan terkirim. Silakan tinjau dan mohon tunggu hingga 6 jam.';btn.textContent='PENGAJUAN TERKIRIM';}catch(e){$('appealStatus').textContent=e.message;btn.disabled=false;btn.textContent='KIRIM PENGAJUAN UNBAN'}}
-async function loadOwnerUnbanRequests(){const box=$('ownerUnbanRequests');if(!box)return;box.textContent='Memuat...';try{const d=await apiJSON('/api/owner/unban');box.innerHTML=(d.requests||[]).map(x=>'<div class="panel-card" style="margin:8px 0"><b>'+escapeText(x.number)+'</b><p>'+escapeText(x.name)+' · '+escapeText(x.bannedAt)+'</p><p>'+escapeText(x.reason)+' '+escapeText(x.details||'')+'</p><p>Status: '+escapeText(x.status)+'</p><button class="secondary" onclick="reviewOwnerUnban(\\''+x.id+'\\',\\'approved\\')">SETUJUI</button> <button class="secondary" onclick="reviewOwnerUnban(\\''+x.id+'\\',\\'rejected\\')">TOLAK</button></div>').join('')||'Belum ada pengajuan.'}catch(e){box.textContent='Tidak dapat memuat: '+e.message}}
+async function submitRenoxUnban(){
+ if(!waAppealCheck||waAppealCheck.eligibility!=='review')return;
+ const bannedAt=$('appealBannedDate').value,reason=$('appealReason').value,details=$('appealDetails').value.trim();
+ if(!bannedAt){$('appealStatus').textContent='Pilih tanggal banned terlebih dahulu.';return}
+ const btn=$('appealPrepare');btn.disabled=true;btn.textContent='MENGIRIM...';
+ try{const d=await apiJSON('/api/unban',{method:'POST',body:JSON.stringify({guestId,number:waAppealCheck.number,bannedAt,reason,details})});$('appealStatus').textContent=d.message||'Pengajuan terkirim. Silakan tinjau dan mohon tunggu hingga 6 jam.';btn.textContent='PENGAJUAN TERKIRIM'}
+ catch(e){$('appealStatus').textContent=e.message;btn.disabled=false;btn.textContent='KIRIM PENGAJUAN UNBAN'}
+}
+async function loadOwnerUnbanRequests(){
+ const box=$('ownerUnbanRequests');if(!box)return;box.textContent='Memuat...';
+ try{
+  const d=await apiJSON('/api/owner/unban');box.textContent='';
+  (d.requests||[]).forEach(item=>{
+   const card=document.createElement('div');card.className='panel-card';card.style.margin='8px 0';
+   const title=document.createElement('b');title.textContent=item.number||'';
+   const info=document.createElement('p');info.textContent=(item.name||'Member')+' · '+(item.bannedAt||'');
+   const reason=document.createElement('p');reason.textContent=(item.reason||'')+' '+(item.details||'');
+   const state=document.createElement('p');state.textContent='Status: '+(item.status||'pending');
+   card.append(title,info,reason,state);
+   if(item.status==='pending'){
+    const approve=document.createElement('button');approve.className='secondary';approve.textContent='SETUJUI';approve.onclick=()=>reviewOwnerUnban(item.id,'approved');
+    const reject=document.createElement('button');reject.className='secondary';reject.textContent='TOLAK';reject.onclick=()=>reviewOwnerUnban(item.id,'rejected');card.append(approve,reject);
+   }
+   box.append(card);
+  });
+  if(!box.children.length)box.textContent='Belum ada pengajuan.'
+ }catch(e){box.textContent='Tidak dapat memuat: '+e.message}
+}
 async function reviewOwnerUnban(id,status){try{await apiJSON('/api/owner/unban',{method:'POST',body:JSON.stringify({id,status})});await loadOwnerUnbanRequests()}catch(e){alert(e.message)}}
 
 function prepareWhatsAppAppeal(){if(!waAppealCheck||waAppealCheck.eligibility!=='review')return;const number=waAppealCheck.number,method=$('appealMethod').value,reason=$('appealReason').value,details=$('appealDetails').value.trim();const letter=`Kepada Tim Dukungan WhatsApp,
