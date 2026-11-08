@@ -525,7 +525,7 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
   <div class="auth-art"><img src="/login-anime.jpg" alt="Artwork Renox Project"></div>
   <div class="auth-form">
    <label class="auth-input-wrap"><span class="auth-input-icon" aria-hidden="true">🔒</span><input id="gateUsername" class="field auth-field" maxlength="24" placeholder="USERNAME" autocomplete="username" aria-label="Username"></label>
-   <label class="auth-input-wrap"><span class="auth-input-icon">♙</span><input id="gatePassword" class="field auth-field" type="password" maxlength="128" placeholder="PASSWORD" autocomplete="current-password" aria-label="Password"><button type="button" class="auth-eye" onclick="toggleGatePassword()" aria-label="Tampilkan password">◉</button></label>
+   <label class="auth-input-wrap"><span class="auth-input-icon" aria-hidden="true">🔒</span><input id="gatePassword" class="field auth-field" type="password" maxlength="128" placeholder="PASSWORD" autocomplete="current-password" aria-label="Password"><button type="button" class="auth-eye" onclick="toggleGatePassword()" aria-label="Tampilkan password">◉</button></label>
    <label class="remember-login"><input id="rememberLogin" type="checkbox"><span class="remember-switch" aria-hidden="true"></span><span class="remember-text">Simpan login di perangkat ini</span></label>
    <div class="auth-actions"><button id="gateLoginButton" class="primary auth-login" onclick="gateAuth('login')">L O G I N</button><button class="auth-register" onclick="gateAuth('register')">BUAT AKUN BARU</button></div>
    <div id="gateStatus" class="hint auth-status" aria-live="polite"></div>
@@ -810,7 +810,8 @@ function showPage(page,el){if(page==='noxchat')page='privatechat';if(page==='own
  if(page==='announcements'||page==='leaks')loadPublicContent();
  if(page==='memes')loadMemes();
  if(page==='schedule')renderSchedule();
- if(page==='owner')loadOwnerConsole();
+ if(page==='owner'){loadOwnerConsole();setTimeout(loadOwnerUnbanRequests,250)}
+ if(page==='privatechat')searchDMUsers();
  if(page==='phoneinfo')refreshPhoneInfo();
 }
 
