@@ -1547,12 +1547,14 @@ async function checkAccount(){
    let cached=null;
    try{cached=JSON.parse(localStorage.getItem('renoxProfile:'+guestId)||'null')}catch(e){}
    try{const existing=await apiJSON('/api/profile/'+encodeURIComponent(guestId));cached=existing.profile}catch(e){}
-   guestProfile=cached?{...guestProfile,...cached,id:guestId}:{...guestProfile,id:guestId,name:/^Guest(?:-|$)/i.test(guestProfile.name||'')?accountName:guestProfile.name};
-   if(!cached){
+   guestProfile=cached?{...guestProfile,...cached,id:guestId}:{...guestProfile,id:guestId};
+   if(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name))guestProfile.name=accountName;
+   if(!cached||/^Guest(?:-|$)/i.test(cached?.name||'')){
     try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:guestProfile.name||accountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile=saved.profile}catch(e){}
    }
   }else if(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name)){
    guestProfile.name=accountName;
+   try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:accountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile=saved.profile}catch(e){console.warn('Account profile sync:',e.message)}
   }
   try{localStorage.setItem('renoxProfile:'+guestId,JSON.stringify(guestProfile))}catch(e){}
   try{updateGuestPreview()}catch(e){console.warn('RENOX profile preview:',e)}
