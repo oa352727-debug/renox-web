@@ -1480,7 +1480,7 @@ async function checkWhatsAppBan(){
  }catch(e){out.textContent='Gagal: '+e.message;status.textContent='Pemeriksaan gagal. Coba lagi nanti.'}
 }
 
-async let renoxBanCheckCache=null;
+let renoxBanCheckCache=null;
 function renoxTerminal(line,kind='green'){
  const box=$('appealConsole');if(!box)return;
  const row=document.createElement('div');row.className='term-'+kind;
