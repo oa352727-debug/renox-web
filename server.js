@@ -889,7 +889,7 @@ const server = http.createServer(async (req, res) => {
       const staff=(db.settings.staffUsers||[]).some(x=>String(x).toLowerCase()===key);
       const accountAllowed=!db.settings.maintenance||db.accounts?.[key]?.developer||staff;
       const ok=valid&&db.accounts?.[key]&&db.accounts[key].sessionId===parts[1]&&accountAllowed;
-      return json(res,200,{authenticated:!!ok,revoked:!!valid&&!ok&&accountAllowed,blockedByMaintenance:!!valid&&!accountAllowed,maintenance:Boolean(db.settings.maintenance),username:ok?db.accounts[key].username:null,guestId:ok?crypto.createHash("sha256").update("renox-account:"+key).digest("hex").slice(0,32):null});
+      if(ok&&db.accounts[key].developer){const ownerExpiry=String(Date.now()+7*86400000),ownerToken=ownerExpiry+"."+sign(ownerExpiry);res.setHeader("Set-Cookie","renox_owner="+ownerToken+"; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800"+(process.env.NODE_ENV==="production"?"; Secure":""));} return json(res,200,{authenticated:!!ok,developer:!!(ok&&db.accounts[key].developer),revoked:!!valid&&!ok&&accountAllowed,blockedByMaintenance:!!valid&&!accountAllowed,maintenance:Boolean(db.settings.maintenance),username:ok?db.accounts[key].username:null,guestId:ok?crypto.createHash("sha256").update("renox-account:"+key).digest("hex").slice(0,32):null});
     }
     if(req.method==="POST"&&route==="/api/auth/logout"){
       res.writeHead(200,{"Content-Type":"application/json","Set-Cookie":"renox_account=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0"});return res.end(JSON.stringify({ok:true}));
