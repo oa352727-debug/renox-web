@@ -6,6 +6,7 @@ const os = require("os");
 const { spawn } = require("child_process");
 const { promisify } = require("util");
 const execFile = promisify(require("child_process").execFile);
+const { createTelegramMonitor } = require("./telegram-monitor");
 
 const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 2429);
 const HOST = "0.0.0.0";
@@ -134,6 +135,7 @@ function getClientIp(req) { return String(req.socket.remoteAddress || "unknown")
 function getAccountKey(req) { const raw=cookieMap(req).renox_account||"", first=raw.indexOf("."); return first>0?raw.slice(0,first):""; }
 function trackIp(req,key) { if(!key)return; const ip=getClientIp(req); db.ipLog=db.ipLog||{}; db.ipLog[key]={ip,lastLogin:Date.now()}; }
 let botHeartbeatAt=0;
+const telegramMonitor = createTelegramMonitor();
 const rateLimits = new Map();
 const tempMailSessions = new Map();
 function rateLimit(key, limit, windowMs) {
@@ -871,7 +873,7 @@ const server = http.createServer(async (req, res) => {
       if(db.accounts[key]) return json(res,409,{error:"Username sudah digunakan."});
       if(db.settings.maintenance) return json(res,503,{error:"RENOX sedang maintenance. Pendaftaran sementara ditutup."});
       const salt=crypto.randomBytes(16).toString("hex"), hash=crypto.scryptSync(password,salt,64).toString("hex"),sid=crypto.randomUUID();
-      db.accounts[key]={username,salt,hash,createdAt:Date.now(),sessionId:sid}; db.registrationEvents=Array.isArray(db.registrationEvents)?db.registrationEvents:[]; db.registrationEvents.push({id:crypto.randomUUID(),username,createdAt:Date.now()}); db.registrationEvents=db.registrationEvents.slice(-500); trackIp(req,key); await saveDB();
+      db.accounts[key]={username,salt,hash,createdAt:Date.now(),sessionId:sid}; db.registrationEvents=Array.isArray(db.registrationEvents)?db.registrationEvents:[]; db.registrationEvents.push({id:crypto.randomUUID(),username,createdAt:Date.now()}); db.registrationEvents=db.registrationEvents.slice(-500); trackIp(req,key); await saveDB(); telegramMonitor.notifyNewRegistration(username);
       const maxAge=remember?2592000:43200, expiry=String(Date.now()+maxAge*1000), token=`${expiry}.${sid}.${sign(expiry+"|"+key+"|"+sid)}`;
       res.writeHead(201,{"Content-Type":"application/json","Set-Cookie":`renox_account=${encodeURIComponent(key)}.${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${maxAge}${process.env.NODE_ENV==="production"?"; Secure":""}`});
       return res.end(JSON.stringify({ok:true,username}));
