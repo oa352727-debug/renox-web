@@ -18,7 +18,7 @@ const PRESENCE_TTL = 90_000;
 const MAX_BODY = 16_000_000;
 const NOXTOK_MAX_VIDEO_BYTES = Math.max(1, Number(process.env.NOXTOK_MAX_VIDEO_MB || 250)) * 1024 * 1024;
 const RELEASE = {
-  version: "10.2.0",
+  version: "10.2.1",
   name: "Renox Project · Lookup & Web Tools Update",
   publishedAt: "2026-11-08",
   changes: [
@@ -26,7 +26,8 @@ const RELEASE = {
     "Unban: pemeriksaan ulang status sebelum pengajuan disimpan.",
     "Unban: nomor dengan status banned permanen yang dinyatakan provider akan ditolak.",
     "Unban: daftar pengajuan dan tindakan review tersedia untuk owner.",
-    "Update: endpoint changelog publik agar halaman pembaruan dapat menampilkan versi dan catatan patch."
+    "Update: endpoint changelog publik agar halaman pembaruan dapat menampilkan versi dan catatan patch.",
+    "Profile: nama akun login diverifikasi dari cookie sesi server, bukan dari input browser."
   ]
 };
 function isPermanentBan(data) {
@@ -603,9 +604,32 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, await configuredGameLookup("ML_LOOKUP_API", id, "Mobile Legends"));
     }
     if (req.method === "POST" && route === "/api/profile") {
-      const body = await readBody(req), id = body.guestId;
+      const body = await readBody(req);
+      let id = body.guestId;
       if (!validGuestId(id)) return json(res, 400, { error: "Guest ID tidak valid." });
-      const name = cleanText(body.name, 24) || "Guest"; let avatar = typeof body.avatar === "string" ? body.avatar : ""; const banner=typeof body.banner==="string"?body.banner:""; const bannerUrl=/^https:\/\/(files\.catbox\.moe|catbox\.moe)\//i.test(banner); const bannerData=/^data:image\/(png|jpeg|webp);base64,[a-z0-9+/=]+$/i.test(banner)&&banner.length<=5_600_000; if(banner && !bannerUrl && !bannerData) return json(res,400,{error:"Banner harus berupa gambar Catbox HTTPS atau gambar PNG/JPG/WebP maksimal 4 MB."});
+
+      // Resolve the signed account cookie server-side. Never trust a client-supplied
+      // username when a valid Renox account session is present.
+      const rawAccount = cookieMap(req).renox_account || "";
+      const dot = rawAccount.indexOf(".");
+      const accountKey = dot > 0 ? rawAccount.slice(0, dot) : "";
+      const token = dot > 0 ? rawAccount.slice(dot + 1) : "";
+      const parts = token.split(".");
+      const expected = parts.length === 3 ? sign(parts[0] + "|" + accountKey + "|" + parts[1]) : "";
+      const account = db.accounts?.[accountKey];
+      const sessionValid = parts.length === 3 &&
+        Number(parts[0]) > Date.now() &&
+        parts[2].length === expected.length &&
+        crypto.timingSafeEqual(Buffer.from(parts[2]), Buffer.from(expected)) &&
+        account && account.sessionId === parts[1];
+      if (sessionValid) {
+        const accountGuestId = crypto.createHash("sha256")
+          .update("renox-account:" + accountKey).digest("hex").slice(0, 32);
+        if (id !== accountGuestId) return json(res, 403, { error: "Profil tidak sesuai dengan akun yang sedang login." });
+      }
+      const name = sessionValid ? cleanText(account.username, 24) : (cleanText(body.name, 24) || "Guest");
+      let avatar = typeof body.avatar === "string" ? body.avatar : "";
+      const banner=typeof body.banner==="string"?body.banner:""; const bannerUrl=/^https:\/\/(files\.catbox\.moe|catbox\.moe)\//i.test(banner); const bannerData=/^data:image\/(png|jpeg|webp);base64,[a-z0-9+/=]+$/i.test(banner)&&banner.length<=5_600_000; if(banner && !bannerUrl && !bannerData) return json(res,400,{error:"Banner harus berupa gambar Catbox HTTPS atau gambar PNG/JPG/WebP maksimal 4 MB."});
       if (avatar && !/^data:image\/(png|jpeg|webp|gif);base64,[a-z0-9+/=]+$/i.test(avatar)) return json(res, 400, { error: "Format foto harus PNG, JPG, WEBP, atau GIF." });
       if (avatar.length > 1_200_000) return json(res, 413, { error: "Ukuran foto maksimal sekitar 900 KB." });
       const old = db.profiles[id] || {};
