@@ -34,6 +34,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Renox-Pterodactyl-10.2.1
-          path: Renox-Pterodactyl-10.2.1.zip
+          path: Renox-Pterodactyl-10.2.1-20261109.zip
           if-no-files-found: error
           retention-days: 7
