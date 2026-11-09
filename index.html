@@ -807,7 +807,7 @@ try{historyData=JSON.parse(localStorage.getItem('renoxHistory')||'[]')}catch(e){
 
 function toggleMainMenu(){document.body.classList.toggle('menu-open')}
 document.addEventListener('click',e=>{if(document.body.classList.contains('menu-open')&&!e.target.closest('.sidebar')&&!e.target.closest('.hamburger-btn'))document.body.classList.remove('menu-open')});
-function showPage(page,el){if(page==='noxchat')page='privatechat';if(page==='owner'&&!renoxOwnerMode){page='profile';el=null;setTimeout(()=>openDeveloperLogin(),80)}document.body.classList.remove('menu-open');
+function showPage(page,el){document.body.classList.toggle('renox-global-chat-open',page==='community');if(page==='noxchat')page='privatechat';if(page==='owner'&&!renoxOwnerMode){page='profile';el=null;setTimeout(()=>openDeveloperLogin(),80)}document.body.classList.remove('menu-open');
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
  if($(page))$(page).classList.add('active');
  document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
@@ -1164,8 +1164,8 @@ async function toggleMaintenance(){let enabled=$('maintenanceToggle').dataset.en
 async function publishPost(kind){let p=kind==='announcements'?'announcement':'leak',title=$(p+'Title').value.trim(),content=$(p+'Content').value.trim();try{await apiJSON('/api/owner/'+kind,{method:'POST',body:JSON.stringify({title,content})});$(p+'Title').value='';$(p+'Content').value='';await loadPublicContent();alert('Posting berhasil diterbitkan.')}catch(e){alert(e.message)}}
 
 async function loadGuestProfile(){
- try{const d=await apiJSON('/api/profile/'+encodeURIComponent(guestId));guestProfile=d.profile;updateGuestPreview();if(guestProfile.banner){renderProfileBanner(guestProfile.banner)}loadEconomy()}
- catch{updateGuestPreview()}
+ try{const d=await apiJSON('/api/profile/'+encodeURIComponent(guestId));guestProfile=d.profile||guestProfile;if(renoxAccountName&&(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name))){guestProfile.name=renoxAccountName;try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:renoxAccountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile={...saved.profile,name:renoxAccountName}}catch(e){console.warn('Profile username sync:',e.message)}}updateGuestPreview();if(guestProfile.banner){renderProfileBanner(guestProfile.banner)}loadEconomy()}
+ catch{if(renoxAccountName&&(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name)))guestProfile.name=renoxAccountName;updateGuestPreview()}
 }
 async function saveGuestProfile(){
  const name=renoxAccountName||guestProfile.name;guestProfile.name=name;
@@ -1536,7 +1536,7 @@ async function checkAccount(){
   const authStatus=$('authStatus');if(authStatus)authStatus.textContent='Sesi belum login.';
   return false;
  }
- const accountName=d.username||'Member';renoxAccountName=accountName;
+ const accountName=d.username||'Member';renoxAccountName=accountName;guestProfile.name=accountName;
  const authStatus=$('authStatus');if(authStatus)authStatus.textContent='✓ Login aktif sebagai '+accountName;
  // Autentikasi sudah berhasil. Kesalahan pemuatan profil/dashboard tidak boleh
  // mengunci pengguna kembali ke layar login.
@@ -1959,6 +1959,77 @@ input,textarea,select,.field{background:#0b1120!important;color:#eef4ff!importan
 .profile-hero-card,.profile,.card{border-radius:18px!important;box-shadow:0 16px 45px #0005}.profile h2{letter-spacing:.3px}.profile .avatar{border-radius:22px}
 @media(max-width:550px){.owner-inline{flex-direction:column;align-items:stretch}}
 </style>
+
+<style id="renox-fix-pack-20261109">
+/* Comic login artwork (the comic image supplied for Renox) */
+.renox-auth-gate{background:linear-gradient(135deg,rgba(5,8,18,.56),rgba(7,10,24,.78)),url("https://files.catbox.moe/a46rxs.jpg") center/cover fixed no-repeat!important}
+.auth-card{background:linear-gradient(145deg,rgba(16,24,43,.88),rgba(8,13,28,.91))!important}
+#renoxBotMascot{z-index:10002!important;right:16px;bottom:18px}
+#renoxBotMascot.explode{pointer-events:none}
+/* One ring per account; a small count means several stories are inside */
+.status-item{position:relative}
+.status-item .status-count{position:absolute;right:-3px;top:-4px;min-width:19px;height:19px;padding:0 5px;border-radius:12px;background:#f5c451;color:#17120a;border:2px solid #11182a;font-size:10px;font-weight:900;display:grid;place-items:center}
+body.renox-global-chat-open{overflow:hidden!important}
+body.renox-global-chat-open .sidebar,
+body.renox-global-chat-open .topbar,
+body.renox-global-chat-open .liquid-bottom-nav,
+body.renox-global-chat-open .hamburger-btn,
+body.renox-global-chat-open .project-audio-toggle{display:none!important}
+body.renox-global-chat-open main{margin:0!important;padding:0!important;width:100%!important;max-width:none!important}
+body.renox-global-chat-open #community.page.active{display:block!important;position:fixed!important;inset:0!important;z-index:9990!important;width:100vw!important;height:100dvh!important;min-height:100dvh!important;margin:0!important;padding:12px!important;overflow:auto!important;background:#090d18!important}
+body.renox-global-chat-open #community .chat-shell{min-height:calc(100dvh - 105px);background:#111827!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;opacity:1!important;filter:none!important;border-color:#34415c}
+body.renox-global-chat-open #community .chat-toolbar{background:#1a2437!important}
+body.renox-global-chat-open #community .chat-message,
+body.renox-global-chat-open #community .chat-bubble{opacity:1!important;filter:none!important}
+body.renox-global-chat-open #community .chat-messages{min-height:50dvh}
+@media(max-width:700px){body.renox-global-chat-open #community.page.active{padding:8px!important}body.renox-global-chat-open #community .chat-shell{min-height:calc(100dvh - 80px);border-radius:14px}}
+</style>
+<script id="renox-fix-pack-script-20261109">
+/* Group every story by its owner so one person always occupies one status ring. */
+async function loadStatuses(){
+ try{
+  const d=await apiJSON('/api/statuses?guestId='+encodeURIComponent(guestId));
+  const raw=Array.isArray(d.statuses)?d.statuses:[];
+  const grouped=new Map();
+  raw.forEach(st=>{
+   const key=String(st.guestId||st.userId||st.name||st.id);
+   if(!grouped.has(key))grouped.set(key,[]);
+   grouped.get(key).push(st);
+  });
+  const groups=[...grouped.entries()].map(([key,items])=>({key,items:items.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0))}));
+  statusListCache=groups.flatMap(g=>g.items);
+  const strip=$('statusStrip');if(!strip)return;
+  const cards=groups.map(g=>{
+   const st=g.items[g.items.length-1],mine=g.items.some(x=>String(x.guestId)===String(guestId));
+   const seen=g.items.every(x=>(x.viewers||[]).some(v=>String(v.guestId)===String(guestId)));
+   const label=mine?(renoxAccountName||st.name||'Status saya'):(st.name||'Member');
+   const count=g.items.length>1?'<span class="status-count">'+g.items.length+'</span>':'';
+   return '<button class="status-item '+(seen?'seen':'unseen')+'" onclick="viewUserStatus(\''+escapeText(g.items[0].id)+'\')"><span class="status-ring"><img src="'+escapeText(st.avatar||'https://placehold.co/80x80/26334d/ffffff?text=R')+'" alt=""></span>'+count+'<small>'+escapeText(label)+'</small></button>';
+  }).join('');
+  strip.innerHTML='<button class="status-add" onclick="addUserStatus()"><span>＋</span><small>Status saya</small></button>'+cards;
+ }catch(e){console.warn('Status:',e.message)}
+}
+/* The old AM action launched an unsupported app intent. Show valid search destinations instead. */
+async function findAMPreset(){
+ const raw=$('amQuery').value.trim(),status=$('amStatus'),results=$('amResults'),preview=$('amVideoPreview');
+ if(!raw){status.textContent='Masukkan link video terlebih dahulu.';return}
+ results.innerHTML='';preview.innerHTML='';
+ let u;try{u=new URL(raw)}catch{status.textContent='Link tidak valid. Gunakan URL lengkap HTTPS TikTok atau YouTube.';return}
+ const host=u.hostname.toLowerCase().replace(/^www\./,'');
+ if(u.protocol!=='https:'||!(host==='youtube.com'||host==='youtu.be'||host.endsWith('.youtube.com')||host==='tiktok.com'||host.endsWith('.tiktok.com'))){status.textContent='Tipe link belum didukung. Gunakan video publik YouTube atau TikTok.';return}
+ status.textContent='Memeriksa video dan menyiapkan pencarian preset...';
+ try{
+  const d=await apiJSON('/api/am-finder?url='+encodeURIComponent(u.href));
+  let videoId='';
+  if(host==='youtu.be')videoId=u.pathname.split('/').filter(Boolean)[0]||'';
+  else if(host.endsWith('youtube.com'))videoId=u.searchParams.get('v')||((u.pathname.match(/\/(?:shorts|live|embed)\/([^/?]+)/)||[])[1])||'';
+  if(videoId)preview.innerHTML='<iframe class="am-preview" title="Video referensi preset" src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(videoId)+'" allow="accelerometer;autoplay;encrypted-media;picture-in-picture" allowfullscreen></iframe>';
+  else preview.innerHTML='<div class="music-placeholder">Link TikTok diterima. Preview bergantung pada dukungan embed TikTok.</div>';
+  status.textContent=(d.title?'Video: '+d.title+' · ':'')+(d.note||'Link berhasil dibaca. Pilih hasil pencarian preset di bawah.');
+  results.innerHTML=(d.results||[]).map(x=>'<article class="am-preset-item"><span><b>'+escapeText(x.title)+'</b><small style="display:block;color:#c4cee2;margin-top:6px">Hasil pencarian — bukan file preset otomatis</small><small style="display:flex;gap:12px;margin-top:9px"><a target="_blank" rel="noopener" href="'+escapeText(x.youtube||'#')+'">Cari di YouTube ↗</a><a target="_blank" rel="noopener" href="'+escapeText(x.tiktok||'#')+'">Cari di TikTok ↗</a></small></span></article>').join('')||'<p class="hint">Belum ada hasil pencarian.</p>';
+ }catch(e){status.textContent='Gagal membaca video: '+e.message}
+}
+</script>
 </html>
 
 <style>
