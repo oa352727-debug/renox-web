@@ -15,7 +15,7 @@ const DB_FILE = path.join(DATA_DIR, "renox-db.json");
 const OWNER_KEY = process.env.RENOX_OWNER_KEY || "RenoxGanteng";
 const SESSION_SECRET = process.env.RENOX_SESSION_SECRET || crypto.randomBytes(32).toString("hex");
 const PRESENCE_TTL = 90_000;
-const MAX_BODY = 3_000_000;
+const MAX_BODY = 16_000_000;
 const NOXTOK_MAX_VIDEO_BYTES = Math.max(1, Number(process.env.NOXTOK_MAX_VIDEO_MB || 250)) * 1024 * 1024;
 const RELEASE = {
   version: "10.2.0",
@@ -64,7 +64,7 @@ function r2PublicUrl(key) {
 }
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
-if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, JSON.stringify({ profiles: {}, messages: [], announcements: [], leaks: [], unbanRequests: [], dailyClaims: {}, accounts: {}, settings: { maintenance: false, maintenanceReason:"", maintenanceAffected:"", maintenanceUntil:"", globalTheme:"#42e8ff", developerTitle: {text:'RENOX DEVELOPER',color:'#42e8ff'} } }, null, 2));
+if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, JSON.stringify({ profiles: {}, messages: [], announcements: [], leaks: [], unbanRequests: [], dailyClaims: {}, accounts: {}, friends: {}, settings: { maintenance: false, maintenanceReason:"", maintenanceAffected:"", maintenanceUntil:"", globalTheme:"#42e8ff", developerTitle: {text:'RENOX DEVELOPER',color:'#42e8ff'} } }, null, 2));
 
 function readDB() {
   try {
@@ -72,6 +72,7 @@ function readDB() {
     return {
       profiles: d.profiles || {},
       accounts: d.accounts || {},
+      friends: d.friends || {},
       dailyClaims: d.dailyClaims || {},
       messages: Array.isArray(d.messages) ? d.messages : [],
       announcements: Array.isArray(d.announcements) ? d.announcements : [],
@@ -84,7 +85,7 @@ function readDB() {
       settings: { maintenance: Boolean(d.settings?.maintenance), maintenanceReason: cleanText(d.settings?.maintenanceReason,180), maintenanceAffected: cleanText(d.settings?.maintenanceAffected,500), maintenanceUntil: String(d.settings?.maintenanceUntil || ""), globalTheme: d.settings?.globalTheme || "#42e8ff", developerTitle: d.settings?.developerTitle || {text:'RENOX DEVELOPER',color:'#42e8ff'}, pinnedFeature: d.settings?.pinnedFeature || {title:"Coming Soon Board",description:"Fitur baru pilihan developer akan muncul di sini."}, staffUsers: Array.isArray(d.settings?.staffUsers) ? d.settings.staffUsers : [] }
     };
   } catch {
-    return { profiles: {}, dailyClaims: {}, messages: [], announcements: [], leaks: [], unbanRequests: [], privateMessages: [], statuses: [], mutedUsers: {}, bannedIps:{}, ipLog:{}, noxtok:[], follows:{}, accounts: {}, settings: { maintenance: false, maintenanceReason:"", maintenanceAffected:"", maintenanceUntil:"", globalTheme:"#42e8ff", pinnedFeature:{title:"Coming Soon Board",description:"Fitur baru pilihan developer akan muncul di sini."}, staffUsers:[] } };
+    return { profiles: {}, dailyClaims: {}, messages: [], announcements: [], leaks: [], unbanRequests: [], privateMessages: [], statuses: [], mutedUsers: {}, bannedIps:{}, ipLog:{}, noxtok:[], follows:{}, accounts: {}, friends: {}, settings: { maintenance: false, maintenanceReason:"", maintenanceAffected:"", maintenanceUntil:"", globalTheme:"#42e8ff", pinnedFeature:{title:"Coming Soon Board",description:"Fitur baru pilihan developer akan muncul di sini."}, staffUsers:[] } };
   }
 }
 let db = readDB();
@@ -391,9 +392,12 @@ const server = http.createServer(async (req, res) => {
       if (!/^[a-zA-Z0-9._]{2,30}$/.test(username)) return json(res,400,{error:"Username TikTok tidak valid."});
       if (!rateLimit(`tiktok:${getClientKey(req)}`, 8, 60000)) return json(res,429,{error:"Terlalu banyak pencarian. Coba lagi sebentar."});
       const payload = await synoxGet("/stalker/tiktokstalk", { user: username });
-      const user = payload.data?.user || {}, stats = payload.data?.stats || {};
-      if (!payload.status || !user.uniqueId) return json(res,404,{error:"Profil TikTok tidak ditemukan atau tidak tersedia."});
-      return json(res,200,{user:{uniqueId:cleanText(user.uniqueId,30),nickname:cleanText(user.nickname,80),signature:cleanText(user.signature,300),avatarLarger:user.avatarLarger||user.avatarMedium||user.avatarThumb||"",avatarMedium:user.avatarMedium||"",avatarThumb:user.avatarThumb||"",followerCount:Number(stats.followerCount||0),followingCount:Number(stats.followingCount||0),videoCount:Number(stats.videoCount||0),heartCount:Number(stats.heartCount||stats.heart||0),verified:Boolean(user.verified),privateAccount:Boolean(user.privateAccount),region:cleanText(user.region||"",40),userId:cleanText(user.id||"",80),createTime:Number(user.createTime||0)}});
+      const root=payload.data||payload.result||payload;
+      const user=root.user||root.userInfo||root.user_info||root.profile||root;
+      const stats=root.stats||root.statsV2||user.stats||user.statistics||{};
+      const uniqueId=user.uniqueId||user.unique_id||user.username||user.uniqueID||"";
+      if ((payload.status===false)||!uniqueId) return json(res,404,{error:payload.message||"Profil TikTok tidak ditemukan atau format data provider berubah."});
+      return json(res,200,{user:{uniqueId:cleanText(uniqueId,30),nickname:cleanText(user.nickname||user.displayName||user.name||uniqueId,80),signature:cleanText(user.signature||user.bio||"",300),avatarLarger:user.avatarLarger||user.avatarMedium||user.avatarThumb||user.avatar||user.avatar_url||"",avatarMedium:user.avatarMedium||user.avatar||"",avatarThumb:user.avatarThumb||user.avatar||"",followerCount:Number(stats.followerCount||stats.followers||user.followerCount||0),followingCount:Number(stats.followingCount||stats.following||user.followingCount||0),videoCount:Number(stats.videoCount||stats.videos||user.videoCount||0),heartCount:Number(stats.heartCount||stats.heart||stats.likes||user.heartCount||0),verified:Boolean(user.verified||user.isVerified),privateAccount:Boolean(user.privateAccount||user.isPrivate),region:cleanText(user.region||user.regionCode||"",40),userId:cleanText(user.id||user.uid||user.secUid||"",80),createTime:Number(user.createTime||user.create_time||0)}});
     }
     if (req.method === "GET" && route === "/api/email-public") {
       const email=cleanText(url.searchParams.get("email"),120).toLowerCase();
@@ -601,7 +605,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && route === "/api/profile") {
       const body = await readBody(req), id = body.guestId;
       if (!validGuestId(id)) return json(res, 400, { error: "Guest ID tidak valid." });
-      const name = cleanText(body.name, 24) || "Guest"; let avatar = typeof body.avatar === "string" ? body.avatar : ""; const banner=typeof body.banner==="string"?body.banner:""; if(banner && (!/^https:\/\//i.test(banner)||!/^https:\/\/(files\.catbox\.moe|catbox\.moe)\//i.test(banner))) return json(res,400,{error:"URL banner tidak diizinkan."});
+      const name = cleanText(body.name, 24) || "Guest"; let avatar = typeof body.avatar === "string" ? body.avatar : ""; const banner=typeof body.banner==="string"?body.banner:""; const bannerUrl=/^https:\/\/(files\.catbox\.moe|catbox\.moe)\//i.test(banner); const bannerData=/^data:image\/(png|jpeg|webp);base64,[a-z0-9+/=]+$/i.test(banner)&&banner.length<=5_600_000; if(banner && !bannerUrl && !bannerData) return json(res,400,{error:"Banner harus berupa gambar Catbox HTTPS atau gambar PNG/JPG/WebP maksimal 4 MB."});
       if (avatar && !/^data:image\/(png|jpeg|webp|gif);base64,[a-z0-9+/=]+$/i.test(avatar)) return json(res, 400, { error: "Format foto harus PNG, JPG, WEBP, atau GIF." });
       if (avatar.length > 1_200_000) return json(res, 413, { error: "Ukuran foto maksimal sekitar 900 KB." });
       const old = db.profiles[id] || {};
@@ -642,15 +646,57 @@ const server = http.createServer(async (req, res) => {
       const online = Object.values(db.profiles).filter(x => Date.now() - (x.lastSeen || 0) < PRESENCE_TTL);
       await saveDB(); return json(res, 200, { onlineCount: online.length, users: online.slice(0,50).map(x => ({ id:x.id,name:x.name,avatar:x.avatar,role:String(x.name||"").trim().toLowerCase()==="noxxd"?"developer":"member" })) });
     }
+    if (req.method === "GET" && route === "/api/members") {
+      const q=cleanText(url.searchParams.get("q")||"",40).toLowerCase();
+      const viewer=String(url.searchParams.get("guestId")||"");
+      const members=Object.values(db.profiles).filter(p=>p&&validGuestId(p.id)&&p.id!==viewer&&(!q||String(p.name||"").toLowerCase().includes(q)));
+      members.sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));
+      return json(res,200,{members:members.slice(0,100).map(p=>({id:p.id,name:p.name||"Member",avatar:p.avatar||"",banner:p.banner||"",lastSeen:p.lastSeen||0}))});
+    }
+    if (req.method === "GET" && route === "/api/friends") {
+      const id=String(url.searchParams.get("guestId")||"");
+      if(!validGuestId(id))return json(res,400,{error:"Identitas akun tidak valid."});
+      const ids=Array.isArray(db.friends?.[id])?db.friends[id]:[];
+      const friends=ids.map(friendId=>db.profiles[friendId]).filter(Boolean).map(p=>({id:p.id,name:p.name||"Member",avatar:p.avatar||"",lastSeen:p.lastSeen||0}));
+      return json(res,200,{friends});
+    }
+    if (req.method === "POST" && route === "/api/friends") {
+      const b=await readBody(req),id=String(b.guestId||""),target=String(b.targetId||"");
+      if(!validGuestId(id)||!validGuestId(target)||id===target||!db.profiles[id]||!db.profiles[target])return json(res,400,{error:"Kontak Renox tidak valid atau tidak ditemukan."});
+      db.friends=db.friends||{};db.friends[id]=Array.isArray(db.friends[id])?db.friends[id]:[];
+      if(!db.friends[id].includes(target))db.friends[id].unshift(target);
+      db.friends[id]=db.friends[id].slice(0,500);await saveDB();return json(res,201,{ok:true});
+    }
+    if (req.method === "DELETE" && route === "/api/friends") {
+      const b=await readBody(req),id=String(b.guestId||""),target=String(b.targetId||"");
+      if(!validGuestId(id)||!validGuestId(target))return json(res,400,{error:"Identitas kontak tidak valid."});
+      db.friends=db.friends||{};db.friends[id]=(db.friends[id]||[]).filter(x=>x!==target);await saveDB();return json(res,200,{ok:true});
+    }
+
     if (req.method === "GET" && route === "/api/statuses") {
       const viewer=url.searchParams.get("guestId");if(!validGuestId(viewer))return json(res,400,{error:"Guest ID tidak valid."});
       const cutoff=Date.now()-24*60*60*1000;db.statuses=db.statuses.filter(x=>x.createdAt>cutoff);
       return json(res,200,{statuses:db.statuses.slice().sort((a,b)=>a.createdAt-b.createdAt).map(x=>({...x,viewerCount:(x.viewers||[]).length,viewers:(x.guestId===viewer||isOwner(req))?(x.viewers||[]):[]}))});
     }
     if (req.method === "POST" && route === "/api/statuses") {
-      const body=await readBody(req),id=body.guestId,text=cleanText(body.text,240),description=cleanText(body.description,500),media=typeof body.media==="string"?body.media:"",mediaType=["image","video"].includes(body.mediaType)?body.mediaType:"";if(!validGuestId(id))return json(res,400,{error:"Guest ID tidak valid."});if(!text&&!description&&!media)return json(res,400,{error:"Status tidak boleh kosong."});if(media&&(media.length>980000||!/^data:(image\/(jpeg|png|webp|gif)|video\/(mp4|webm|quicktime));base64,/.test(media)))return json(res,400,{error:"Media tidak valid atau terlalu besar (maks. 700 KB)."});
+      const body=await readBody(req),id=body.guestId,text=cleanText(body.text,240),description=cleanText(body.description,500);
+      const mediaItems=Array.isArray(body.mediaItems)?body.mediaItems.slice(0,2):(typeof body.media==="string"&&body.media?[{media:body.media,type:body.mediaType}]:[]);
+      if(!validGuestId(id))return json(res,400,{error:"Guest ID tidak valid."});
+      if(!text&&!description&&!mediaItems.length)return json(res,400,{error:"Status tidak boleh kosong."});
+      if(Array.isArray(body.mediaItems)&&body.mediaItems.length>2)return json(res,400,{error:"Satu status maksimal berisi 2 foto/video."});
+      const normalized=[];
+      for(const item of mediaItems){
+        const value=typeof item?.media==="string"?item.media:"",type=["image","video"].includes(item?.type)?item.type:"";
+        const mime=value.match(/^data:([^;,]+);base64,/i)?.[1]||"";
+        const allowed=type==="video"?/^video\/(mp4|webm|quicktime)$/i.test(mime):type==="image"?/^image\/(jpeg|png|webp|gif)$/i.test(mime):false;
+        const encoded=value.split(",")[1]||"",bytes=Math.floor(encoded.length*3/4);
+        if(!allowed||!encoded||bytes>5*1024*1024)return json(res,400,{error:"Setiap foto/video harus valid dan maksimal 5 MB."});
+        normalized.push({media:value,type});
+      }
       const profile=db.profiles[id];if(!profile)return json(res,400,{error:"Simpan profil terlebih dahulu sebelum membuat status."});
-      const status={id:crypto.randomUUID(),guestId:id,name:profile.name||"Guest",avatar:profile.avatar||"",text,description,media,mediaType,createdAt:Date.now(),viewers:[]};db.statuses=db.statuses.filter(x=>x.guestId!==id||x.createdAt>Date.now()-24*60*60*1000);db.statuses.push(status);db.statuses=db.statuses.slice(-300);await saveDB();return json(res,201,{status});
+      const first=normalized[0]||{};
+      const status={id:crypto.randomUUID(),guestId:id,name:profile.name||"Member",avatar:profile.avatar||"",text,description,media:first.media||"",mediaType:first.type||"",mediaItems:normalized,createdAt:Date.now(),viewers:[],likes:[]};
+      db.statuses=db.statuses.filter(x=>x.guestId!==id||x.createdAt>Date.now()-24*60*60*1000);db.statuses.push(status);db.statuses=db.statuses.slice(-300);await saveDB();return json(res,201,{status});
     }
     if (req.method === "POST" && route === "/api/statuses/view") {
       const body=await readBody(req),id=body.guestId,status=db.statuses.find(x=>x.id===body.statusId);if(!validGuestId(id))return json(res,400,{error:"Guest ID tidak valid."});if(!status)return json(res,404,{error:"Status sudah kedaluwarsa atau tidak ditemukan."});
