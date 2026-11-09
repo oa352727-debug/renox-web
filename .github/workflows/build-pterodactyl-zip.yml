@@ -1,4 +1,4 @@
-name: Build Renox Pterodactyl ZIP
+name: Build Renox Pterodactyl ZIP # refreshed 2026-11-09
 on:
   workflow_dispatch:
   push:
