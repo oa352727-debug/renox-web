@@ -700,7 +700,7 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
   <h3>FORMULIR BANDING</h3>
   <label for="checkbanNumber">NOMOR TARGET</label>
   <input id="checkbanNumber" class="field" inputmode="tel" autocomplete="tel" placeholder="+62xxxxxxxxxx">
-  <label for="appealReason">ALASAN</label>
+  <label for="appealBannedAt">TANGGAL PEMBLOKIRAN</label><input id="appealBannedAt" class="field" type="date" max="2026-11-09"><label for="appealReason">ALASAN</label>
   <textarea id="appealReason" class="field" rows="5" maxlength="1200" placeholder="Tuliskan alasan banding secara jujur dan jelas..."></textarea>
   <div id="appealStatus" class="hint" aria-live="polite">Masukkan nomor target dan alasan banding.</div>
   <button id="appealPrepare" class="primary" onclick="submitRenoxUnban()">KIRIM BANDING ↗</button>
@@ -897,10 +897,10 @@ async function lookup(query){
   $('message').textContent='⚠ '+e.message;
  }finally{$('searchBtn').disabled=false}
 }
-function getSavedFriends(){try{return JSON.parse(localStorage.getItem('renoxSavedFriends')||'[]')}catch{return []}}
-function saveCurrentFriend(){if(!currentID)return;const item={id:String(currentID),name:$('display').textContent||$('username').textContent,username:$('username').textContent,avatar:$('avatar').src};const all=getSavedFriends();if(all.some(x=>x.id===item.id)){alert('Teman ini sudah tersimpan.');return}all.unshift(item);localStorage.setItem('renoxSavedFriends',JSON.stringify(all.slice(0,100)));alert('Profil berhasil disimpan ke Saved Friends.')}
-function renderFavorites(){const all=getSavedFriends();$('favoriteCount').textContent=all.length+' SAVED';$('favoriteList').innerHTML=all.length?all.map(x=>`<article class="favorite-card"><img src="${escapeHTML(x.avatar)}" alt=""><div><b>${escapeHTML(x.name)}</b><small>${escapeHTML(x.username)} · ID ${escapeHTML(x.id)}</small></div><a target="_blank" rel="noopener" href="https://www.roblox.com/users/${encodeURIComponent(x.id)}/profile">OPEN ↗</a><button onclick="removeFavorite('${escapeHTML(x.id)}')">REMOVE</button></article>`).join(''):'<div class="empty">Belum ada teman tersimpan. Buka Roblox Lookup lalu tekan SAVE FRIEND.</div>'}
-function removeFavorite(id){localStorage.setItem('renoxSavedFriends',JSON.stringify(getSavedFriends().filter(x=>x.id!==id)));renderFavorites()}
+async function getSavedFriends(){try{return (await apiJSON('/api/friends?guestId='+encodeURIComponent(guestId))).friends||[]}catch{return []}}
+async function saveCurrentFriend(targetId){const id=targetId||window.renoxSelectedFriendId;if(!id){alert('Pilih anggota Renox terlebih dahulu.');return}try{await apiJSON('/api/friends',{method:'POST',body:JSON.stringify({guestId,targetId:id})});alert('Kontak Renox berhasil disimpan.');renderFavorites()}catch(e){alert(e.message)}}
+async function renderFavorites(){const all=await getSavedFriends();$('favoriteCount').textContent=all.length+' SAVED';$('favoriteList').innerHTML=all.length?all.map(x=>'<article class="favorite-card"><b>'+escapeText(x.name)+'</b><small>Anggota Renox · '+escapeText(x.id)+'</small><button onclick="showPage(\'privatechat\');document.getElementById(\'dmPeer\').value='+JSON.stringify(x.name)+';searchDMUsers().then(()=>openDM('+JSON.stringify(x.id)+'))">CHAT</button><button onclick="removeFavorite('+JSON.stringify(x.id)+')">REMOVE</button></article>').join(''):'<div class="empty">Belum ada kontak Renox.</div>'}
+async function removeFavorite(id){try{await apiJSON('/api/friends',{method:'DELETE',body:JSON.stringify({guestId,targetId:id})});renderFavorites()}catch(e){alert(e.message)}}
 function fmt(v){return v==null?'Unavailable':Number(v).toLocaleString('id-ID')}
 function accountAge(date){
  const days=Math.floor((Date.now()-new Date(date).getTime())/86400000);
@@ -918,7 +918,7 @@ function clearHistory(){
 }
 
 // --- Renox Project: guest profile, presence, and global chat ---
-const GUEST_KEY='renoxGuestId';
+const GUEST_KEY='renoxGuestId';let renoxAccountName='';
 let guestId=localStorage.getItem(GUEST_KEY);
 if(!guestId){guestId=(crypto.randomUUID?crypto.randomUUID():('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)})));localStorage.setItem(GUEST_KEY,guestId)}
 let guestProfile={id:guestId,name:'Guest-'+guestId.slice(0,4),avatar:''};
@@ -983,7 +983,7 @@ let renoxDMUsers=[];
 async function searchDMUsers(){
  const q=$('dmPeer').value.trim().toLowerCase();
  try{
-  const d=await apiJSON('/api/members');renoxDMUsers=d.members||[];
+  const d=await apiJSON('/api/members?guestId='+encodeURIComponent(guestId)+'&q='+encodeURIComponent(q));renoxDMUsers=d.members||[];
   const matches=renoxDMUsers.filter(x=>(x.name||'').toLowerCase().includes(q)).slice(0,80),box=$('dmRecentList');box.textContent='';
   if(!matches.length){box.textContent='Tidak ada anggota yang cocok.';return}
   matches.forEach(member=>{
@@ -1168,7 +1168,7 @@ async function loadGuestProfile(){
  catch{updateGuestPreview()}
 }
 async function saveGuestProfile(){
- const name=guestProfile.name;
+ const name=renoxAccountName||guestProfile.name;guestProfile.name=name;
  const file=$('guestAvatarInput').files[0];
  const save=async avatar=>{
   try{const d=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name,avatar:avatar||guestProfile.avatar||'',banner:guestProfile.banner||''})});guestProfile=d.profile;updateGuestPreview();if(guestProfile.banner){renderProfileBanner(guestProfile.banner)}loadEconomy();$('profileMessage').textContent='✓ Profil tersimpan dan dapat dilihat pengguna lain.'}
@@ -1249,7 +1249,7 @@ async function refreshChat(){
   }
  }catch{}
 }
-async function openPublicProfile(id){
+async function openPublicProfile(id){window.renoxSelectedFriendId=id;
  const modal=$('publicProfileModal');if(!modal)return;modal.hidden=false;
  $('publicProfileName').textContent='Memuat profil...';$('publicProfileRole').textContent='ROLE · PROTOTYPE';$('publicProfileJoined').textContent='Tanggal bergabung: memuat...';$('publicProfileId').textContent='ID: '+id;$('publicProfileVerified').innerHTML='';
  try{
@@ -1446,9 +1446,11 @@ async function checkWhatsAppBan(){
 async function submitRenoxUnban(){
  const number=$('checkbanNumber').value.replace(/[^0-9]/g,'');
  const reason=$('appealReason').value.trim();
+ const bannedAt=$('appealBannedAt')?.value||'';
  const status=$('appealStatus'),btn=$('appealPrepare');
  if(!/^\d{8,15}$/.test(number)){status.textContent='Masukkan nomor target dengan kode negara, 8–15 digit.';return}
  if(reason.length<15){status.textContent='Alasan banding minimal 15 karakter.';return}
+ if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(bannedAt)||new Date(bannedAt+'T00:00:00').getTime()>Date.now()){status.textContent='Pilih tanggal pemblokiran yang valid.';return}
  btn.disabled=true;btn.textContent='MEMERIKSA & MENGIRIM...';status.textContent='Memeriksa status nomor secara otomatis...';
  try{
   let check=null;
@@ -1456,10 +1458,10 @@ async function submitRenoxUnban(){
   const all=[check.status,check.reason,check.violation_type].join(' ').toLowerCase();
   const permanent=/permanent|permanently|permanent.?ban|permanen|final.?ban|final/.test(all);
   if(permanent&&check.banned){status.textContent='✕ BANDING DITOLAK — nomor '+number+' terdeteksi terbanned permanen.';alert('✕ Banding ditolak karena nomor '+number+' terbanned permanen.');return}
-  const d=await apiJSON('/api/unban-request',{method:'POST',body:JSON.stringify({number,bannedAt:'',reason})});
-  status.textContent='✓ Banding berhasil dikirim untuk ditinjau. Mohon tunggu hingga 6 jam. Ini belum berarti nomor sudah dipulihkan.';
-  alert('✓ Banding berhasil dikirim. Silakan tunggu proses peninjauan hingga 6 jam.');
-  btn.textContent='BANDING TERKIRIM';
+  const d=await apiJSON('/api/unban-request',{method:'POST',body:JSON.stringify({number,bannedAt,reason})});
+  if(!d.ok||d.status!=='submitted')throw new Error(d.message||'Server belum mengonfirmasi pengajuan.');
+  status.textContent='✓ Tercatat untuk tinjauan internal Renox (ID '+d.requestId+'). Ini bukan pengiriman langsung ke WhatsApp.';
+  btn.textContent='TERCATAT UNTUK TINJAUAN';
  }catch(e){status.textContent='Gagal mengirim banding: '+e.message;btn.disabled=false;btn.textContent='KIRIM BANDING ↗'}
 }
 async function loadOwnerUnbanRequests(){
@@ -1527,7 +1529,7 @@ async function checkAccount(){
   const authStatus=$('authStatus');if(authStatus)authStatus.textContent='Sesi belum login.';
   return false;
  }
- const accountName=d.username||'Member';
+ const accountName=d.username||'Member';renoxAccountName=accountName;
  const authStatus=$('authStatus');if(authStatus)authStatus.textContent='✓ Login aktif sebagai '+accountName;
  // Autentikasi sudah berhasil. Kesalahan pemuatan profil/dashboard tidak boleh
  // mengunci pengguna kembali ke layar login.
@@ -1619,7 +1621,7 @@ async function getHtmlSource(){
 function copyHtmlSource(){const v=$("htmlSourceOutput").value;if(!v){$("htmlSourceStatus").textContent="Belum ada HTML untuk disalin.";return}navigator.clipboard.writeText(v).then(()=>$("htmlSourceStatus").textContent="HTML disalin.").catch(()=>$("htmlSourceStatus").textContent="Browser menolak akses clipboard.");}
 
 
-document.addEventListener('DOMContentLoaded',()=>{applyGraphicsSettings();if(localStorage.getItem('renoxThemePriority20261108')!=='1'){localStorage.setItem('renoxTheme','comic');localStorage.setItem('renoxThemePriority20261108','1')}setRenoxTheme(localStorage.getItem('renoxTheme')||'comic');renderDMRecent();checkRenoxUpdate();setInterval(checkRenoxUpdate,45000);setInterval(()=>{if(dmPeer&&$('privatechat')?.classList.contains('active'))refreshDM().catch(()=>{})},5000);setRenoxLanguage(localStorage.getItem('renoxLanguage')||'id');if($('refreshRateSelect'))$('refreshRateSelect').value=localStorage.getItem('renoxRefreshPreference')||'60';if($('fontSelect')&&localStorage.getItem('renoxFont'))$('fontSelect').value=localStorage.getItem('renoxFont');checkAccount();checkDeveloper();refreshGlobalTheme();loadPublicContent();setInterval(loadPublicContent,30000);renderDailyHadith();loadPrayerTimes();loadStatuses();refreshChat();filterAnimeCatalog();setInterval(refreshGlobalTheme,4000);setInterval(loadStatuses,30000);setInterval(refreshChat,4500);setInterval(checkAccount,12000);setInterval(()=>{if($('accountGate').style.display==='none')refreshServerStats()},10000);if(guestProfile.banner){if($('profileBannerSelect'))$('profileBannerSelect').value='';applyProfileBanner(guestProfile.banner)}});
+document.addEventListener('DOMContentLoaded',()=>{applyGraphicsSettings();if(localStorage.getItem('renoxThemePriority20261108')!=='1'){localStorage.setItem('renoxTheme','current');localStorage.setItem('renoxThemePriority20261108','1')}setRenoxTheme('current');renderDMRecent();checkRenoxUpdate();setInterval(checkRenoxUpdate,45000);setInterval(()=>{if(dmPeer&&$('privatechat')?.classList.contains('active'))refreshDM().catch(()=>{})},5000);setRenoxLanguage(localStorage.getItem('renoxLanguage')||'id');if($('refreshRateSelect'))$('refreshRateSelect').value=localStorage.getItem('renoxRefreshPreference')||'60';if($('fontSelect')&&localStorage.getItem('renoxFont'))$('fontSelect').value=localStorage.getItem('renoxFont');checkAccount();checkDeveloper();refreshGlobalTheme();loadPublicContent();setInterval(loadPublicContent,30000);renderDailyHadith();loadPrayerTimes();loadStatuses();refreshChat();filterAnimeCatalog();setInterval(refreshGlobalTheme,4000);setInterval(loadStatuses,30000);setInterval(refreshChat,4500);setInterval(checkAccount,12000);setInterval(()=>{if($('accountGate').style.display==='none')refreshServerStats()},10000);if(guestProfile.banner){if($('profileBannerSelect'))$('profileBannerSelect').value='';applyProfileBanner(guestProfile.banner)}});
 </script>
 <div id="navDrawer" class="nav-drawer" hidden><div class="nav-drawer-head"><b>RENOX NAVIGATION</b><button onclick="toggleNavDrawer()">×</button></div><div id="navDrawerItems" class="nav-drawer-items"></div></div><div id="publicProfileModal" class="public-profile-modal" hidden onclick="if(event.target===this)closePublicProfile()"><div class="public-profile-card"><button class="public-profile-close" onclick="closePublicProfile()">×</button><div id="publicProfileBanner" class="public-profile-banner"></div><div class="public-profile-body"><img id="publicProfileAvatar" class="public-profile-avatar" src="https://placehold.co/100x100" alt=""><h2 id="publicProfileName">Member</h2><div id="publicProfileVerified"></div><p id="publicProfileRole">MEMBER · PROTOTYPE</p><p id="publicProfileJoined">Tanggal bergabung: belum tersedia</p><p id="publicProfileId"></p></div></div></div><nav class="liquid-bottom-nav" aria-label="Navigasi utama"><button class="active" onclick="bottomNavigate('home',this)"><span class="nav-icon">⌂</span><small>HOME</small></button><button onclick="bottomNavigate('gethtml',this)"><span class="nav-icon nav-html-logo">&lt;/&gt;</span><small>GET HTML</small></button><button onclick="bottomNavigate('tiktok',this)"><span class="nav-icon">♪</span><small>TIKTOK LOOKUP</small></button><button onclick="bottomNavigate('noxchat',this)"><span class="nav-icon">✉</span><small>NOX CHAT</small></button><button onclick="toggleNavDrawer()"><span class="nav-icon">☰</span><small>MORE</small></button><i class="liquid-indicator"></i></nav>
 <style id="renox-identity-redesign">
