@@ -943,10 +943,8 @@ try{const cached=JSON.parse(localStorage.getItem('renoxProfile:'+guestId)||'null
 let lastChatTime=0;let renoxOwnerMode=false;
 function escapeText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 async function apiJSON(url,options={}){let r;try{r=await fetch(url,{credentials:'same-origin',cache:'no-store',...options,headers:{'Accept':'application/json','Content-Type':'application/json',...(options.headers||{})}})}catch(e){throw new Error('Tidak dapat terhubung ke server RENOX. Periksa backend Pterodactyl dan koneksi API.')}const raw=await r.text();let d={};if(raw){try{d=JSON.parse(raw)}catch{throw new Error('Server mengirim respons bukan JSON (HTTP '+r.status+'). Periksa backend/API.')}}if(!r.ok)throw new Error(d.error||d.message||('Server error HTTP '+r.status));return d}
-function renoxAvatarFallback(id,name){
- let hash=2166136261;for(const c of String(id||name||'renox')){hash^=c.charCodeAt(0);hash=Math.imul(hash,16777619)}
- const hue=(hash>>>0)%360,initials=String(name||'R').trim().split(/\\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'R';
- const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="hsl('+hue+',72%,38%)"/><stop offset="1" stop-color="hsl('+((hue+75)%360)+',75%,18%)"/></linearGradient></defs><rect width="160" height="160" rx="80" fill="url(#g)"/><circle cx="80" cy="61" r="29" fill="#fff" opacity=".9"/><path d="M24 148c5-34 26-51 56-51s51 17 56 51" fill="#fff" opacity=".9"/><text x="80" y="151" text-anchor="middle" font-size="1" fill="#fff">'+initials+'</text></svg>';
+function renoxAvatarFallback(){
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="80" fill="#858b98"/><circle cx="80" cy="57" r="29" fill="#d9dce2"/><path d="M24 148c5-34 26-51 56-51s51 17 56 51" fill="#d9dce2"/></svg>';
  return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
 }
 function updateGuestPreview(){
@@ -1182,7 +1180,7 @@ async function toggleMaintenance(){let enabled=$('maintenanceToggle').dataset.en
 async function publishPost(kind){let p=kind==='announcements'?'announcement':'leak',title=$(p+'Title').value.trim(),content=$(p+'Content').value.trim();try{await apiJSON('/api/owner/'+kind,{method:'POST',body:JSON.stringify({title,content})});$(p+'Title').value='';$(p+'Content').value='';await loadPublicContent();alert('Posting berhasil diterbitkan.')}catch(e){alert(e.message)}}
 
 async function loadGuestProfile(){
- try{const d=await apiJSON('/api/profile/'+encodeURIComponent(guestId));guestProfile=d.profile||guestProfile;if(renoxAccountName&&guestProfile.name!==renoxAccountName){guestProfile.name=renoxAccountName;try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:renoxAccountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile={...saved.profile,name:renoxAccountName}}catch(e){console.warn('Profile username sync:',e.message)}}updateGuestPreview();if(guestProfile.banner){renderProfileBanner(guestProfile.banner)}loadEconomy()}
+ try{const cached=JSON.parse(localStorage.getItem('renoxProfile:'+guestId)||'null')||{};const d=await apiJSON('/api/profile/'+encodeURIComponent(guestId));guestProfile={...cached,...(d.profile||{}),avatar:(d.profile&&d.profile.avatar)||cached.avatar||'',banner:(d.profile&&d.profile.banner)||cached.banner||''};if(renoxAccountName&&guestProfile.name!==renoxAccountName){guestProfile.name=renoxAccountName;try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:renoxAccountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile={...saved.profile,name:renoxAccountName}}catch(e){console.warn('Profile username sync:',e.message)}}updateGuestPreview();if(guestProfile.banner){renderProfileBanner(guestProfile.banner)}loadEconomy()}
  catch{if(renoxAccountName)guestProfile.name=renoxAccountName;updateGuestPreview()}
 }
 async function saveGuestProfile(){
@@ -1190,7 +1188,7 @@ async function saveGuestProfile(){
  const file=$('guestAvatarInput').files[0];
  const save=async avatar=>{
   try{const d=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name,avatar:avatar||guestProfile.avatar||'',banner:guestProfile.banner||''})});guestProfile=d.profile;updateGuestPreview();if(guestProfile.banner){renderProfileBanner(guestProfile.banner)}loadEconomy();$('profileMessage').textContent='✓ Profil tersimpan dan dapat dilihat pengguna lain.'}
-  catch(e){localStorage.setItem('renoxProfile:'+guestId,JSON.stringify(guestProfile));$('profileMessage').textContent='✓ Nama tersimpan di perangkat. Sinkronisasi server akan dicoba saat koneksi tersedia.'}
+  catch(e){try{localStorage.setItem('renoxProfile:'+guestId,JSON.stringify({...guestProfile,avatar}))}catch{};$('profileMessage').textContent='Gagal menyimpan ke server: '+e.message+'. Foto disimpan sementara di perangkat ini.'}
  };
  if(file){
   if(file.size>900*1024){$('profileMessage').textContent='Foto maksimal 900 KB.';return}
@@ -2076,6 +2074,27 @@ body.renox-story-open .liquid-bottom-nav,body.renox-story-open .renox-bottom-nav
 .wa-appeal-console{min-height:220px!important;max-height:340px!important;overflow:auto!important;background:#05080d!important;color:#d3f8df!important;border:1px solid #24354a!important;box-shadow:inset 0 0 28px #000!important;font:12px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace!important}
 .term-green{color:#7de5a4}.term-cyan{color:#77cfff}.term-yellow{color:#f6d58a}.term-red{color:#ff8585}.term-muted{color:#8090a8}.term-cursor{color:#76e5a1;animation:renoxBlink 1s steps(2,start) infinite}@keyframes renoxBlink{to{visibility:hidden}}
 @media(max-width:700px){.profile-banner-preview{min-height:230px!important;aspect-ratio:1/1!important}.profile-hero-card{min-height:250px!important;padding:18px!important}.status-compose-card{padding:22px 17px!important}}
+</style><style id="renox-status-profile-final">
+/* Story viewer: media takes space only when it exists. Footer/thanks never overlap. */
+#statusViewer.fullscreen-status{position:fixed!important;inset:0!important;z-index:2147483000!important;width:100vw!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;margin:0!important;padding:calc(16px + env(safe-area-inset-top)) 16px calc(12px + env(safe-area-inset-bottom))!important;display:flex!important;flex-direction:column!important;gap:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;background:radial-gradient(ellipse at 50% 0%,#20345b 0%,#0b1224 55%,#050811 100%)!important}
+#statusViewer.fullscreen-status .status-progress-track{order:0;flex:0 0 3px;margin:0 0 14px}
+#statusViewer.fullscreen-status .status-view-close{order:1;position:absolute!important;left:16px!important;right:auto!important;top:calc(12px + env(safe-area-inset-top))!important;width:auto!important;height:42px!important;padding:0 16px!important;border:1px solid #ffffff45!important;border-radius:14px!important;background:#ffffff18!important;color:#fff!important;font-weight:800}
+#statusViewer.fullscreen-status .status-viewer-name{order:2;align-self:center;margin:0 0 14px!important;padding:0 64px!important;text-align:center;font-size:14px!important;line-height:1.35}
+#statusViewer.fullscreen-status .status-viewer-text{order:3;min-height:0!important;margin:0 0 8px!important;font-size:clamp(17px,4vw,24px)!important;line-height:1.4!important}
+#statusViewer.fullscreen-status .status-viewer-description{order:4;flex:0 0 auto;margin:0!important;max-height:22vh;overflow:auto}
+#statusViewer.fullscreen-status .status-viewer-media{order:5;flex:1 1 auto;min-height:0!important;max-height:58dvh;margin:12px 0!important;display:grid;place-items:center;overflow:hidden;border-radius:18px;background:transparent!important}
+#statusViewer.fullscreen-status .status-viewer-media:empty{display:none!important}
+#statusViewer.fullscreen-status .status-viewer-media img,#statusViewer.fullscreen-status .status-viewer-media video{display:block;width:100%!important;height:100%!important;max-height:58dvh!important;object-fit:contain!important;background:#05070d;border-radius:18px}
+#statusViewer.fullscreen-status .status-viewer-footer{order:6;position:static!important;flex:0 0 auto!important;display:flex!important;justify-content:center!important;gap:14px!important;margin:10px 0!important;padding:0!important}
+#statusViewer.fullscreen-status .status-viewer-footer button{min-width:110px;min-height:44px;font-size:13px!important;border-radius:14px!important}
+#statusViewer.fullscreen-status .noxstatus-thanks{order:7;position:static!important;flex:0 0 auto!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px 12px!important;margin-top:8px!important;padding:12px 2px calc(6px + env(safe-area-inset-bottom))!important;font-size:10px!important;line-height:1.3!important;border-top:1px solid #ffffff22}
+#statusViewer.fullscreen-status .noxstatus-thanks span{white-space:normal!important;min-width:0!important;justify-content:flex-start!important}
+#statusViewer.fullscreen-status .noxstatus-thanks svg{flex:0 0 18px}
+#statusViewer.fullscreen-status .status-viewers-list{order:8;flex:0 0 auto}
+#statusViewer.fullscreen-status .status-viewers-list[hidden]{display:none!important}
+#statusViewer.fullscreen-status .status-media-nav{display:flex;align-items:center;justify-content:center;gap:20px;position:absolute;bottom:calc(125px + env(safe-area-inset-bottom));left:0;right:0;z-index:3}
+#statusViewer.fullscreen-status .status-media-nav button{width:40px;height:40px;border:1px solid #ffffff55;border-radius:50%;background:#101a30;color:white;font-size:24px}
+@media(max-height:700px){#statusViewer.fullscreen-status .status-viewer-media{max-height:44dvh}#statusViewer.fullscreen-status .status-viewer-media img,#statusViewer.fullscreen-status .status-viewer-media video{max-height:44dvh!important}#statusViewer.fullscreen-status .noxstatus-thanks{gap:5px 8px;padding-top:7px!important}}
 </style></body>
 
 <style>
