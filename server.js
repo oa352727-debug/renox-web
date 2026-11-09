@@ -261,6 +261,16 @@ const server = http.createServer(async (req, res) => {
     const requestIp=getClientIp(req); if(db.bannedIps?.[requestIp] && !route.startsWith("/api/owner/")) return json(res,403,{error:"Akses dari alamat IP ini dibatasi oleh developer."});
   try {
     if (req.method === "GET" && route === "/api/health") return json(res, 200, { project: "RENOX PROJECT", status: "ONLINE", version: RELEASE.version, uptime: Math.floor(process.uptime()), pid: process.pid });
+    if(req.method==="GET"&&route==="/api/bot/events"){
+      const configured=String(process.env.RENOX_BOT_TOKEN||"");
+      const supplied=String(req.headers["x-renox-bot-token"]||"");
+      if(!configured)return json(res,503,{error:"Bot notifier belum dikonfigurasi di server."});
+      const a=Buffer.from(configured),b=Buffer.from(supplied);
+      if(a.length!==b.length||!crypto.timingSafeEqual(a,b))return json(res,401,{error:"Token bot tidak valid."});
+      const since=Math.max(0,Number(url.searchParams.get("since")||0));
+      const events=(db.registrationEvents||[]).filter(e=>Number(e.createdAt)>since).slice(0,100);
+      return json(res,200,{events,serverTime:Date.now()});
+    }
     if (req.method === "GET" && route === "/api/update-policy") { const p=db.settings.updatePolicy||{}; return json(res,200,{enabled:Boolean(p.enabled),requiredVersion:String(p.requiredVersion||"30.0.1"),downloadUrl:String(p.downloadUrl||""),message:cleanText(p.message,180)}); }
     if (req.method === "GET" && route === "/api/updates") {
       return json(res, 200, { current: RELEASE, releases: [RELEASE] });
@@ -861,7 +871,7 @@ const server = http.createServer(async (req, res) => {
       if(db.accounts[key]) return json(res,409,{error:"Username sudah digunakan."});
       if(db.settings.maintenance) return json(res,503,{error:"RENOX sedang maintenance. Pendaftaran sementara ditutup."});
       const salt=crypto.randomBytes(16).toString("hex"), hash=crypto.scryptSync(password,salt,64).toString("hex"),sid=crypto.randomUUID();
-      db.accounts[key]={username,salt,hash,createdAt:Date.now(),sessionId:sid}; trackIp(req,key); await saveDB();
+      db.accounts[key]={username,salt,hash,createdAt:Date.now(),sessionId:sid}; db.registrationEvents=Array.isArray(db.registrationEvents)?db.registrationEvents:[]; db.registrationEvents.push({id:crypto.randomUUID(),username,createdAt:Date.now()}); db.registrationEvents=db.registrationEvents.slice(-500); trackIp(req,key); await saveDB();
       const maxAge=remember?2592000:43200, expiry=String(Date.now()+maxAge*1000), token=`${expiry}.${sid}.${sign(expiry+"|"+key+"|"+sid)}`;
       res.writeHead(201,{"Content-Type":"application/json","Set-Cookie":`renox_account=${encodeURIComponent(key)}.${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${maxAge}${process.env.NODE_ENV==="production"?"; Secure":""}`});
       return res.end(JSON.stringify({ok:true,username}));
