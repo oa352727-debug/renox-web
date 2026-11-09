@@ -660,7 +660,7 @@ const server = http.createServer(async (req, res) => {
       const id = route.slice("/api/profile/".length);
       if (!validGuestId(id)) return json(res, 400, { error: "Guest ID tidak valid." });
       const profile = db.profiles[id];
-      return profile ? json(res, 200, { profile: { id: profile.id, name: profile.name, avatar: profile.avatar, banner:profile.banner||"", balance:profile.balance||0, ownedTitles:profile.ownedTitles||[], equippedTitle:profile.equippedTitle||"", titleColor:profile.titleColor||"#b879ff", developerTitle:profile.developerTitle||"", developerTitleColor:profile.developerTitleColor||"#42e8ff", lastSeen: profile.lastSeen } }) : json(res, 404, { error: "Profil guest belum ditemukan." });
+      return profile ? json(res, 200, { profile: { id: profile.id, name: profile.name, avatar: profile.avatar, banner:profile.banner||"", balance:profile.balance||0, ownedTitles:profile.ownedTitles||[], equippedTitle:profile.equippedTitle||"", titleColor:profile.titleColor||"#b879ff", developerTitle:profile.developerTitle||"", developerTitleColor:profile.developerTitleColor||"#42e8ff", isDeveloper:String(profile.name||"").trim().toLowerCase()==="noxxd", role:String(profile.name||"").trim().toLowerCase()==="noxxd"?"developer":"member", lastSeen: profile.lastSeen } }) : json(res, 404, { error: "Profil guest belum ditemukan." });
     }
     if (req.method === "POST" && route === "/api/presence") {
       const body = await readBody(req);

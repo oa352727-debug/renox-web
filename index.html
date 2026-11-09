@@ -809,7 +809,7 @@ let currentID=null;
 let historyData=[];
 try{historyData=JSON.parse(localStorage.getItem('renoxHistory')||'[]')}catch(e){}
 
-function toggleMainMenu(){document.body.classList.toggle('menu-open')}
+function toggleMainMenu(){showPage('menu')}
 document.addEventListener('click',e=>{if(document.body.classList.contains('menu-open')&&!e.target.closest('.sidebar')&&!e.target.closest('.hamburger-btn'))document.body.classList.remove('menu-open')});
 function showPage(page,el){document.body.classList.toggle('renox-global-chat-open',page==='community');if(page==='noxchat')page='privatechat';if(page==='owner'&&!renoxOwnerMode){page='profile';el=null;setTimeout(()=>openDeveloperLogin(),80)}document.body.classList.remove('menu-open');
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
@@ -932,7 +932,7 @@ function escapeText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;',
 async function apiJSON(url,options={}){let r;try{r=await fetch(url,{credentials:'same-origin',cache:'no-store',...options,headers:{'Accept':'application/json','Content-Type':'application/json',...(options.headers||{})}})}catch(e){throw new Error('Tidak dapat terhubung ke server RENOX. Periksa backend Pterodactyl dan koneksi API.')}const raw=await r.text();let d={};if(raw){try{d=JSON.parse(raw)}catch{throw new Error('Server mengirim respons bukan JSON (HTTP '+r.status+'). Periksa backend/API.')}}if(!r.ok)throw new Error(d.error||d.message||('Server error HTTP '+r.status));return d}
 function updateGuestPreview(){
  try{localStorage.setItem('renoxProfile:'+guestId,JSON.stringify(guestProfile))}catch(e){}
- const accountName=String(guestProfile.name||'Guest');const isRenoxDeveloper=accountName.trim().toLowerCase()==='noxxd'||!!renoxOwnerMode;
+ const accountName=String(guestProfile.name||'Guest');const isRenoxDeveloper=!!renoxOwnerMode;
  const titleNames={neon:'NEON ELITE',royal:'ROYAL RENOX',cyber:'CYBER PHANTOM'};const title=isRenoxDeveloper?'':(guestProfile.developerTitle||titleNames[guestProfile.equippedTitle]||'');const titleColor=guestProfile.developerTitleColor||guestProfile.titleColor||'#b879ff';
  const developerTitle=isRenoxDeveloper?'<span class="developer-badge profile-developer-title">✦ '+escapeText(guestProfile.developerTitle||'RENOX DEVELOPER')+'</span><span class="renox-blue-check">✓</span>':'';const titleMarkup=title?'<span class="v7-title-chip" style="color:'+escapeText(titleColor)+'">'+escapeText(title)+'</span>':'';
  if($('guestNamePreview'))$('guestNamePreview').innerHTML=escapeText(accountName)+developerTitle+titleMarkup;if($('guestIdPreview'))$('guestIdPreview').textContent=(isRenoxDeveloper?'DEVELOPER ID: ':'ACCOUNT ID: ')+guestId;if($('homeProfileName'))$('homeProfileName').innerHTML=escapeText(accountName)+developerTitle+titleMarkup;
@@ -1272,9 +1272,9 @@ async function openPublicProfile(id){window.renoxSelectedFriendId=id;window.reno
  $('publicProfileName').textContent='Memuat profil...';$('publicProfileRole').textContent='ROLE · PROTOTYPE';$('publicProfileJoined').textContent='Tanggal bergabung: memuat...';$('publicProfileId').textContent='ID: '+id;$('publicProfileVerified').innerHTML='';
  try{
   const d=await apiJSON('/api/profile/'+encodeURIComponent(id)),p=d.profile||{};
-  $('publicProfileName').textContent=p.name||'Member';$('publicProfileAvatar').src=p.avatar||'https://placehold.co/100x100/26334d/ffffff?text=R';
+  $('publicProfileName').innerHTML=escapeText(p.name||'Member')+(p.isDeveloper?'<span class="developer-badge profile-developer-title">✦ RENOX DEVELOPER</span>':(p.developerTitle?'<span class="developer-badge profile-developer-title">✦ '+escapeText(p.developerTitle)+'</span>':''));$('publicProfileAvatar').src=p.avatar||'https://placehold.co/100x100/26334d/ffffff?text=R';
   const role=String(p.role||((p.developerTitle||p.isDeveloper)?'developer':'member')).toLowerCase();
-  $('publicProfileRole').textContent=(role==='developer'?'DEVELOPER':'MEMBER')+' · PROTOTYPE';
+  $('publicProfileRole').textContent=(role==='developer'?'RENOX DEVELOPER':'MEMBER')+' · VERIFIED PROFILE';
   const joined=p.joinedAt||p.createdAt||p.created_at||p.joinDate;
   $('publicProfileJoined').textContent='Tanggal bergabung: '+(joined?new Date(joined).toLocaleDateString('id-ID'):'belum tersedia dari server');
   $('publicProfileId').textContent='GUEST ID: '+id;
