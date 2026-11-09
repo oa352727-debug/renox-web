@@ -6,7 +6,14 @@ const os = require("os");
 const { spawn } = require("child_process");
 const { promisify } = require("util");
 const execFile = promisify(require("child_process").execFile);
-const { createTelegramMonitor } = require("./telegram-monitor");
+let telegramMonitor = { notifyNewRegistration: () => {} };
+try {
+  const { createTelegramMonitor } = require("./bot.js");
+  telegramMonitor = createTelegramMonitor();
+} catch (error) {
+  console.error("[Renox] Telegram bot tidak dimuat:", error.message);
+  console.error("[Renox] Pastikan bot.js berada satu folder dengan server.js.");
+}
 
 const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 2429);
 const HOST = "0.0.0.0";
@@ -135,7 +142,7 @@ function getClientIp(req) { return String(req.socket.remoteAddress || "unknown")
 function getAccountKey(req) { const raw=cookieMap(req).renox_account||"", first=raw.indexOf("."); return first>0?raw.slice(0,first):""; }
 function trackIp(req,key) { if(!key)return; const ip=getClientIp(req); db.ipLog=db.ipLog||{}; db.ipLog[key]={ip,lastLogin:Date.now()}; }
 let botHeartbeatAt=0;
-const telegramMonitor = createTelegramMonitor();
+
 const rateLimits = new Map();
 const tempMailSessions = new Map();
 function rateLimit(key, limit, windowMs) {
