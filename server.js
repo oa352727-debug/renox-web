@@ -305,7 +305,7 @@ const server = http.createServer(async (req, res) => {
       if(!/^\\d{8,15}$/.test(number))return json(res,400,{error:"Nomor harus 8–15 digit dengan kode negara."});
       if(!rateLimit(`checkban:${getClientKey(req)}`,6,60000))return json(res,429,{error:"Terlalu banyak pemeriksaan. Coba lagi sebentar."});
       const d=await fetchBanDetails(number);
-      return json(res,200,{number:d.number||number,banned:!!d.banned,permanent:isPermanentBan(d),otp_ready:!!d.otp_ready,wa_clone:!!d.wa_clone,status:cleanText(d.status,40),reason:cleanText(d.reason,80),violation_type:cleanText(d.violation_type,30),cooldowns:d.cooldowns||{}});
+      return json(res,200,{number:d.number||number,banned:!!d.banned,permanent:isPermanentBan(d),bannedAt:d.bannedAt||d.banned_at||d.banDate||d.ban_date||d.blockedAt||d.blocked_at||d.date_banned||null,otp_ready:!!d.otp_ready,wa_clone:!!d.wa_clone,status:cleanText(d.status,40),reason:cleanText(d.reason,80),violation_type:cleanText(d.violation_type,30),cooldowns:d.cooldowns||{}});
     }
     if (req.method === "POST" && route === "/api/unban-request") {
       const b=await readBody(req);
