@@ -1205,8 +1205,19 @@ async function sendChat(){
  };
  if(file){if(file.size>650*1024){alert('Foto maksimal 650 KB.');if(button)button.disabled=false;return}const r=new FileReader();r.onload=()=>submit(r.result);r.onerror=()=>{if(button)button.disabled=false};r.readAsDataURL(file)}else submit('');
 }
-let activeStatusId=null,activeStatusIndex=-1,statusLikeState=false,statusListCache=[];
-async function loadStatuses(){try{const d=await apiJSON('/api/statuses?guestId='+encodeURIComponent(guestId));statusListCache=d.statuses||[];const strip=$('statusStrip');if(!strip)return;strip.innerHTML='<button class="status-add" onclick="addUserStatus()"><span>＋</span><small>Status saya</small></button>'+statusListCache.map(st=>{const mine=st.guestId===guestId;const seen=(st.viewers||[]).some(v=>v.guestId===guestId);return `<button class="status-item ${seen?'seen':'unseen'}" onclick="viewUserStatus('${escapeText(st.id)}')"><span class="status-ring"><img src="${escapeText(st.avatar||'https://placehold.co/80x80/26334d/ffffff?text=R')}" alt=""></span><small>${escapeText(mine?'Status saya':st.name||'Guest')}</small></button>`}).join('');}catch(e){console.warn('Status:',e.message)}}
+let activeStatusId=null,activeStatusIndex=-1,statusLikeState=false,statusListCache=[],activeStatusGroupIds=[];
+async function loadStatuses(){
+ try{
+  const d=await apiJSON('/api/statuses?guestId='+encodeURIComponent(guestId));
+  statusListCache=Array.isArray(d.statuses)?d.statuses:[];
+  const strip=$('statusStrip');if(!strip)return;
+  const groups=new Map();
+  statusListCache.forEach((st,index)=>{const key=String(st.guestId||st.name||'unknown');if(!groups.has(key))groups.set(key,{items:[],first:st,index});groups.get(key).items.push(st)});
+  const cards=[...groups.values()].map(g=>{const st=g.first,mine=st.guestId===guestId,seen=g.items.every(x=>(x.viewers||[]).some(v=>v.guestId===guestId)),ids=g.items.map(x=>String(x.id));return `<button class="status-item ${seen?'seen':'unseen'}" onclick='viewStatusGroup(${JSON.stringify(ids)})'><span class="status-ring"><img src="${escapeText(st.avatar||'https://placehold.co/80x80/26334d/ffffff?text=R')}" alt="">${g.items.length>1?'<b class="status-count">'+g.items.length+'</b>':''}</span><small>${escapeText(mine?'Status saya':st.name||'Member')}</small></button>`}).join('');
+  strip.innerHTML='<button class="status-add" onclick="addUserStatus()"><span>＋</span><small>Status saya</small></button>'+cards;
+ }catch(e){console.warn('Status:',e.message)}
+}
+function viewStatusGroup(ids){activeStatusGroupIds=Array.isArray(ids)?ids.map(String):[];const first=statusListCache.find(x=>String(x.id)===activeStatusGroupIds[0]);if(first)viewUserStatus(first.id)}
 function addUserStatus(){$('statusTextInput').value='';$('statusDescriptionInput').value='';$('statusMediaInput').value='';$('statusMediaPreview').innerHTML='';$('statusComposer').hidden=false}
 function closeStatusComposer(){$('statusComposer').hidden=true}
 $('statusMediaInput')?.addEventListener('change',function(){const f=this.files&&this.files[0],box=$('statusMediaPreview');box.innerHTML='';if(!f)return;if(f.size>5*1024*1024){this.value='';alert('Ukuran media maksimal 5 MB.');return}const url=URL.createObjectURL(f),el=document.createElement(f.type.startsWith('video/')?'video':'img');el.src=url;if(el.tagName==='VIDEO'){el.controls=true;el.muted=true}box.appendChild(el)});
@@ -1220,23 +1231,24 @@ async function submitUserStatus(){
 }
 async function viewUserStatus(id){
  try{
-  const index=statusListCache.findIndex(x=>String(x.id)===String(id));if(index>=0)activeStatusIndex=index;
+  if(!activeStatusGroupIds.length){const st=statusListCache.find(x=>String(x.id)===String(id));activeStatusGroupIds=statusListCache.filter(x=>String(x.guestId||'')===String(st?.guestId||'')).map(x=>String(x.id))}
+  const index=activeStatusGroupIds.indexOf(String(id));if(index>=0)activeStatusIndex=index;
   const d=await apiJSON('/api/statuses/view',{method:'POST',body:JSON.stringify({guestId,statusId:id})}),st=d.status;activeStatusId=id;
   $('statusViewerName').textContent=(st.name||'Member')+' · '+new Date(st.createdAt).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
   $('statusViewerText').textContent='';$('statusViewerDescription').textContent=st.description||st.text||'';
   const mediaBox=$('statusViewerMedia');mediaBox.innerHTML='';
   const items=Array.isArray(st.mediaItems)&&st.mediaItems.length?st.mediaItems:(st.media?[{media:st.media,type:st.mediaType}]:[]);let mediaIndex=0;const paintMedia=()=>{mediaBox.innerHTML='';const item=items[mediaIndex];if(!item)return;const m=document.createElement(item.type==='video'?'video':'img');m.src=item.media;if(m.tagName==='VIDEO'){m.controls=true;m.playsInline=true;m.autoplay=true;m.muted=true;m.addEventListener('ended',()=>{if(mediaIndex<items.length-1){mediaIndex++;paintMedia()}else goToNextStatus()})}mediaBox.appendChild(m);if(items.length>1){const nav=document.createElement('div');nav.className='status-media-nav';const prev=document.createElement('button');prev.textContent='‹';prev.disabled=mediaIndex===0;prev.onclick=()=>{mediaIndex--;paintMedia()};const count=document.createElement('span');count.textContent=(mediaIndex+1)+' / '+items.length;const forward=document.createElement('button');forward.textContent='›';forward.disabled=mediaIndex===items.length-1;forward.onclick=()=>{mediaIndex++;paintMedia()};nav.append(prev,count,forward);mediaBox.appendChild(nav)}};paintMedia();
   const liked=(st.likes||[]).some(x=>(x.guestId||x)===guestId);$('statusLikeButton').textContent=liked?'♥':'♡';$('statusLikeButton').classList.toggle('liked',liked);
-  $('statusViewer').hidden=false;$('statusViewer').classList.add('fullscreen-status');await loadStatuses();
+  $('statusViewer').hidden=false;$('statusViewer').classList.add('fullscreen-status');document.body.classList.add('renox-story-open');await loadStatuses();
  }catch(e){alert(e.message)}
 }
-function goToNextStatus(){const next=statusListCache[activeStatusIndex+1];if(next)viewUserStatus(next.id);else closeStatusViewer()}
+function goToNextStatus(){const nextId=activeStatusGroupIds[activeStatusIndex+1];const next=statusListCache.find(x=>String(x.id)===String(nextId));if(next)viewUserStatus(next.id);else closeStatusViewer()}
 async function toggleStatusLike(){
  if(!activeStatusId)return;
  try{const d=await apiJSON('/api/statuses/like',{method:'POST',body:JSON.stringify({guestId,statusId:activeStatusId})});$('statusLikeButton').textContent=d.liked?'♥':'♡';$('statusLikeButton').classList.toggle('liked',!!d.liked);const current=statusListCache.find(x=>String(x.id)===String(activeStatusId));if(current){current.likes=Array.isArray(current.likes)?current.likes:[];if(d.liked&&!current.likes.some(x=>(x.guestId||x)===guestId))current.likes.push({guestId});if(!d.liked)current.likes=current.likes.filter(x=>(x.guestId||x)!==guestId)}}catch(e){alert(e.message)}
 }
 function showStatusViewers(){const el=$('statusViewersList');if(el)el.hidden=!el.hidden}
-function closeStatusViewer(){const viewer=$('statusViewer');if(viewer){viewer.hidden=true;viewer.classList.remove('fullscreen-status')}activeStatusId=null;activeStatusIndex=-1}
+function closeStatusViewer(){const viewer=$('statusViewer');if(viewer){viewer.hidden=true;viewer.classList.remove('fullscreen-status')}document.body.classList.remove('renox-story-open');activeStatusId=null;activeStatusIndex=-1;activeStatusGroupIds=[]}
 $('statusViewer')?.addEventListener('click',e=>{if(e.target.closest('button')||e.target.closest('input'))return;goToNextStatus()});
 function openDeveloperContact(){$('developerContactModal').hidden=false}
 function closeDeveloperContact(){$('developerContactModal').hidden=true}
@@ -2228,4 +2240,21 @@ body.renox-comic-theme .home-prayer-card .field{background:#fff!important;color:
 body:has(.fullscreen-status) .liquid-bottom-nav{display:none!important}
 body.renox-comic-theme #community .chat-shell,body.renox-comic-theme #community .chat-toolbar,body.renox-comic-theme #community .chat-members,body.renox-comic-theme #community .chat-bubble{background:#fff!important;color:#111!important;opacity:1!important}
 body.renox-comic-theme #community .chat-message-meta b,body.renox-comic-theme #community .chat-message-meta time,body.renox-comic-theme #community .chat-bubble{color:#111!important;-webkit-text-fill-color:#111!important;font-weight:1000!important}
+</style>
+<style id="renox-story-refresh-20261109">
+/* Renox story UX refresh */
+.status-section{overflow:hidden!important}
+#statusStrip{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;gap:14px!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:thin;padding:12px 4px 16px!important}
+#statusStrip .status-item,#statusStrip .status-add{width:76px!important;min-width:76px!important;max-width:76px!important;flex:0 0 76px!important;min-height:88px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:7px!important;padding:0!important}
+#statusStrip .status-ring,#statusStrip .status-add>span{width:66px!important;height:66px!important;flex:0 0 66px!important}
+#statusStrip .status-item small,#statusStrip .status-add small{width:76px!important;max-width:76px!important;text-align:center!important}
+.status-ring{position:relative!important}
+.status-count{position:absolute!important;right:-5px!important;top:-5px!important;min-width:21px!important;height:21px!important;border-radius:20px!important;background:#f7d778!important;color:#171322!important;border:2px solid #101426!important;font-size:10px!important;font-weight:900!important;display:grid!important;place-items:center!important}
+body.renox-story-open{overflow:hidden!important}
+body.renox-story-open .sidebar,body.renox-story-open .topbar,body.renox-story-open .liquid-bottom-nav,body.renox-story-open .hamburger-btn,body.renox-story-open .project-audio-toggle{display:none!important}
+body.renox-story-open main{margin:0!important;padding:0!important;width:100%!important}
+#statusViewer.fullscreen-status{position:fixed!important;inset:0!important;z-index:100900!important}
+#statusViewer.fullscreen-status .noxstatus-thanks{margin-top:auto!important;padding-bottom:max(12px,env(safe-area-inset-bottom))!important}
+#renoxBotMascot{display:grid!important;visibility:visible!important;opacity:1!important;z-index:100950!important}
+.profile-hero-card.profile-banner-active{background-size:cover!important;background-position:center!important}
 </style>
