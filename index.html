@@ -1164,8 +1164,8 @@ async function toggleMaintenance(){let enabled=$('maintenanceToggle').dataset.en
 async function publishPost(kind){let p=kind==='announcements'?'announcement':'leak',title=$(p+'Title').value.trim(),content=$(p+'Content').value.trim();try{await apiJSON('/api/owner/'+kind,{method:'POST',body:JSON.stringify({title,content})});$(p+'Title').value='';$(p+'Content').value='';await loadPublicContent();alert('Posting berhasil diterbitkan.')}catch(e){alert(e.message)}}
 
 async function loadGuestProfile(){
- try{const d=await apiJSON('/api/profile/'+encodeURIComponent(guestId));guestProfile=d.profile||guestProfile;if(renoxAccountName&&(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name))){guestProfile.name=renoxAccountName;try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:renoxAccountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile={...saved.profile,name:renoxAccountName}}catch(e){console.warn('Profile username sync:',e.message)}}updateGuestPreview();if(guestProfile.banner){renderProfileBanner(guestProfile.banner)}loadEconomy()}
- catch{if(renoxAccountName&&(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name)))guestProfile.name=renoxAccountName;updateGuestPreview()}
+ try{const d=await apiJSON('/api/profile/'+encodeURIComponent(guestId));guestProfile=d.profile||guestProfile;if(renoxAccountName&&guestProfile.name!==renoxAccountName){guestProfile.name=renoxAccountName;try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:renoxAccountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile={...saved.profile,name:renoxAccountName}}catch(e){console.warn('Profile username sync:',e.message)}}updateGuestPreview();if(guestProfile.banner){renderProfileBanner(guestProfile.banner)}loadEconomy()}
+ catch{if(renoxAccountName)guestProfile.name=renoxAccountName;updateGuestPreview()}
 }
 async function saveGuestProfile(){
  const name=renoxAccountName||guestProfile.name;guestProfile.name=name;
