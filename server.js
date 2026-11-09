@@ -83,7 +83,7 @@ function readDB() {
       statuses: Array.isArray(d.statuses) ? d.statuses : [],
       mutedUsers: d.mutedUsers || {},
       bannedIps: d.bannedIps || {}, ipLog: d.ipLog || {}, noxtok: Array.isArray(d.noxtok) ? d.noxtok : [], follows: d.follows || {},
-      settings: { maintenance: Boolean(d.settings?.maintenance), maintenanceReason: cleanText(d.settings?.maintenanceReason,180), maintenanceAffected: cleanText(d.settings?.maintenanceAffected,500), maintenanceUntil: String(d.settings?.maintenanceUntil || ""), globalTheme: d.settings?.globalTheme || "#42e8ff", developerTitle: d.settings?.developerTitle || {text:'RENOX DEVELOPER',color:'#42e8ff'}, pinnedFeature: d.settings?.pinnedFeature || {title:"Coming Soon Board",description:"Fitur baru pilihan developer akan muncul di sini."}, staffUsers: Array.isArray(d.settings?.staffUsers) ? d.settings.staffUsers : [] }
+      settings: { maintenance: Boolean(d.settings?.maintenance), maintenanceReason: cleanText(d.settings?.maintenanceReason,180), maintenanceAffected: cleanText(d.settings?.maintenanceAffected,500), maintenanceUntil: String(d.settings?.maintenanceUntil || ""), globalTheme: d.settings?.globalTheme || "#42e8ff", developerTitle: d.settings?.developerTitle || {text:'RENOX DEVELOPER',color:'#42e8ff'}, pinnedFeature: d.settings?.pinnedFeature || {title:"Coming Soon Board",description:"Fitur baru pilihan developer akan muncul di sini."}, staffUsers: Array.isArray(d.settings?.staffUsers) ? d.settings.staffUsers : [], updatePolicy: { enabled:Boolean(d.settings?.updatePolicy?.enabled), requiredVersion:String(d.settings?.updatePolicy?.requiredVersion||"30.0.1"), downloadUrl:String(d.settings?.updatePolicy?.downloadUrl||""), message:cleanText(d.settings?.updatePolicy?.message,180) } }
     };
   } catch {
     return { profiles: {}, dailyClaims: {}, messages: [], announcements: [], leaks: [], unbanRequests: [], privateMessages: [], statuses: [], mutedUsers: {}, bannedIps:{}, ipLog:{}, noxtok:[], follows:{}, accounts: {}, friends: {}, settings: { maintenance: false, maintenanceReason:"", maintenanceAffected:"", maintenanceUntil:"", globalTheme:"#42e8ff", pinnedFeature:{title:"Coming Soon Board",description:"Fitur baru pilihan developer akan muncul di sini."}, staffUsers:[] } };
@@ -261,6 +261,7 @@ const server = http.createServer(async (req, res) => {
     const requestIp=getClientIp(req); if(db.bannedIps?.[requestIp] && !route.startsWith("/api/owner/")) return json(res,403,{error:"Akses dari alamat IP ini dibatasi oleh developer."});
   try {
     if (req.method === "GET" && route === "/api/health") return json(res, 200, { project: "RENOX PROJECT", status: "ONLINE", version: RELEASE.version, uptime: Math.floor(process.uptime()), pid: process.pid });
+    if (req.method === "GET" && route === "/api/update-policy") { const p=db.settings.updatePolicy||{}; return json(res,200,{enabled:Boolean(p.enabled),requiredVersion:String(p.requiredVersion||"30.0.1"),downloadUrl:String(p.downloadUrl||""),message:cleanText(p.message,180)}); }
     if (req.method === "GET" && route === "/api/updates") {
       return json(res, 200, { current: RELEASE, releases: [RELEASE] });
     }
@@ -923,6 +924,7 @@ const server = http.createServer(async (req, res) => {
         await saveDB();
         return json(res,200,{ok:true,request:item});
       }
+      if(req.method==="POST"&&route==="/api/owner/update-policy"){const b=await readBody(req),requiredVersion=cleanText(b.requiredVersion,24),downloadUrl=String(b.downloadUrl||"").trim(),message=cleanText(b.message,180);if(!/^\\d+(?:\\.\\d+){1,3}$/.test(requiredVersion))return json(res,400,{error:"Versi minimum harus format angka, contoh 30.0.1."});if(Boolean(b.enabled)){let u;try{u=new URL(downloadUrl)}catch{return json(res,400,{error:"URL unduhan tidak valid."})}if(u.protocol!=="https:")return json(res,400,{error:"URL unduhan wajib menggunakan HTTPS."})}db.settings.updatePolicy={enabled:Boolean(b.enabled),requiredVersion,downloadUrl,message,updatedAt:Date.now()};await saveDB();return json(res,200,{ok:true,policy:db.settings.updatePolicy})}
       if(req.method==="POST"&&route==="/api/owner/theme"){
         const b=await readBody(req),c=String(b.color||"");
         if(!/^#[0-9a-f]{6}$/i.test(c))return json(res,400,{error:"Warna tema tidak valid."});
