@@ -1,13 +1,13 @@
-name: Build Renox Update + Termux Bot ZIP
+name: Build Renox Pterodactyl One-Process ZIP
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
       - 'server.js'
+      - 'telegram-monitor.js'
       - 'public/index.html'
       - 'index.html'
-      - 'bot.js'
       - 'package.json'
       - '.github/workflows/build-pterodactyl-zip.yml'
 permissions:
@@ -21,62 +21,61 @@ jobs:
       - name: Check JavaScript syntax and HTML parity
         run: |
           node --check server.js
-          node --check bot.js
+          node --check telegram-monitor.js
           cmp -s index.html public/index.html
           python3 - <<'PY'
           import re, subprocess, tempfile, pathlib
           html = pathlib.Path('public/index.html').read_text()
-          scripts = re.findall(r'<script\b(?![^>]*\bsrc=)[^>]*>([\s\S]*?)</script\s*>', html, re.I)
-          for i, script in enumerate(scripts):
+          scripts = re.findall(r'<script\\b(?![^>]*\\bsrc=)[^>]*>([\\s\\S]*?)</script\\s*>', html, re.I)
+          for script in scripts:
               with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False) as f:
                   f.write(script); name=f.name
               subprocess.run(['node','--check',name],check=True)
           print(f'Checked {len(scripts)} inline scripts.')
           PY
-      - name: Prepare Pterodactyl and Termux package
+      - name: Prepare Pterodactyl ZIP
         run: |
-          mkdir -p renox-update/public renox-update/termux
-          cp server.js package.json renox-update/
-          cp public/index.html renox-update/public/index.html
-          cp bot.js renox-update/termux/bot.js
-          cat > renox-update/README-INSTALL.txt <<'EOF'
-          RENOX UPDATE + TERMUX TELEGRAM MONITOR
+          mkdir -p renox-pterodactyl/public
+          cp server.js telegram-monitor.js package.json renox-pterodactyl/
+          cp public/index.html renox-pterodactyl/public/index.html
+          cat > renox-pterodactyl/README-INSTALL.txt <<'EOF'
+          RENOX PROJECT + TELEGRAM MONITOR (ONE PROCESS)
           
-          PTERODACTYL BACKEND:
-          1. Back up your existing data/renox-db.json.
-          2. Upload/extract this ZIP to the Pterodactyl server root.
-          3. Replace server.js and public/index.html with these files.
-          4. KEEP your existing data/renox-db.json. Never replace it with a blank database.
-          5. Set PORT to the current allocation (3058).
-          6. Add environment variable RENOX_BOT_TOKEN with a long random secret.
-          7. Run npm install if needed, then restart the server.
+          IMPORTANT:
+          - This package runs Renox and the Telegram monitor in the SAME Node.js process.
+          - There is no separate bot.js process and no extra port.
+          - No Pterodactyl API URL/key is needed.
+          - Keep your existing data/renox-db.json. Back it up first and NEVER replace it with a blank database.
           
-          TERMUX TELEGRAM BOT:
-          1. Copy termux/bot.js to a folder in Termux.
-          2. Create .env using termux/.env.example as a template.
-          3. Use the SAME RENOX_BOT_TOKEN value as Pterodactyl.
-          4. Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID.
-          5. Set PTERO_URL and PTERO_API_KEY (Pterodactyl Client API key, ptlc_).
-          6. Run: node bot.js
+          INSTALL:
+          1. Back up data/renox-db.json.
+          2. Upload/extract these files into the Pterodactyl server root.
+          3. Replace server.js, telegram-monitor.js, package.json, and public/index.html.
+          4. Keep the existing data/renox-db.json unchanged.
+          5. Set PORT to the Pterodactyl allocation (currently 3058, if unchanged).
+          6. Add TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in Pterodactyl Startup / Environment.
+          7. Run npm install if dependencies are not installed, then restart the server.
           
-          Bot is read-only. It reports new registrations and server resources; it does not control servers.
-          The Pterodactyl Client API key can only list servers visible to that API key.
-          Do not share .env, Telegram tokens, or Pterodactyl API keys.
+          TELEGRAM ENVIRONMENT:
+          TELEGRAM_BOT_TOKEN=token_from_BotFather
+          TELEGRAM_CHAT_ID=your_private_chat_or_group_id
+          
+          FEATURES:
+          - Sends a startup notification when Renox starts.
+          - Sends new-registration notifications with the username.
+          - Sends Renox ON status and process uptime every 10 minutes.
+          - /status shows whether Renox is ON and how long it has been running.
+          - /start and /help show bot usage.
+          
+          UPTIME means the current server.js process runtime. It resets when the Pterodactyl process restarts.
+          If Renox is OFF, its in-process bot is also offline and cannot send an OFF message.
+          Keep Telegram credentials private. Do not commit them to GitHub.
           EOF
-          cat > renox-update/termux/.env.example <<'EOF'
-          TELEGRAM_BOT_TOKEN=
-          TELEGRAM_CHAT_ID=
-          RENOX_API_URL=https://renox-web-1cnu.vercel.app
-          RENOX_BOT_TOKEN=
-          PTERO_URL=https://your-panel.example.com
-          PTERO_API_KEY=
-          STATS_INTERVAL_MINUTES=10
-          EOF
-          cd renox-update
-          zip -r ../Renox-Update-Termux-Bot.zip .
+          cd renox-pterodactyl
+          zip -r ../Renox-Pterodactyl-OneProcess.zip .
       - uses: actions/upload-artifact@v4
         with:
-          name: Renox-Update-Termux-Bot
-          path: Renox-Update-Termux-Bot.zip
+          name: Renox-Pterodactyl-OneProcess
+          path: Renox-Pterodactyl-OneProcess.zip
           if-no-files-found: error
           retention-days: 7
