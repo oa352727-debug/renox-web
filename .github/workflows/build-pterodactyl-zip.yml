@@ -1,4 +1,4 @@
-name: Build Renox Pterodactyl ZIP # refreshed 2026-11-09
+name: Build Renox Update + Termux Bot ZIP
 on:
   workflow_dispatch:
   push:
@@ -6,6 +6,8 @@ on:
     paths:
       - 'server.js'
       - 'public/index.html'
+      - 'index.html'
+      - 'bot.js'
       - 'package.json'
       - '.github/workflows/build-pterodactyl-zip.yml'
 permissions:
@@ -16,24 +18,65 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare Pterodactyl package
+      - name: Check JavaScript syntax and HTML parity
         run: |
-          mkdir -p renox-pterodactyl/public
-          cp server.js package.json renox-pterodactyl/
-          cp public/index.html renox-pterodactyl/public/
-          cat > renox-pterodactyl/README-INSTALL.txt <<'EOF'
-          RENOX PROJECT - PTERODACTYL
-          1. Upload/extract this ZIP into your Pterodactyl server root.
-          2. Keep your existing data/renox-db.json. Do not overwrite or delete it.
-          3. Set PORT to the server's allocated port (currently 2638) in Startup/Variables.
-          4. Run npm install, then npm start.
-          5. Do not upload .env or secrets to GitHub.
+          node --check server.js
+          node --check bot.js
+          cmp -s index.html public/index.html
+          python3 - <<'PY'
+          import re, subprocess, tempfile, pathlib
+          html = pathlib.Path('public/index.html').read_text()
+          scripts = re.findall(r'<script\b(?![^>]*\bsrc=)[^>]*>([\s\S]*?)</script\s*>', html, re.I)
+          for i, script in enumerate(scripts):
+              with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False) as f:
+                  f.write(script); name=f.name
+              subprocess.run(['node','--check',name],check=True)
+          print(f'Checked {len(scripts)} inline scripts.')
+          PY
+      - name: Prepare Pterodactyl and Termux package
+        run: |
+          mkdir -p renox-update/public renox-update/termux
+          cp server.js package.json renox-update/
+          cp public/index.html renox-update/public/index.html
+          cp bot.js renox-update/termux/bot.js
+          cat > renox-update/README-INSTALL.txt <<'EOF'
+          RENOX UPDATE + TERMUX TELEGRAM MONITOR
+          
+          PTERODACTYL BACKEND:
+          1. Back up your existing data/renox-db.json.
+          2. Upload/extract this ZIP to the Pterodactyl server root.
+          3. Replace server.js and public/index.html with these files.
+          4. KEEP your existing data/renox-db.json. Never replace it with a blank database.
+          5. Set PORT to the current allocation (3058).
+          6. Add environment variable RENOX_BOT_TOKEN with a long random secret.
+          7. Run npm install if needed, then restart the server.
+          
+          TERMUX TELEGRAM BOT:
+          1. Copy termux/bot.js to a folder in Termux.
+          2. Create .env using termux/.env.example as a template.
+          3. Use the SAME RENOX_BOT_TOKEN value as Pterodactyl.
+          4. Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID.
+          5. Set PTERO_URL and PTERO_API_KEY (Pterodactyl Client API key, ptlc_).
+          6. Run: node bot.js
+          
+          Bot is read-only. It reports new registrations and server resources; it does not control servers.
+          The Pterodactyl Client API key can only list servers visible to that API key.
+          Do not share .env, Telegram tokens, or Pterodactyl API keys.
           EOF
-          cd renox-pterodactyl
-          zip -r ../Renox-Pterodactyl-10.2.1-20261109.zip .
+          cat > renox-update/termux/.env.example <<'EOF'
+          TELEGRAM_BOT_TOKEN=
+          TELEGRAM_CHAT_ID=
+          RENOX_API_URL=https://renox-web-1cnu.vercel.app
+          RENOX_BOT_TOKEN=
+          PTERO_URL=https://your-panel.example.com
+          PTERO_API_KEY=
+          STATS_INTERVAL_MINUTES=10
+          EOF
+          cd renox-update
+          zip -r ../Renox-Update-Termux-Bot.zip .
       - uses: actions/upload-artifact@v4
         with:
-          name: Renox-Pterodactyl-10.2.1
-          path: Renox-Pterodactyl-10.2.1-20261109.zip
+          name: Renox-Update-Termux-Bot
+          path: Renox-Update-Termux-Bot.zip
           if-no-files-found: error
           retention-days: 7
