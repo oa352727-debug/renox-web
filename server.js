@@ -15,11 +15,12 @@ try {
   console.error("[Renox] Pastikan bot.js berada satu folder dengan server.js.");
 }
 
-const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 2429);
+const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 26186);
 const HOST = "0.0.0.0";
 const PUBLIC = path.join(__dirname, "public");
-const DATA_DIR = path.join(__dirname, "data");
-const DB_FILE = path.join(DATA_DIR, "renox-db.json");
+// Gunakan volume persisten Pterodactyl bila tersedia.
+const DATA_DIR = path.resolve(process.env.RENOX_DATA_DIR || path.join(__dirname, "data"));
+const DB_FILE = path.resolve(process.env.RENOX_DB_FILE || path.join(DATA_DIR, "renox-db.json"));
 const OWNER_KEY = process.env.RENOX_OWNER_KEY || "RenoxGanteng";
 const SESSION_SECRET = process.env.RENOX_SESSION_SECRET || crypto.randomBytes(32).toString("hex");
 const PRESENCE_TTL = 90_000;
@@ -74,6 +75,27 @@ function r2PublicUrl(key) {
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, JSON.stringify({ profiles: {}, messages: [], announcements: [], leaks: [], unbanRequests: [], dailyClaims: {}, accounts: {}, friends: {}, settings: { maintenance: false, maintenanceReason:"", maintenanceAffected:"", maintenanceUntil:"", globalTheme:"#42e8ff", developerTitle: {text:'RENOX DEVELOPER',color:'#42e8ff'} } }, null, 2));
+
+// Pastikan folder database tersedia dan buat database awal jika belum ada.
+fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
+if (!fs.existsSync(DB_FILE)) {
+  const initialDB = {
+    profiles: {}, accounts: {}, friends: {}, dailyClaims: {},
+    messages: [], announcements: [], leaks: [], unbanRequests: [],
+    privateMessages: [], statuses: [], mutedUsers: {}, bannedIps: {},
+    ipLog: {}, noxtok: [], follows: {}, registrationEvents: [],
+    settings: {
+      maintenance: false, maintenanceReason: "", maintenanceAffected: "",
+      maintenanceUntil: "", globalTheme: "#42e8ff",
+      developerTitle: { text: "RENOX DEVELOPER", color: "#42e8ff" },
+      pinnedFeature: { title: "Coming Soon Board", description: "Fitur baru pilihan developer akan muncul di sini." },
+      staffUsers: [],
+      updatePolicy: { enabled: false, requiredVersion: "30.0.1", downloadUrl: "", message: "" }
+    }
+  };
+  fs.writeFileSync(DB_FILE, JSON.stringify(initialDB, null, 2), { flag: "wx" });
+  console.log("[Renox DB] Database baru dibuat:", DB_FILE);
+}
 
 function readDB() {
   try {
