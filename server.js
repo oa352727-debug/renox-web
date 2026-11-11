@@ -162,6 +162,14 @@ function isOwner(req) {
 function getClientKey(req) { return req.socket.remoteAddress || "unknown"; }
 function getClientIp(req) { return String(req.socket.remoteAddress || "unknown").replace(/^::ffff:/, ""); }
 function getAccountKey(req) { const raw=cookieMap(req).renox_account||"", first=raw.indexOf("."); return first>0?raw.slice(0,first):""; }
+function getAuthenticatedAccount(req) {
+  const raw=cookieMap(req).renox_account||"",first=raw.indexOf("."),key=first>0?raw.slice(0,first):"",token=first>0?raw.slice(first+1):"",parts=token.split(".");
+  const expected=parts.length===3?sign(parts[0]+"|"+key+"|"+parts[1]):"";
+  const valid=parts.length===3&&Number(parts[0])>Date.now()&&parts[2].length===expected.length&&crypto.timingSafeEqual(Buffer.from(parts[2]),Buffer.from(expected));
+  const account=db.accounts?.[key];
+  if(!valid||!account||account.sessionId!==parts[1])return null;
+  return {key,account,role:account.developer?"admin":(account.role==="reseller"?"reseller":"member")};
+}
 function trackIp(req,key) { if(!key)return; const ip=getClientIp(req); db.ipLog=db.ipLog||{}; db.ipLog[key]={ip,lastLogin:Date.now()}; }
 let botHeartbeatAt=0;
 
@@ -654,6 +662,48 @@ const server = http.createServer(async (req, res) => {
       if(!rateLimit("ml-stalk:"+getClientKey(req),6,60000))return json(res,429,{error:"Terlalu banyak lookup Mobile Legends."});
       return json(res,200,await dinonicGet("/stalker/mobile-legend",{id,server}));
     }
+    if (req.method === "GET" && route === "/api/qr-generate") {
+      const textValue=String(url.searchParams.get("text")||"").trim(),color=String(url.searchParams.get("color")||"#000000"),bg=String(url.searchParams.get("bg")||"#ffffff"),size=Number(url.searchParams.get("size")||512);
+      if(!textValue||textValue.length>1500)return json(res,400,{error:"Isi teks QR (maksimal 1.500 karakter)."});
+      if(!/^#[0-9a-f]{6}$/i.test(color)||!/^#[0-9a-f]{6}$/i.test(bg)||!Number.isInteger(size)||size<128||size>1024)return json(res,400,{error:"Warna atau ukuran QR tidak valid."});
+      if(!rateLimit("qr:"+getClientKey(req),10,60000))return json(res,429,{error:"Terlalu banyak membuat QR."});
+      return json(res,200,await dinonicGet("/tools/qr-custom",{text:textValue,color,bg,size}));
+    }
+    if (req.method === "GET" && route === "/api/google-tts") {
+      const textValue=String(url.searchParams.get("text")||"").trim(),lang=cleanText(url.searchParams.get("lang")||"id",8),slow=String(url.searchParams.get("slow")||"false");
+      if(!textValue||textValue.length>800)return json(res,400,{error:"Teks wajib diisi (maksimal 800 karakter)."});
+      if(!/^[a-z]{2}(?:-[A-Z]{2})?$/.test(lang)||!["true","false"].includes(slow))return json(res,400,{error:"Bahasa atau mode suara tidak valid."});
+      if(!rateLimit("tts:"+getClientKey(req),8,60000))return json(res,429,{error:"Terlalu banyak permintaan suara."});
+      return json(res,200,await dinonicGet("/tools/google-tts",{text:textValue,lang,slow}));
+    }
+    if (req.method === "POST" && route === "/api/nexo-gemini") {
+      const b=await readBody(req),prompt=String(b.prompt||"").trim();
+      if(!prompt||prompt.length>1200)return json(res,400,{error:"Prompt wajib diisi (maksimal 1.200 karakter)."});
+      if(!rateLimit("gemini:"+getClientKey(req),12,60000))return json(res,429,{error:"Nexo AI sedang menerima terlalu banyak pesan."});
+      const payload=await dinonicGet("/ai/gemini",{prompt});
+      const root=payload.data??payload.result??payload;
+      const answer=typeof root==="string"?root:(root.answer||root.response||root.text||root.message||root.output||"");
+      if(!answer)return json(res,502,{error:"Gemini provider tidak mengembalikan teks jawaban yang dikenali.",provider:"Dinonic Gemini"});
+      return json(res,200,{answer:String(answer).slice(0,12000),provider:"Google Gemini · Dinonic"});
+    }
+    if (req.method === "GET" && route === "/api/anime-latest") {
+      const page=Math.max(1,Math.min(30,Number(url.searchParams.get("page")||1)||1));
+      if(!rateLimit("anime-latest:"+getClientKey(req),8,60000))return json(res,429,{error:"Terlalu banyak memuat daftar anime."});
+      const payload=await dinonicGet("/anime/nontonanimex/terbaru",{page});
+      return json(res,200,{provider:"NontonAnimeX · Dinonic",page,data:payload.data??payload.result??payload});
+    }
+    if (req.method === "POST" && route === "/api/role/email") {
+      const auth=getAuthenticatedAccount(req);
+      if(!auth)return json(res,401,{error:"Silakan login terlebih dahulu."});
+      if(!["reseller","admin"].includes(auth.role))return json(res,403,{error:"Fitur email hanya tersedia untuk role Reseller dan Admin."});
+      const b=await readBody(req),to=String(b.to||"").trim(),subject=cleanText(b.subject,140),textBody=String(b.text||"").trim(),htmlBody=String(b.html||"").trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)||!subject||(!textBody&&!htmlBody)||textBody.length>5000||htmlBody.length>10000)return json(res,400,{error:"Alamat email, subjek, atau isi email tidak valid."});
+      if(!rateLimit("role-email:"+auth.key,5,3600000))return json(res,429,{error:"Batas pengiriman email tercapai. Coba lagi nanti."});
+      const mailEnv=["DINONIC_MAIL_HOST","DINONIC_MAIL_PORT","DINONIC_MAIL_USER","DINONIC_MAIL_PASS"];
+      if(mailEnv.some(k=>!process.env[k]))return json(res,503,{error:"SMTP belum dikonfigurasi oleh admin di Environment Pterodactyl."});
+      const payload=await dinonicGet("/tools/send-mail",{to,subject,text:textBody,html:htmlBody,from_name:cleanText(process.env.DINONIC_MAIL_FROM_NAME||"Renox Project",60),host:process.env.DINONIC_MAIL_HOST,port:process.env.DINONIC_MAIL_PORT,user:process.env.DINONIC_MAIL_USER,pass:process.env.DINONIC_MAIL_PASS});
+      return json(res,200,{ok:true,result:payload});
+    }
     if (req.method === "GET" && route === "/api/otp-checker") {
       return json(res,403,{status:false,code:"OWNERSHIP_VERIFICATION_REQUIRED",error:"Pemeriksaan OTP dinonaktifkan. Renox tidak dapat mengambil atau menampilkan kode OTP dari nomor yang kepemilikannya belum diverifikasi."});
     }
@@ -959,7 +1009,7 @@ const server = http.createServer(async (req, res) => {
       const staff=(db.settings.staffUsers||[]).some(x=>String(x).toLowerCase()===key);
       const accountAllowed=!db.settings.maintenance||db.accounts?.[key]?.developer||staff;
       const ok=valid&&db.accounts?.[key]&&db.accounts[key].sessionId===parts[1]&&accountAllowed;
-      if(ok&&db.accounts[key].developer){const ownerExpiry=String(Date.now()+7*86400000),ownerToken=ownerExpiry+"."+sign(ownerExpiry);res.setHeader("Set-Cookie","renox_owner="+ownerToken+"; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800"+(process.env.NODE_ENV==="production"?"; Secure":""));} return json(res,200,{authenticated:!!ok,developer:!!(ok&&db.accounts[key].developer),revoked:!!valid&&!ok&&accountAllowed,blockedByMaintenance:!!valid&&!accountAllowed,maintenance:Boolean(db.settings.maintenance),username:ok?db.accounts[key].username:null,guestId:ok?crypto.createHash("sha256").update("renox-account:"+key).digest("hex").slice(0,32):null});
+      if(ok&&db.accounts[key].developer){const ownerExpiry=String(Date.now()+7*86400000),ownerToken=ownerExpiry+"."+sign(ownerExpiry);res.setHeader("Set-Cookie","renox_owner="+ownerToken+"; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800"+(process.env.NODE_ENV==="production"?"; Secure":""));} return json(res,200,{authenticated:!!ok,role:ok?(db.accounts[key].developer?"admin":(db.accounts[key].role==="reseller"?"reseller":"member")):null,developer:!!(ok&&db.accounts[key].developer),revoked:!!valid&&!ok&&accountAllowed,blockedByMaintenance:!!valid&&!accountAllowed,maintenance:Boolean(db.settings.maintenance),username:ok?db.accounts[key].username:null,guestId:ok?crypto.createHash("sha256").update("renox-account:"+key).digest("hex").slice(0,32):null});
     }
     if(req.method==="POST"&&route==="/api/auth/logout"){
       res.writeHead(200,{"Content-Type":"application/json","Set-Cookie":"renox_account=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0"});return res.end(JSON.stringify({ok:true}));
@@ -981,6 +1031,13 @@ const server = http.createServer(async (req, res) => {
     }
     if (route.startsWith("/api/owner/")) {
       if (!isOwner(req)) return json(res, 401, { error:"Owner access required." });
+      if(req.method==="POST"&&route==="/api/owner/account-role"){
+        const b=await readBody(req),key=String(b.username||"").trim().toLowerCase(),role=String(b.role||"").toLowerCase();
+        if(!db.accounts?.[key])return json(res,404,{error:"Akun tidak ditemukan."});
+        if(!["member","reseller"].includes(role))return json(res,400,{error:"Role harus member atau reseller. Admin hanya melalui akun developer."});
+        if(db.accounts[key].developer)return json(res,403,{error:"Role admin developer tidak dapat diturunkan melalui endpoint ini."});
+        db.accounts[key].role=role;await saveDB();return json(res,200,{ok:true,username:db.accounts[key].username,role});
+      }
       if (req.method === "GET" && route === "/api/owner/unban-requests") {
         return json(res,200,{requests:(db.unbanRequests||[]).map(x=>({...x,numberMasked:x.number.replace(/(\\d{3})\\d+(\\d{2})/,"$1••••$2")}))});
       }
