@@ -27,8 +27,8 @@ const PRESENCE_TTL = 90_000;
 const MAX_BODY = 16_000_000;
 const NOXTOK_MAX_VIDEO_BYTES = Math.max(1, Number(process.env.NOXTOK_MAX_VIDEO_MB || 250)) * 1024 * 1024;
 const RELEASE = {
-  version: "10.2.1",
-  name: "Renox Project · Lookup & Web Tools Update",
+  version: "10.3.0",
+  name: "Renox Project · Dinonic Tools & Mobile Legends Update",
   publishedAt: "2026-11-08",
   changes: [
     "Unban: formulir pengajuan wajib berisi nomor, alasan, dan tanggal pemblokiran.",
