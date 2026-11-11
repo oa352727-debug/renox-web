@@ -650,7 +650,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === "GET" && route === "/api/ml-stalk") {
       const id=cleanText(url.searchParams.get("id"),24),server=cleanText(url.searchParams.get("server"),12);
-      if(!/^\\d{5,20}$/.test(id)||!/^\\d{1,8}$/.test(server))return json(res,400,{error:"Masukkan User ID dan Server ID Mobile Legends yang valid."});
+      if(!/^\d{5,20}$/.test(id)||!/^\d{1,8}$/.test(server))return json(res,400,{error:"Masukkan User ID dan Server ID Mobile Legends yang valid."});
       if(!rateLimit("ml-stalk:"+getClientKey(req),6,60000))return json(res,429,{error:"Terlalu banyak lookup Mobile Legends."});
       return json(res,200,await dinonicGet("/stalker/mobile-legend",{id,server}));
     }
