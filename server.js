@@ -259,6 +259,27 @@ async function synoxGet(pathname, params) {
   if (!response.ok || payload.status === false) throw new Error(payload.message || `SynoxCloud HTTP ${response.status}`);
   return payload;
 }
+async function dinonicGet(pathname, params = {}) {
+  const apiKey = String(process.env.DINONIC_API_KEY || "").trim();
+  if (!apiKey) throw new Error("Dinonic API belum dikonfigurasi. Isi DINONIC_API_KEY di Environment Pterodactyl.");
+  const endpoint = new URL("https://api.dinonic.web.id" + pathname);
+  endpoint.searchParams.set("apikey", apiKey);
+  for (const [key, value] of Object.entries(params)) endpoint.searchParams.set(key, String(value));
+  const response = await fetch(endpoint, { headers: { "Accept": "application/json", "User-Agent": "RenoxProject/10.3" }, signal: AbortSignal.timeout(18000) });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || payload.status === false || payload.success === false) {
+    throw new Error(cleanText(payload.message || payload.error || `Dinonic API HTTP ${response.status}`, 220));
+  }
+  return payload;
+}
+function dinonicItems(payload) {
+  const root = payload?.data ?? payload?.result ?? payload?.results ?? payload;
+  if (Array.isArray(root)) return root;
+  for (const key of ["items", "results", "pins", "videos", "files", "data", "result"]) {
+    if (Array.isArray(root?.[key])) return root[key];
+  }
+  return [];
+}
 function isPublicWebUrl(raw) {
   let u; try { u = new URL(raw); } catch { return false; }
   if (!["http:", "https:"].includes(u.protocol) || u.username || u.password) return false;
@@ -434,13 +455,12 @@ const server = http.createServer(async (req, res) => {
       const username = cleanText(url.searchParams.get("username"), 30).replace(/^@+/, "");
       if (!/^[a-zA-Z0-9._]{2,30}$/.test(username)) return json(res,400,{error:"Username TikTok tidak valid."});
       if (!rateLimit(`tiktok:${getClientKey(req)}`, 8, 60000)) return json(res,429,{error:"Terlalu banyak pencarian. Coba lagi sebentar."});
-      const payload = await synoxGet("/stalker/tiktokstalk", { user: username });
+      const payload = await dinonicGet("/stalk/tiktok", { username });
       const root=payload.data||payload.result||payload;
       const user=root.user||root.userInfo||root.user_info||root.profile||root;
       const stats=root.stats||root.statsV2||user.stats||user.statistics||{};
-      const uniqueId=user.uniqueId||user.unique_id||user.username||user.uniqueID||"";
-      if ((payload.status===false)||!uniqueId) return json(res,404,{error:payload.message||"Profil TikTok tidak ditemukan atau format data provider berubah."});
-      return json(res,200,{user:{uniqueId:cleanText(uniqueId,30),nickname:cleanText(user.nickname||user.displayName||user.name||uniqueId,80),signature:cleanText(user.signature||user.bio||"",300),avatarLarger:user.avatarLarger||user.avatarMedium||user.avatarThumb||user.avatar||user.avatar_url||"",avatarMedium:user.avatarMedium||user.avatar||"",avatarThumb:user.avatarThumb||user.avatar||"",followerCount:Number(stats.followerCount||stats.followers||user.followerCount||0),followingCount:Number(stats.followingCount||stats.following||user.followingCount||0),videoCount:Number(stats.videoCount||stats.videos||user.videoCount||0),heartCount:Number(stats.heartCount||stats.heart||stats.likes||user.heartCount||0),verified:Boolean(user.verified||user.isVerified),privateAccount:Boolean(user.privateAccount||user.isPrivate),region:cleanText(user.region||user.regionCode||"",40),userId:cleanText(user.id||user.uid||user.secUid||"",80),createTime:Number(user.createTime||user.create_time||0)}});
+      const uniqueId=user.uniqueId||user.unique_id||user.username||user.uniqueID||user.unique_id||username;
+      return json(res,200,{user:{uniqueId:cleanText(uniqueId,30),nickname:cleanText(user.nickname||user.displayName||user.name||uniqueId,80),signature:cleanText(user.signature||user.bio||"",300),avatarLarger:user.avatarLarger||user.avatarMedium||user.avatarThumb||user.avatar||user.avatar_url||user.avatarUrl||"",avatarMedium:user.avatarMedium||user.avatar||user.avatar_url||"",avatarThumb:user.avatarThumb||user.avatar||"",followerCount:Number(stats.followerCount||stats.followers||user.followerCount||user.followers||0),followingCount:Number(stats.followingCount||stats.following||user.followingCount||0),videoCount:Number(stats.videoCount||stats.videos||user.videoCount||0),heartCount:Number(stats.heartCount||stats.heart||stats.likes||user.heartCount||0),verified:Boolean(user.verified||user.isVerified),privateAccount:Boolean(user.privateAccount||user.isPrivate),region:cleanText(user.region||user.regionCode||"",40),userId:cleanText(user.id||user.uid||user.secUid||"",80),createTime:Number(user.createTime||user.create_time||0),bioLink:user.bioLink||user.bio_link||""}});
     }
     if (req.method === "GET" && route === "/api/email-public") {
       const email=cleanText(url.searchParams.get("email"),120).toLowerCase();
@@ -500,36 +520,15 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === "GET" && route === "/api/pinterest-search") {
       const q=cleanText(url.searchParams.get("q"),120);
-      const offset=Math.max(0,Math.min(500,Number(url.searchParams.get("bookmark")||0)||0));
       if(q.length<2)return json(res,400,{error:"Masukkan kata kunci minimal 2 karakter."});
       if(!rateLimit(`pinterest:${getClientKey(req)}`,12,60000))return json(res,429,{error:"Pencarian terlalu cepat. Tunggu sebentar."});
-      const searchUrl=new URL("https://www.pinterest.com/search/pins/");
-      searchUrl.searchParams.set("q",q);
-      const response=await fetch(searchUrl,{headers:{
-        "User-Agent":"Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 Chrome/125.0.0.0 Mobile Safari/537.36",
-        "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language":"id-ID,id;q=0.9,en-US;q=0.8"
-      },redirect:"follow",signal:AbortSignal.timeout(22000)});
-      if(!response.ok)throw new Error(`Pinterest membatasi pencarian tidak resmi (HTTP ${response.status}). Coba lagi nanti.`);
-      let html=await response.text();
-      html=html.replace(/\\u002F/g,"/").replace(/\\u003A/g,":").replace(/\\\//g,"/").replace(/&amp;/g,"&");
-      const found=new Map();
-      const addImage=(raw,title="")=>{
-        let src=String(raw||"").replace(/\\u002F/g,"/").replace(/\\\//g,"/").replace(/&amp;/g,"&");
-        if(!src.startsWith("https://i.pinimg.com/"))return;
-        src=src.replace(/\/\d+x\d+\//,"/originals/");
-        if(!/\.(jpg|jpeg|png|webp)(\?|$)/i.test(src))return;
-        if(!found.has(src))found.set(src,{id:crypto.createHash("sha1").update(src).digest("hex").slice(0,12),title:cleanText(title||q,160),image:src,thumb:src,source:"https://www.pinterest.com/search/pins/?q="+encodeURIComponent(q)});
-      };
-      const patterns=[
-        /"(?:url|src|image_url)"\s*:\s*"(https?:\\?\/\\?\/i\.pinimg\.com[^"]+)"/gi,
-        /https?:\\?\/\\?\/i\.pinimg\.com\\?\/(?:originals|[0-9]+x[0-9]+)\\?\/[^"'\\\s<>]+?\.(?:jpg|jpeg|png|webp)(?:\?[^"'\\\s<>]*)?/gi,
-        /(?:src|data-src)="(https:\/\/i\.pinimg\.com\/[^"]+)"/gi
-      ];
-      for(const re of patterns){let m;while((m=re.exec(html))!==null){const raw=m[1]||m[0];addImage(raw,q);if(found.size>=180)break;}}
-      const all=[...found.values()];
-      const page=all.slice(offset,offset+20);
-      return json(res,200,{query:q,provider:"Pinterest public page · unofficial scraper",results:page,bookmark:all.length>offset+20?String(offset+20):null,hasMore:all.length>offset+20,notice:all.length?"Hasil dari halaman publik Pinterest. Jumlah hasil bergantung pada akses yang diberikan Pinterest.":"Pinterest tidak mengirim gambar yang dapat dibaca; situs dapat sedang membatasi scraper."});
+      const payload=await dinonicGet("/search/pinterest",{q});
+      const results=dinonicItems(payload).map((x,i)=>{
+        const image=x.image||x.image_url||x.thumbnail||x.thumb||x.url||x.src||x.media?.url||"";
+        const source=x.source||x.pin_url||x.link||x.url||image;
+        return {id:x.pinId||x.pin_id||x.id||String(i),title:cleanText(x.title||x.description||q,160),image,thumb:x.thumb||x.thumbnail||image,source};
+      }).filter(x=>/^https:\/\//i.test(x.image));
+      return json(res,200,{query:q,provider:"Dinonic API",results,bookmark:null,notice:results.length?"Hasil pencarian Pinterest dari Dinonic.":"Provider tidak mengembalikan gambar yang dikenali."});
     }
     if (req.method === "GET" && route === "/api/pinterest-download") {
       const raw=url.searchParams.get("url")||"";let imageUrl;
@@ -547,6 +546,20 @@ const server = http.createServer(async (req, res) => {
       if(bytes.length>12*1024*1024)throw new Error("Ukuran gambar terlalu besar (maksimum 12 MB).");
       res.writeHead(200,{"Content-Type":type,"Content-Length":bytes.length,"Content-Disposition":`attachment; filename="renox-pinterest-${Date.now()}.${type.includes("png")?"png":type.includes("webp")?"webp":"jpg"}`,"Cache-Control":"no-store","X-Content-Type-Options":"nosniff"});
       return res.end(bytes);
+    }
+    if (req.method === "GET" && route === "/api/sfile-search") {
+      const q=cleanText(url.searchParams.get("q"),120),page=Math.max(1,Math.min(50,Number(url.searchParams.get("page")||1)||1));
+      if(q.length<2)return json(res,400,{error:"Masukkan kata kunci minimal 2 karakter."});
+      if(!rateLimit(`sfile:${getClientKey(req)}`,10,60000))return json(res,429,{error:"Pencarian terlalu cepat. Tunggu sebentar."});
+      const payload=await dinonicGet("/search/sfile",{q,page});
+      return json(res,200,{query:q,page,provider:"Dinonic API",results:dinonicItems(payload),raw:payload});
+    }
+    if (req.method === "GET" && route === "/api/tiktok-search") {
+      const q=cleanText(url.searchParams.get("q"),120);
+      if(q.length<2)return json(res,400,{error:"Masukkan kata kunci minimal 2 karakter."});
+      if(!rateLimit(`tiktok-search:${getClientKey(req)}`,10,60000))return json(res,429,{error:"Pencarian terlalu cepat. Tunggu sebentar."});
+      const payload=await dinonicGet("/search/tiktok",{q});
+      return json(res,200,{query:q,provider:"Dinonic API",results:dinonicItems(payload),raw:payload});
     }
     if (req.method === "GET" && route === "/api/maps-search") {
       const q=cleanText(url.searchParams.get("q"),160);
@@ -637,8 +650,9 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === "GET" && route === "/api/ff-lookup") {
       const id = cleanText(url.searchParams.get("id"), 40);
-      if (!id) return json(res, 400, { error: "Masukkan Player ID Free Fire." });
-      return json(res, 200, await configuredGameLookup("FF_LOOKUP_API", id, "Free Fire"));
+      if (!/^\\d{5,20}$/.test(id)) return json(res, 400, { error: "Masukkan Player ID Free Fire yang valid." });
+      if (!rateLimit(`ff:${getClientKey(req)}`, 8, 60000)) return json(res,429,{error:"Terlalu banyak pencarian Free Fire. Tunggu sebentar."});
+      return json(res, 200, await dinonicGet("/stalk/ff", { id }));
     }
     if (req.method === "GET" && route === "/api/ml-lookup") {
       const id = cleanText(url.searchParams.get("id"), 60);
