@@ -1,6 +1,7 @@
 # Renox Project
 
 ## Backend Pterodactyl
+- Panel Pterodactyl saat ini: `http://168.144.188.23` (alamat panel saja; bukan otomatis alamat API/backend).
 - Gunakan Node.js 18 atau lebih baru.
 - Startup command: `npm start`.
 - Port fallback project: `26186`. Pastikan allocation Pterodactyl dan environment `PORT` sesuai.
