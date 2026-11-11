@@ -648,6 +648,12 @@ const server = http.createServer(async (req, res) => {
       return json(res,200,{status:true,md5:cleanText(result.md5,100),copiedFilesAmount:Number(result.copiedFilesAmount||0),download:result.download});
     }
 
+    if (req.method === "GET" && route === "/api/fakeff-lobby") {
+      const username=cleanText(url.searchParams.get("username"),24),lobby=Number(url.searchParams.get("lobby")||30);
+      if(!/^[a-zA-Z0-9 _.-]{2,24}$/.test(username)||!Number.isInteger(lobby)||lobby<1||lobby>100)return json(res,400,{error:"Username atau jumlah lobby tidak valid."});
+      if(!rateLimit("fakeff:"+getClientKey(req),4,60000))return json(res,429,{error:"Terlalu banyak membuat simulasi."});
+      return json(res,200,await dinonicGet("/canvas/fakeff",{username,lobby}));
+    }
     if (req.method === "GET" && route === "/api/fakeml-lobby") {
       const username=cleanText(url.searchParams.get("username"),24),rank=cleanText(url.searchParams.get("rank")||"imo",20),avatar=String(url.searchParams.get("avatar")||"").trim(),border=String(url.searchParams.get("border")||"0");
       if(!/^[a-zA-Z0-9 _.-]{2,24}$/.test(username))return json(res,400,{error:"Username Mobile Legends tidak valid."});
