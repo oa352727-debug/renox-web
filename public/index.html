@@ -1148,12 +1148,23 @@ async function fetchPinterestPage(q,append){
  }catch(e){status.textContent=e.message||'Pinterest API gagal diakses.'}
  finally{more.disabled=false}
 }
+async function generateRenoxQR(){
+ const text=$('qrText').value.trim(),out=$('qrResult');if(!text){out.textContent='Isi teks terlebih dahulu.';return}out.textContent='Membuat QR...';
+ try{const q=new URLSearchParams({text,color:$('qrColor').value,bg:$('qrBg').value,size:$('qrSize').value});const d=await apiJSON('/api/qr-generate?'+q);const root=d.data||d.result||d;const image=root.image||root.url||root.imageUrl||root.qr||root.base64||'';if(typeof image!=='string'||!image){out.textContent='Provider merespons tetapi gambar QR tidak dikenali.';return}const src=image.startsWith('data:')||/^https:\/\//i.test(image)?image:'data:image/png;base64,'+image;out.innerHTML='<img alt="QR Code Renox" style="display:block;width:min(100%,320px);background:#fff;padding:12px;border-radius:16px" src="'+escapeText(src)+'"><a download="renox-qr.png" href="'+escapeText(src)+'">SIMPAN QR</a>'}catch(e){out.textContent='⚠ '+e.message}}
+async function generateRenoxTTS(){
+ const text=$('ttsText').value.trim(),out=$('ttsResult');if(!text){out.textContent='Isi teks terlebih dahulu.';return}out.textContent='Membuat audio...';
+ try{const q=new URLSearchParams({text,lang:$('ttsLang').value,slow:'false'}),d=await apiJSON('/api/google-tts?'+q),root=d.data||d.result||d;const audio=root.audio||root.url||root.audioUrl||root.mp3||root.base64||'';if(typeof audio!=='string'||!audio){out.textContent='Provider merespons tetapi audio belum dikenali.';return}const src=audio.startsWith('data:')||/^https:\/\//i.test(audio)?audio:'data:audio/mpeg;base64,'+audio;out.innerHTML='<audio controls style="width:100%" src="'+escapeText(src)+'"></audio>'}catch(e){out.textContent='⚠ '+e.message}}
+async function loadLatestAnime(page=1){
+ const status=$('animeLatestStatus'),out=$('animeLatestResults');status.textContent='Memuat daftar anime...';out.innerHTML='';
+ try{const d=await apiJSON('/api/anime-latest?page='+page),root=d.data||[],items=Array.isArray(root)?root:(root.items||root.results||root.anime||[]);if(!items.length){status.textContent='Provider belum mengembalikan daftar yang dikenali.';return}out.innerHTML=items.slice(0,30).map((x,i)=>{const title=escapeText(x.title||x.name||x.judul||'Anime '+(i+1)),url=String(x.url||x.link||x.href||''),img=String(x.image||x.cover||x.thumbnail||'');return '<article class="feed-item">'+( /^https:\/\//i.test(img)?'<img loading="lazy" style="width:100%;max-width:120px;border-radius:10px" src="'+escapeText(img)+'" alt="">':'')+'<div><b>'+title+'</b>'+(x.episode?'<p>'+escapeText(x.episode)+'</p>':'')+( /^https:\/\//i.test(url)?'<a href="'+escapeText(url)+'" target="_blank" rel="noopener noreferrer">LIHAT DETAIL ↗</a>':'')+'</div></article>'}).join('');status.textContent=items.length+' item · '+(d.provider||'Dinonic API')}catch(e){status.textContent='⚠ '+e.message}}
+async function sendRenoxMail(){
+ const status=$('mailStatus'),payload={to:$('mailTo').value.trim(),subject:$('mailSubject').value.trim(),text:$('mailText').value.trim()};if(!payload.to||!payload.subject||!payload.text){status.textContent='Lengkapi penerima, subjek, dan isi email.';return}status.textContent='Mengirim email...';try{await apiJSON('/api/role/email',{method:'POST',body:JSON.stringify(payload)});status.textContent='Email diterima oleh provider untuk diproses.'}catch(e){status.textContent='⚠ '+e.message}}
 async function askNexoAI(){
  const input=$('nexoPrompt'),prompt=input.value.trim();if(!prompt)return;
  input.value='';addNexoMessage('user',prompt);$('nexoSend').disabled=true;$('nexoStatus').textContent='Nexo sedang mencari web dan menyusun jawaban...';
  const loading=addNexoMessage('assistant','Sedang berpikir dan mencari sumber publik…');
  try{
-  const d=await apiJSON('/api/nexo-ai',{method:'POST',body:JSON.stringify({prompt})});
+  const d=await apiJSON('/api/nexo-gemini',{method:'POST',body:JSON.stringify({prompt})});
   loading.querySelector('p').textContent=d.answer+(d.notice?'\n\n'+d.notice:'');
   if(d.sources?.length){const sources=document.createElement('div');sources.className='nexo-sources';const label=document.createElement('b');label.textContent='SUMBER WEB';sources.appendChild(label);d.sources.forEach(s=>{const a=document.createElement('a');a.href=s.url;a.target='_blank';a.rel='noopener';a.textContent=s.title+' ↗';sources.appendChild(a)});loading.querySelector('.nexo-bubble').appendChild(sources)}
   $('nexoStatus').textContent='Provider: '+(d.provider||'AI gratis')+' · Periksa sumber untuk informasi penting.';
