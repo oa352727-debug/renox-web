@@ -639,6 +639,21 @@ const server = http.createServer(async (req, res) => {
       if(!payload.status||!result.status||!/^https:\/\/copier\.saveweb2zip\.com\/api\/downloadArchive\/[A-Za-z0-9_-]+$/.test(result.download||""))return json(res,502,{error:"Provider tidak menghasilkan arsip ZIP yang valid."});
       return json(res,200,{status:true,md5:cleanText(result.md5,100),copiedFilesAmount:Number(result.copiedFilesAmount||0),download:result.download});
     }
+
+    if (req.method === "GET" && route === "/api/fakeml-lobby") {
+      const username=cleanText(url.searchParams.get("username"),24),rank=cleanText(url.searchParams.get("rank")||"imo",20),avatar=String(url.searchParams.get("avatar")||"").trim(),border=String(url.searchParams.get("border")||"0");
+      if(!/^[a-zA-Z0-9 _.-]{2,24}$/.test(username))return json(res,400,{error:"Username Mobile Legends tidak valid."});
+      if(avatar&&!isPublicWebUrl(avatar))return json(res,400,{error:"Avatar harus berupa URL publik HTTP/HTTPS."});
+      if(!/^[a-zA-Z0-9_-]{1,20}$/.test(rank)||!["0","1","2","3"].includes(border))return json(res,400,{error:"Rank atau border tidak valid."});
+      if(!rateLimit("fakeml:"+getClientKey(req),4,60000))return json(res,429,{error:"Terlalu banyak membuat simulasi."});
+      return json(res,200,await dinonicGet("/canvas/fakeml",{username,avatar:avatar||"VALUE",rank,border}));
+    }
+    if (req.method === "GET" && route === "/api/ml-stalk") {
+      const id=cleanText(url.searchParams.get("id"),24),server=cleanText(url.searchParams.get("server"),12);
+      if(!/^\\d{5,20}$/.test(id)||!/^\\d{1,8}$/.test(server))return json(res,400,{error:"Masukkan User ID dan Server ID Mobile Legends yang valid."});
+      if(!rateLimit("ml-stalk:"+getClientKey(req),6,60000))return json(res,429,{error:"Terlalu banyak lookup Mobile Legends."});
+      return json(res,200,await dinonicGet("/stalker/mobile-legend",{id,server}));
+    }
     if (req.method === "GET" && route === "/api/otp-checker") {
       return json(res,403,{status:false,code:"OWNERSHIP_VERIFICATION_REQUIRED",error:"Pemeriksaan OTP dinonaktifkan. Renox tidak dapat mengambil atau menampilkan kode OTP dari nomor yang kepemilikannya belum diverifikasi."});
     }
