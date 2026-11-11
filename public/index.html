@@ -568,6 +568,7 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
  <div class="nav" onclick="showPage('memes',this)"><i>▧</i><span>Reddit Memes</span></div>
  <div class="nav" onclick="showPage('music',this)"><i>♫</i><span>YouTube Music</span></div>
  <div class="nav" onclick="showPage('amfinder',this)"><i>✧</i><span>AM Finder</span></div>
+ <div class="nav" onclick="showPage('mltools',this)"><i>✧</i><span>ML Studio</span></div>
  <div class="nav" onclick="showPage('temp-mail',this)"><i>✉</i><span>Temp Mail</span></div>
  <div class="nav" onclick="showPage('checkban',this)"><i>◉</i><span>Unban Method</span></div>
  <div class="nav" onclick="showPage('videodownloader',this)"><i>⇩</i><span>Video Downloader</span></div>
@@ -722,6 +723,12 @@ Terima kasih.</textarea>
  <div class="card"><h3>SFILE SEARCH</h3><div class="searchbox"><input id="sfileQuery" maxlength="120" placeholder="Cari nama file..." onkeydown="if(event.key==='Enter')runDinonicSearch('sfile')"><button onclick="runDinonicSearch('sfile')">SEARCH</button></div><div id="sfileStatus" class="hint" aria-live="polite"></div><div id="sfileResults" class="feed-list"></div></div>
  <div class="card" style="margin-top:14px"><h3>TIKTOK VIDEO SEARCH</h3><div class="searchbox"><input id="tiktokSearchQuery" maxlength="120" placeholder="Cari video TikTok..." onkeydown="if(event.key==='Enter')runDinonicSearch('tiktok')"><button onclick="runDinonicSearch('tiktok')">SEARCH</button></div><div id="tiktokSearchStatus" class="hint" aria-live="polite"></div><div id="tiktokSearchResults" class="feed-list"></div></div>
 </section>
+
+<section class="page" id="mltools">
+ <div class="hero"><div class="mini">RENOX / MOBILE LEGENDS TOOLS</div><h1>ML <span>STUDIO</span></h1><p>Mockup lobby dan pencarian profil publik Mobile Legends.</p></div>
+ <div class="card"><h3>MOBILE LEGENDS FAKE LOBBY</h3><p class="hint">Hasil diberi label simulasi dan bukan bukti lobby asli.</p><input id="fakeMLName" class="field" maxlength="24" placeholder="Username tampilan"><input id="fakeMLRank" class="field" maxlength="20" value="imo" placeholder="Rank"><input id="fakeMLAvatar" class="field" placeholder="URL avatar (opsional)"><button class="primary" onclick="generateFakeML()">BUAT MOCKUP</button><div id="fakeMLResult" class="hint"></div></div>
+ <div class="card" style="margin-top:14px"><h3>STALK MOBILE LEGENDS</h3><input id="mlStalkId" class="field" inputmode="numeric" placeholder="User ID"><input id="mlStalkServer" class="field" inputmode="numeric" placeholder="Server ID"><button class="primary" onclick="stalkMobileLegends()">CEK PROFIL PUBLIK</button><div id="mlStalkResult" class="feed-list"></div></div>
+</section>
 <section class="page" id="pinterest">
  <div class="hero"><div class="mini">PUBLIC IMAGE DISCOVERY</div><h1>PINTEREST <span>SEARCH</span></h1><p>Cari inspirasi gambar publik berdasarkan kata kunci. Hasil dapat dibuka dan disimpan dari sumbernya.</p></div>
  <div class="card"><div class="searchbox"><input id="pinterestQuery" maxlength="120" placeholder="Contoh: anime wallpaper, gaming setup..." onkeydown="if(event.key==='Enter')searchPinterest()"><button onclick="searchPinterest()">CARI GAMBAR ↗</button></div><p class="hint" id="pinterestStatus">Pencarian langsung melalui Pinterest API resmi. Memerlukan akses Pinterest Search Partner Pins.</p><div id="pinterestResults" class="pinterest-grid"></div><div style="display:flex;justify-content:center;margin-top:16px"><button id="pinterestMore" class="secondary" style="display:none" onclick="loadMorePinterest()">MUAT LEBIH BANYAK</button></div></div>
@@ -835,7 +842,7 @@ function showPage(page,el){document.body.classList.toggle('renox-global-chat-ope
  if($(page))$(page).classList.add('active');updateRenoxHelperVisibility();
  document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
  if(el)el.classList.add('active');
- const titles={'wifi-lookup-page':'Lookup WiFi',menu:'Menu Navigasi',home:'Dashboard',shop:'Renox Shop',lookup:'Roblox Lookup',nexoai:'Nexo AI',noxmaps:'Nox Maps',history:'Search History',favorites:'Saved Friends',freefire:'Free Fire Lookup',mobilelegends:'Mobile Legends Lookup',community:'Global Chat',noxchat:'Nox Chat',pinterest:'Pinterest Search',searchtools:'SFile & TikTok Search',privatechat:'Nox Chat',schedule:'Jadwal Pelajaran',calculator:'Kalkulator',tiktok:'TikTok Lookup',animestream:'Anime Streaming',telegramlookup:'Telegram Lookup',apps:'App Directory',renoxgame:'Renox Game',profile:'Account Profile',gethtml:'Get HTML',videodownloader:'Video Downloader',videolounge:'Video Lounge',amfinder:'AM Finder', 'temp-mail':'Temp Mail',checkban:'Unban Method',music:'Music Player',announcements:'Announcements',leaks:'Game Leaks',memes:'Reddit Memes',owner:'Owner Console',settings:'Display Settings',phoneinfo:'Phone Information'};
+ const titles={'wifi-lookup-page':'Lookup WiFi',menu:'Menu Navigasi',home:'Dashboard',shop:'Renox Shop',lookup:'Roblox Lookup',nexoai:'Nexo AI',noxmaps:'Nox Maps',history:'Search History',favorites:'Saved Friends',freefire:'Free Fire Lookup',mobilelegends:'Mobile Legends Lookup',community:'Global Chat',noxchat:'Nox Chat',pinterest:'Pinterest Search',searchtools:'SFile & TikTok Search',mltools:'ML Studio',privatechat:'Nox Chat',schedule:'Jadwal Pelajaran',calculator:'Kalkulator',tiktok:'TikTok Lookup',animestream:'Anime Streaming',telegramlookup:'Telegram Lookup',apps:'App Directory',renoxgame:'Renox Game',profile:'Account Profile',gethtml:'Get HTML',videodownloader:'Video Downloader',videolounge:'Video Lounge',amfinder:'AM Finder', 'temp-mail':'Temp Mail',checkban:'Unban Method',music:'Music Player',announcements:'Announcements',leaks:'Game Leaks',memes:'Reddit Memes',owner:'Owner Console',settings:'Display Settings',phoneinfo:'Phone Information'};
  $('pageTitle').textContent=titles[page]||'Renox Project';
  if(page==='history')renderHistory();
  if(page==='favorites')renderFavorites();
@@ -1086,6 +1093,20 @@ async function runDinonicSearch(kind){
   status.textContent=items.length+' hasil · '+(d.provider||'Dinonic API');
  }catch(e){status.textContent='⚠ '+e.message}
 }
+
+async function generateFakeML(){
+ const name=$('fakeMLName').value.trim(),out=$('fakeMLResult');if(!name){out.textContent='Isi username tampilan.';return}
+ out.textContent='Membuat mockup simulasi...';
+ try{const params=new URLSearchParams({username:name,rank:$('fakeMLRank').value||'imo',avatar:$('fakeMLAvatar').value||'',border:'0'});const d=await apiJSON('/api/fakeml-lobby?'+params);const root=d.data||d.result||d;const image=root.image||root.url||root.imageUrl||root.canvas||'';if(typeof image==='string'&&image){const src=image.startsWith('data:')||image.startsWith('http')?image:'data:image/png;base64,'+image;out.innerHTML='<b>SIMULASI / MOCKUP</b><img alt="Mockup lobby Mobile Legends" style="display:block;width:100%;max-width:520px;margin-top:10px;border-radius:14px" src="'+escapeText(src)+'">'}else out.textContent='Provider merespons, tetapi URL gambar belum dikenali.'}
+ catch(e){out.textContent='⚠ '+e.message}
+}
+async function stalkMobileLegends(){
+ const id=$('mlStalkId').value.trim(),server=$('mlStalkServer').value.trim(),out=$('mlStalkResult');if(!id||!server){out.textContent='Isi User ID dan Server ID.';return}
+ out.textContent='Mengambil profil publik...';
+ try{const d=await apiJSON('/api/ml-stalk?'+new URLSearchParams({id,server}));const root=d.data||d.result||d;out.innerHTML='<pre class="card" style="white-space:pre-wrap;overflow-wrap:anywhere">'+escapeText(JSON.stringify(root,null,2))+'</pre>'}
+ catch(e){out.textContent='⚠ '+e.message}
+}
+
 function addNexoMessage(role,content){
  const row=document.createElement('div');row.className='nexo-message '+role;
  const label=role==='user'?'ANDA':'NEXO AI';
