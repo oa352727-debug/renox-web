@@ -1094,6 +1094,9 @@ async function runDinonicSearch(kind){
  }catch(e){status.textContent='⚠ '+e.message}
 }
 
+async function generateFakeFF(){
+ const username=$('fakeFFName').value.trim(),lobby=$('fakeFFLobby').value||'30',out=$('fakeFFResult');if(!username){out.textContent='Isi username tampilan.';return}out.textContent='Membuat mockup simulasi...';
+ try{const d=await apiJSON('/api/fakeff-lobby?'+new URLSearchParams({username,lobby})),root=d.data||d.result||d,image=root.image||root.url||root.imageUrl||root.canvas||'';if(typeof image!=='string'||!image){out.textContent='Provider merespons tetapi gambar belum dikenali.';return}const src=image.startsWith('data:')||/^https:\/\//i.test(image)?image:'data:image/png;base64,'+image;out.innerHTML='<b>SIMULASI / MOCKUP</b><img alt="Mockup lobby Free Fire" style="display:block;width:100%;max-width:520px;margin-top:10px;border-radius:14px" src="'+escapeText(src)+'">'}catch(e){out.textContent='⚠ '+e.message}}
 async function generateFakeML(){
  const name=$('fakeMLName').value.trim(),out=$('fakeMLResult');if(!name){out.textContent='Isi username tampilan.';return}
  out.textContent='Membuat mockup simulasi...';
