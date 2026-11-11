@@ -595,7 +595,7 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
 
 <main>
 <div id="maintenanceBanner">MAINTENANCE MODE — Beberapa fitur mungkin sedang dibatasi oleh owner.</div><div class="topbar">
- <div class="topbar-left"> <button type="button" class="renox-sidebar-toggle" onclick="document.body.classList.toggle(\'menu-open\')" aria-label="Buka navigasi" aria-expanded="false">☰</button><div><h2 id="pageTitle">Dashboard</h2><p>Welcome to your Roblox information center.</p></div></div>
+ <div class="topbar-left"> <button type="button" class="renox-sidebar-toggle" onclick="document.body.classList.toggle('menu-open')" aria-label="Buka navigasi" aria-expanded="false">☰</button><div><h2 id="pageTitle">Dashboard</h2><p>Welcome to your Roblox information center.</p></div></div>
  <div class="tag">RENOX / SIGNATURE UI</div>
 </div>
 
@@ -871,7 +871,7 @@ function saveHistory(user){
 function renderHistory(){
  const safeHistory=Array.isArray(historyData)?historyData.filter(x=>x&&x.id!=null&&x.name!=null):[];
  historyData=safeHistory;
- const row=x=>'<div class="history-row"><b>'+escapeHTML(x.name)+'</b><span>ID: '+escapeHTML(x.id)+'</span><button type="button" class="secondary" onclick="searchFromHistory(\''+escapeHTML(x.id)+'\')">BUKA</button></div>';
+ const row=x=>'<div class="history-row"><b>'+escapeHTML(x.name)+'</b><span>ID: '+escapeHTML(x.id)+'</span><button type="button" class="secondary" onclick="searchFromHistory(''+escapeHTML(x.id)+'')">BUKA</button></div>';
  const list=$('historyList'),home=$('homeHistory'),total=$('totalSearch');
  if(list)list.innerHTML=safeHistory.map(row).join('')||'<div class="empty">Belum ada riwayat pencarian.</div>';
  if(home)home.innerHTML=safeHistory.slice(0,4).map(row).join('')||'<div class="empty">Belum ada pencarian.</div>';
@@ -932,7 +932,7 @@ async function lookup(query){
 }
 async function getSavedFriends(){try{return (await apiJSON('/api/friends?guestId='+encodeURIComponent(guestId))).friends||[]}catch{return []}}
 async function saveCurrentFriend(targetId){const id=targetId||window.renoxSelectedFriendId;if(!id){alert('Pilih anggota Renox terlebih dahulu.');return}try{await apiJSON('/api/friends',{method:'POST',body:JSON.stringify({guestId,targetId:id})});alert('Kontak Renox berhasil disimpan.');renderFavorites()}catch(e){alert(e.message)}}
-async function renderFavorites(){const all=await getSavedFriends();$('favoriteCount').textContent=all.length+' SAVED';$('favoriteList').innerHTML=all.length?all.map(x=>'<article class="favorite-card"><b>'+escapeText(x.name)+'</b><small>Anggota Renox · '+escapeText(x.id)+'</small><button onclick="showPage(\'privatechat\');document.getElementById(\'dmPeer\').value='+JSON.stringify(x.name)+';searchDMUsers().then(()=>openDM('+JSON.stringify(x.id)+'))">CHAT</button><button onclick="removeFavorite('+JSON.stringify(x.id)+')">REMOVE</button></article>').join(''):'<div class="empty">Belum ada kontak Renox.</div>'}
+async function renderFavorites(){const all=await getSavedFriends();$('favoriteCount').textContent=all.length+' SAVED';$('favoriteList').innerHTML=all.length?all.map(x=>'<article class="favorite-card"><b>'+escapeText(x.name)+'</b><small>Anggota Renox · '+escapeText(x.id)+'</small><button onclick="showPage('privatechat');document.getElementById('dmPeer').value='+JSON.stringify(x.name)+';searchDMUsers().then(()=>openDM('+JSON.stringify(x.id)+'))">CHAT</button><button onclick="removeFavorite('+JSON.stringify(x.id)+')">REMOVE</button></article>').join(''):'<div class="empty">Belum ada kontak Renox.</div>'}
 async function removeFavorite(id){try{await apiJSON('/api/friends',{method:'DELETE',body:JSON.stringify({guestId,targetId:id})});renderFavorites()}catch(e){alert(e.message)}}
 function fmt(v){return v==null?'Unavailable':Number(v).toLocaleString('id-ID')}
 function accountAge(date){
@@ -1009,7 +1009,7 @@ async function telegramLookup(){
 async function tiktokLookup(){const box=$('tiktokResult');const username=$('tiktokUsername').value.trim().replace(/^@/, '').replace(/[^a-zA-Z0-9._]/g,'');if(!username){box.textContent='Masukkan username TikTok terlebih dahulu.';return}box.textContent='Mencari profil @'+username+'...';try{const d=await apiJSON('/api/tiktok?username='+encodeURIComponent(username));const u=d.user||{};const avatar=u.avatarLarger||u.avatarMedium||u.avatarThumb||'';box.innerHTML=`<div class="tiktok-profile-result"><img src="${escapeText(avatar||'https://placehold.co/120x120/202536/e9edf7?text=TT')}" alt="Foto profil"><div class="tiktok-profile-info"><h3>${escapeText(u.nickname||u.uniqueId||username)}</h3><p>@${escapeText(u.uniqueId||username)}</p><span>${escapeText(u.signature||'')}</span><small style="display:block;margin-top:7px;color:#aeb8ce">${u.verified?'✓ Akun terverifikasi publik · ':''}${u.region?'Wilayah: '+escapeText(u.region)+' · ':''}${u.userId?'UID: '+escapeText(u.userId):''}${u.createTime?' · Dibuat: '+new Date(u.createTime*1000).toLocaleDateString('id-ID'):''}</small>${u.privateAccount?'<small>AKUN PRIVATE</small>':''}${u.bioLink?'<a target="_blank" rel="noopener" href="'+escapeText(u.bioLink)+'">Bio link ↗</a>':''}</div></div><div class="tiktok-stats"><div><b>${Number(u.followerCount||0).toLocaleString('id-ID')}</b><small>FOLLOWERS</small></div><div><b>${Number(u.followingCount||0).toLocaleString('id-ID')}</b><small>FOLLOWING</small></div><div><b>${Number(u.videoCount||0).toLocaleString('id-ID')}</b><small>VIDEOS</small></div><div><b>${Number(u.heartCount||0).toLocaleString('id-ID')}</b><small>LIKES</small></div></div><a class="tiktok-open" href="https://www.tiktok.com/@${encodeURIComponent(username)}" target="_blank" rel="noopener">OPEN TIKTOK PROFILE ↗</a>`}catch(e){box.textContent='⚠ '+e.message+' — layanan profil publik mungkin sedang membatasi permintaan.'}}
 let dmPeer='',dmAfter=0,dmRecent=[],dmRenderedKeys=new Set(),dmRefreshBusy=false;
 try{dmRecent=JSON.parse(localStorage.getItem('renoxDmRecent')||'[]')}catch{dmRecent=[]}
-function renderDMRecent(){const box=$('dmRecentList');if(!box)return;box.innerHTML=dmRecent.length?dmRecent.map(id=>'<button class="nox-wa-recent-item" onclick="selectDM(\''+encodeURIComponent(id)+'\')"><span class="nox-wa-recent-avatar">R</span><span><b>'+escapeText(id)+'</b><small>Pesan pribadi</small></span></button>').join(''):'<div class="nox-wa-empty">Belum ada chat. Masukkan Guest ID untuk memulai.</div>'}
+function renderDMRecent(){const box=$('dmRecentList');if(!box)return;box.innerHTML=dmRecent.length?dmRecent.map(id=>'<button class="nox-wa-recent-item" onclick="selectDM(''+encodeURIComponent(id)+'')"><span class="nox-wa-recent-avatar">R</span><span><b>'+escapeText(id)+'</b><small>Pesan pribadi</small></span></button>').join(''):'<div class="nox-wa-empty">Belum ada chat. Masukkan Guest ID untuk memulai.</div>'}
 function selectDM(id){$('dmPeer').value=decodeURIComponent(id);openDM()}
 let renoxDMUsers=[];
 async function searchDMUsers(){
@@ -1222,7 +1222,7 @@ async function heartbeat(){
  try{
   const d=await apiJSON('/api/presence',{method:'POST',body:JSON.stringify({guestId})});
   if($('presenceCount'))$('presenceCount').textContent='● '+d.onlineCount+' online';
-  if($('onlineUsers'))$('onlineUsers').innerHTML=(d.users||[]).map(u=>'<button type="button" class="online-user" onclick="openPublicProfile(decodeURIComponent(\''+encodeURIComponent(String(u.guestId||''))+'\'))">'+escapeText(u.name)+'<span class="online-role '+(u.role==='developer'?'developer':'member')+'">'+(u.role==='developer'?'✦ DEVELOPER':'MEMBER')+'</span></button>').join('')||'<span class="empty">Belum ada pengguna online.</span>';
+  if($('onlineUsers'))$('onlineUsers').innerHTML=(d.users||[]).map(u=>'<button type="button" class="online-user" onclick="openPublicProfile(decodeURIComponent(''+encodeURIComponent(String(u.guestId||''))+''))">'+escapeText(u.name)+'<span class="online-role '+(u.role==='developer'?'developer':'member')+'">'+(u.role==='developer'?'✦ DEVELOPER':'MEMBER')+'</span></button>').join('')||'<span class="empty">Belum ada pengguna online.</span>';
  }catch{}
 }
 async function sendChat(){
@@ -1292,7 +1292,7 @@ async function refreshChat(){
     const mine=m.guestId===guestId,time=new Date(m.createdAt).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}),name=escapeText(m.name||'Guest'),initial=escapeText((m.name||'G').trim().charAt(0).toUpperCase());
     const displayTitle=m.developerTitle?'':m.title,displayColor=m.titleColor||'#b879ff';
     const devVerified=!!(m.role==='developer'||m.developerTitle||m.isVerified);const titleBg=m.developerTitleBackground||'#243b60';const titleBadge=(devVerified?'<span class="renox-blue-check" title="Developer terverifikasi">✓</span>':'')+(displayTitle?'<span class="v7-title-chip" style="color:'+escapeText(displayColor)+';background:'+escapeText(titleBg)+'">'+escapeText(m.developerTitle||(({neon:'NEON ELITE',royal:'ROYAL RENOX',cyber:'CYBER PHANTOM'})[m.title]||m.title))+'</span>':'');
-    const controls=(renoxOwnerMode?'<div class="chat-mod-actions"><button onclick="moderateChat(\''+escapeText(m.id)+'\',\''+escapeText(m.guestId)+'\',\'delete\')">HAPUS</button><button onclick="moderateChat(\''+escapeText(m.id)+'\',\''+escapeText(m.guestId)+'\',\'mute\')">MUTE USER</button></div>':'')+'<button class="chat-reply-button" onclick="event.stopPropagation();setChatReply(\''+encodeURIComponent(String(m.name||'Guest'))+'\',\''+encodeURIComponent(String(m.message||''))+'\')">↩ Reply</button>';
+    const controls=(renoxOwnerMode?'<div class="chat-mod-actions"><button onclick="moderateChat(''+escapeText(m.id)+'',''+escapeText(m.guestId)+'','delete')">HAPUS</button><button onclick="moderateChat(''+escapeText(m.id)+'',''+escapeText(m.guestId)+'','mute')">MUTE USER</button></div>':'')+'<button class="chat-reply-button" onclick="event.stopPropagation();setChatReply(''+encodeURIComponent(String(m.name||'Guest'))+'',''+encodeURIComponent(String(m.message||''))+'')">↩ Reply</button>';
     const row=document.createElement('article');row.className='chat-message '+(mine?'mine':'theirs');
     row.innerHTML=(m.avatar?'<img class="chat-avatar" src="'+escapeText(m.avatar)+'" alt="">':'<div class="chat-avatar">'+initial+'</div>')+'<div class="chat-bubble-wrap"><div class="chat-message-meta"><b>'+name+'</b>'+titleBadge+'<time>'+time+'</time></div><div class="chat-bubble">'+(m.message?escapeText(m.message):'')+(m.image?'<img class="chat-photo" src="'+escapeText(m.image)+'" alt="Foto chat">':'')+'</div>'+controls+'</div>';row.setAttribute('onclick',"if(!event.target.closest('.chat-mod-actions'))openPublicProfile(decodeURIComponent('"+encodeURIComponent(String(m.guestId||''))+"'))");row.setAttribute('title','Lihat profil pengguna');
     boxes.forEach(box=>{box.appendChild(row.cloneNode(true));while(box.children.length>100)box.removeChild(box.firstChild)});
@@ -2262,7 +2262,7 @@ async function loadStatuses(){
    const seen=g.items.every(x=>(x.viewers||[]).some(v=>String(v.guestId)===String(guestId)));
    const label=mine?(renoxAccountName||st.name||'Status saya'):(st.name||'Member');
    const count=g.items.length>1?'<span class="status-count">'+g.items.length+'</span>':'';
-   return '<button class="status-item '+(seen?'seen':'unseen')+'" onclick="viewUserStatus(\''+escapeText(g.items[0].id)+'\')"><span class="status-ring"><img src="'+escapeText(st.avatar||'https://placehold.co/80x80/858b98/d9dce2?text=+')+'" alt=""></span>'+count+'<small>'+escapeText(label)+'</small></button>';
+   return '<button class="status-item '+(seen?'seen':'unseen')+'" onclick="viewUserStatus(''+escapeText(g.items[0].id)+'')"><span class="status-ring"><img src="'+escapeText(st.avatar||'https://placehold.co/80x80/858b98/d9dce2?text=+')+'" alt=""></span>'+count+'<small>'+escapeText(label)+'</small></button>';
   }).join('');
   strip.innerHTML='<button class="status-add" onclick="addUserStatus()"><span>＋</span><small>Status saya</small></button>'+cards;
  }catch(e){console.warn('Status:',e.message)}
