@@ -417,6 +417,61 @@ html.renox-no-shadows .sidebar,html.renox-no-shadows .hero,html.renox-no-shadows
 @media(max-width:700px){#phoneInfoGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.phone-info-tile{padding:12px}.home-announcement{align-items:flex-start;flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
 
+
+/* RENOX redesigned public welcome, login, cinematic splash and dashboard */
+#renoxWelcome{position:fixed;inset:0;z-index:10010;display:flex;justify-content:center;overflow-y:auto;padding:24px 18px 36px;background:#070707;color:#fff}
+#renoxWelcome:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(#ffffff0c 1px,transparent 1px),linear-gradient(90deg,#ffffff0c 1px,transparent 1px);background-size:58px 58px}
+.rw-inner{position:relative;width:min(680px,100%);display:flex;flex-direction:column;align-items:center;gap:22px;padding:16px 0}
+.rw-logo{width:142px;height:142px;object-fit:contain;border-radius:34px;filter:drop-shadow(0 0 24px #9c55ff66)}
+.rw-title{font-size:clamp(34px,8vw,52px);font-weight:950;letter-spacing:5px;text-align:center;text-shadow:0 0 24px #ffffff55}
+.rw-sub{padding:10px 22px;border:1px solid #ffffff80;border-radius:99px;color:#c6b3dc;font-size:11px;letter-spacing:2px}
+.rw-banner{width:100%;aspect-ratio:1.75;position:relative;overflow:hidden;border:2px solid #fff;border-radius:30px;background:#151020;box-shadow:0 15px 45px #000}
+.rw-banner img{width:100%;height:100%;object-fit:cover;display:block}
+.rw-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#08030a99,transparent 80%)}
+.rw-banner-copy{position:absolute;z-index:1;left:6%;bottom:8%;font-size:clamp(21px,5vw,34px);font-weight:900;font-style:italic;text-shadow:0 2px 9px #000}
+.rw-banner-copy small{display:block;font-size:clamp(12px,3vw,18px);margin-top:5px}
+.rw-features{width:100%;display:grid;gap:14px}
+.rw-feature{border:2px solid #fff;border-radius:24px;padding:19px 22px;background:#191919;display:flex;align-items:center;gap:20px;box-shadow:0 8px 25px #0008}
+.rw-feature-icon{width:68px;height:68px;flex:0 0 68px;border:1px solid #ffffff88;border-radius:20px;display:grid;place-items:center;font-size:30px;background:#ffffff12}
+.rw-feature b{font-size:19px;letter-spacing:1px}.rw-feature p{font-size:13px;color:#aaa;line-height:1.6;margin-top:6px}
+.rw-action{width:100%;min-height:72px;border-radius:28px;border:2px solid white;font-size:20px;font-weight:950;letter-spacing:2px}
+.rw-enter{background:#f2f2f2;color:#080808}.rw-buy{background:#171717;color:#fff;border-color:#fff}
+.rw-community{border:1px solid #fff;border-radius:18px;padding:13px 22px;color:#fff;text-decoration:none;font-weight:800;letter-spacing:1px}
+.rw-social{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%}.rw-social a{padding:17px 10px;text-align:center;border:2px solid #fff;border-radius:20px;color:#fff;text-decoration:none;font-weight:800}
+.rw-copy{font-size:12px;color:#888;border:1px solid #aaa;border-radius:12px;padding:9px 18px}
+#renoxSplash{position:fixed;inset:0;z-index:10020;background:#050309;display:none;align-items:center;justify-content:center;overflow:hidden;color:#fff}
+#renoxSplash.show{display:flex}
+#renoxSplash video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#renoxSplash:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#05030a35,#05030a70 65%,#05030ac9)}
+.rs-skip{position:absolute;z-index:3;right:22px;top:24px;border:1px solid #ffffff80;background:#101827d9;color:#fff;border-radius:99px;padding:12px 20px;font-weight:900;letter-spacing:2px}
+.rs-center{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px;width:min(520px,90%)}
+.rs-logo{width:150px;height:150px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 28px #a45cff)}
+.rs-title{font-size:clamp(30px,7vw,48px);font-weight:900;letter-spacing:3px;color:#c49aff;margin-top:22px}
+.rs-by{margin-top:20px;letter-spacing:4px;color:#eee}
+.rs-track{width:100%;height:7px;background:#ffffff40;border-radius:99px;margin-top:42px;overflow:hidden}
+.rs-track i{display:block;width:0;height:100%;background:linear-gradient(90deg,#8b43d8,#d5a6ff);transition:width .1s linear}
+.rs-percent{font-size:12px;letter-spacing:3px;color:#d5c3ee;margin-top:12px}
+#accountGate{display:none}
+.auth-card{width:min(620px,100%)!important}
+.auth-brandline{display:flex;flex-direction:column;align-items:center;gap:16px}
+.renox-login-mascot{display:none!important}
+.auth-brandline:before{content:"";display:block;width:118px;height:118px;background:url('https://files.catbox.moe/fbk1xn.png') center/contain no-repeat;filter:drop-shadow(0 0 22px #9b5bff)}
+.auth-heading h1{font-size:clamp(36px,8vw,48px)!important;line-height:1.1!important}
+.auth-pill{display:none}
+.auth-heading:after{content:"Masuk untuk melanjutkan";font-size:15px;color:#aaa;margin-top:10px}
+.auth-art{display:none}
+.auth-form{padding:24px;border:2px solid #fff;border-radius:28px;background:#171717e8;box-shadow:0 12px 40px #0008}
+.auth-card .auth-input-wrap{border:2px solid #fff!important;border-radius:20px!important;background:#101010!important}
+.auth-login{background:linear-gradient(110deg,#fff,#ddd)!important;color:#080808!important;letter-spacing:1px!important}
+.auth-login:before{content:"↪ ";font-size:20px}
+.auth-register{background:#ffffff10!important;border:1px solid #ffffff55!important}
+.auth-foot{margin-top:20px;color:#888}
+.renox-dashboard-hero{position:relative;overflow:hidden;border:1px solid #ffffff24;border-radius:23px;padding:21px;margin:0 0 18px;background:linear-gradient(120deg,#20133bdf,#0b0b13ed);box-shadow:0 14px 40px #0005}
+.renox-dashboard-hero:after{content:"";position:absolute;right:-40px;top:-80px;width:240px;height:240px;border-radius:50%;border:1px solid #b47bff35;box-shadow:0 0 0 18px #a56bff0a,0 0 0 38px #a56bff08}
+.rdh-kicker{font-size:9px;letter-spacing:3px;color:#c29cff}.rdh-title{font-size:clamp(24px,5vw,34px);margin:8px 0}.rdh-title span{color:#c29cff}.rdh-desc{font-size:11px;color:#aeb0c0;line-height:1.7}
+.rdh-status{display:inline-flex;align-items:center;gap:8px;border:1px solid #5cda9a55;border-radius:30px;padding:8px 11px;color:#7be3ad;font-size:10px;margin-top:15px}
+@media(max-width:550px){#renoxWelcome{padding:16px 14px 30px}.rw-inner{gap:17px}.rw-logo{width:120px;height:120px}.rw-feature{padding:15px}.rw-feature-icon{width:56px;height:56px;flex-basis:56px}.rw-feature b{font-size:16px}.rw-feature p{font-size:11px}.rw-action{min-height:64px;font-size:17px}.auth-form{padding:18px}.rs-logo{width:125px;height:125px}}
+
 </style>
 <style id="renox-wa-comic-update">
 body.renox-comic-theme{background:#fffaf0!important;color:#171717!important}body.renox-comic-theme:before{background:radial-gradient(circle,#242424 1px,transparent 1.4px) 0 0/17px 17px,linear-gradient(180deg,#fffdf7,#fff4e7)!important}
@@ -519,18 +574,43 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
 <style id="renox-force-update-style">
 #renoxForceUpdate[hidden]{display:none!important}#renoxForceUpdate{position:fixed;inset:0;z-index:2147483000;background:#08050eeF;display:grid;place-items:center;padding:22px;font-family:Inter,Arial,sans-serif;color:#fff}#renoxForceUpdate .rf-card{width:min(630px,100%);max-height:94vh;overflow:auto;background:#1b1628;border:1px solid #51465f;border-radius:34px;padding:38px 30px 32px;text-align:center;box-shadow:0 24px 90px #000b}#renoxForceUpdate .rf-android{font-size:70px;color:#a34ee2;line-height:1;margin:0 0 34px}#renoxForceUpdate h2{font-size:clamp(24px,5vw,36px);font-weight:900;margin:0 0 32px}#renoxForceUpdate .rf-version{font-size:clamp(15px,3.6vw,20px);line-height:1.7;color:#b9b4c2;margin-bottom:32px}#renoxForceUpdate .rf-message{font-size:clamp(14px,3.5vw,19px);line-height:1.65;color:#c4bfca;margin:0 0 40px}#renoxForceUpdate button{width:100%;min-height:76px;border-radius:60px;border:0;font-weight:900;font-size:clamp(16px,3.8vw,23px);margin:0 0 17px}#renoxForceUpdate .rf-download{background:#a34cdb;color:#fff}#renoxForceUpdate .rf-group{background:transparent;border:2px solid #4b4357;color:#fff}#renoxForceUpdate .rf-check{background:transparent;color:#bbb5c3;min-height:48px;font-size:16px;margin:8px 0 0}#renoxForceUpdate .rf-error{color:#ffb1b1;font-size:13px;min-height:18px;margin-top:8px}@media(max-width:420px){#renoxForceUpdate .rf-card{padding:30px 22px;border-radius:28px}#renoxForceUpdate .rf-android{margin-bottom:28px}#renoxForceUpdate h2{margin-bottom:24px}#renoxForceUpdate .rf-message{margin-bottom:30px}}
 </style>
+<style id="renox-nov11-refresh">:root{--rx-violet:#a879ff}.info-hero,.tools-hero{padding:25px;border:1px solid #8e62d955;border-radius:24px;background:radial-gradient(circle at 90% 0%,#a15cff30,transparent 42%),linear-gradient(135deg,#1a1530,#0c1020);margin-bottom:18px}.info-kicker{font-size:9px;letter-spacing:2.5px;color:#c6a3ff;font-weight:800}.info-hero h1,.tools-hero h1{font-size:clamp(25px,5vw,36px);margin:10px 0}.info-hero h1 span,.tools-hero h1 span{color:#c19aff}.info-hero p,.tools-hero p{font-size:12px;color:#aeb3c8;line-height:1.7}.info-user{display:flex;align-items:center;gap:12px;margin-top:22px;padding:14px;border-radius:16px;background:#ffffff09;border:1px solid #ffffff17}.info-avatar{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#8b5cf6,#452477);display:grid;place-items:center;font-weight:900}.info-user b,.info-user small{display:block}.info-user small{font-size:8px;letter-spacing:1.3px;color:#aaa;margin-top:5px}.info-panel{padding:19px;border:1px solid #ffffff1b;border-radius:20px;background:linear-gradient(145deg,#151326,#0d1120);margin:14px 0}.info-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}.info-panel-head h3{font-size:14px}.info-panel-head button{border:1px solid #a879ff55;background:#a879ff12;color:#d4b9ff;border-radius:9px;padding:8px 11px;font-size:9px}.info-panel-head span{font-size:8px;letter-spacing:1px;color:#c6a3ff}.activity-list{display:grid;gap:9px}.activity-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:13px;background:#ffffff07;border:1px solid #ffffff0d}.activity-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:11px;background:#9b6bff1c;color:#d1b4ff}.activity-item b{font-size:11px;display:block}.activity-item small{font-size:9px;color:#8f96ad;display:block;margin-top:4px}.rule-row{display:flex;gap:13px;padding:14px 0;border-top:1px solid #ffffff12}.rule-row>b{color:#c49aff;font-size:17px}.rule-row strong{font-size:12px}.rule-row p{font-size:10px;color:#9ea5bb;line-height:1.6;margin-top:5px}.feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.feature-grid button{min-height:91px;text-align:left;display:grid;grid-template-columns:35px 1fr;grid-template-rows:auto auto;align-content:center;column-gap:10px;padding:14px;border-radius:17px;border:1px solid #ffffff19;background:linear-gradient(145deg,#19152b,#0d1221);color:#f7f4ff}.feature-grid button i{grid-row:1/3;font-style:normal;font-size:22px;color:#c19aff;align-self:center}.feature-grid button b{font-size:11px}.feature-grid button small{font-size:9px;color:#9299b0;margin-top:5px}.menu-category{margin:20px 0}.menu-category>h3{font-size:10px;letter-spacing:2px;color:#bfa0ff;margin:0 0 12px}.menu-category .feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#community .chat-shell{border:1px solid #a879ff45!important;border-radius:22px!important;background:linear-gradient(145deg,#151326,#0b1020)!important;box-shadow:0 18px 50px #0005!important}#community .chat-toolbar{background:#201936!important}#community .chat-members{background:#120f20!important}#community .chat-bubble{background:#211a34!important;color:#f4edff!important;border:1px solid #a879ff30!important}#privatechat .nox-wa-app{border:1px solid #a879ff55!important;border-radius:22px!important;background:#0d1020!important}#privatechat .nox-wa-sidebar{background:#121226!important}#privatechat .nox-wa-top,#privatechat .nox-wa-chat-head{background:#211936!important}#privatechat .nox-wa-messages{background:radial-gradient(circle at 50% 0%,#8b5cf611,transparent 60%),#0d1020!important}#privatechat .nox-wa-compose{background:#171329!important;border-top:1px solid #ffffff16!important}#privatechat .nox-wa-compose input{background:#0c1020!important;color:#fff!important;border:1px solid #ffffff20!important}@media(max-width:550px){.info-hero,.tools-hero{padding:19px}.info-panel{padding:15px}.feature-grid{gap:8px}.feature-grid button{padding:11px;min-height:84px}}.auth-brandline:before{content:'☠'!important;display:grid!important;place-items:center!important;width:112px!important;height:112px!important;background:none!important;color:#d8c2ff!important;font-size:88px!important;filter:drop-shadow(0 0 18px #9b5bff)!important}</style>
 </head>
 <body class="auth-locked">
-<div id="accountGate" class="renox-auth-gate">
+<div id="renoxWelcome">
+ <div class="rw-inner">
+  <img class="rw-logo" src="https://files.catbox.moe/fbk1xn.png" alt="Renox Project">
+  <h1 class="rw-title">Renox Project</h1>
+  <div class="rw-sub">● PROJECT · POWERED BY @diszrenox</div>
+  <div class="rw-banner"><img src="https://files.catbox.moe/vy3gr6.jpg" alt="Renox Project banner"><div class="rw-banner-copy">Renox Project<small>Powered By @diszrenox</small></div></div>
+  <div class="rw-features">
+   <div class="rw-feature"><span class="rw-feature-icon">ϟ</span><div><b>ULTRA FAST</b><p>Lightning speed performance &amp; low latency execution.</p></div></div>
+   <div class="rw-feature"><span class="rw-feature-icon">⬟</span><div><b>SECURE</b><p>Account protection and secure project access.</p></div></div>
+   <div class="rw-feature"><span class="rw-feature-icon">◉</span><div><b>POWERFUL</b><p>Advanced tools &amp; remote access features built-in.</p></div></div>
+  </div>
+  <button class="rw-action rw-enter" onclick="openRenoxLogin()">⇥ &nbsp; ENTER LOGIN &nbsp; →</button>
+  <button class="rw-action rw-buy" onclick="launchTelegram('diszrenox')">♧ &nbsp; BUY ACCESS &nbsp; VIA TG</button>
+  <a class="rw-community" href="https://t.me/diszrenox" target="_blank" rel="noopener">♟ &nbsp; JOIN RENOX COMMUNITY</a>
+  <div class="rw-social"><a href="https://t.me/diszrenox" target="_blank" rel="noopener">◉ &nbsp; Telegram</a><a href="https://wa.me/" target="_blank" rel="noopener">◉ &nbsp; WhatsApp</a></div>
+  <div class="rw-copy">© 2026Renox Project</div>
+ </div>
+</div>
+<div id="renoxSplash" aria-label="Renox Project loading">
+ <video id="renoxSplashVideo" src="https://files.catbox.moe/88u8v3.mp4" playsinline muted preload="auto"></video>
+ <button class="rs-skip" onclick="finishRenoxSplash()">⏭ Skip</button>
+ <div class="rs-center"><img class="rs-logo" src="https://files.catbox.moe/fbk1xn.png" alt="Renox"><div class="rs-title">Renox Project</div><div class="rs-by">✦ &nbsp; by Nox &nbsp; ✦</div><div class="rs-track"><i id="renoxSplashProgress"></i></div><div class="rs-percent" id="renoxSplashPercent">0% · Loading...</div></div>
+</div>
+
+<div id="accountGate" class="renox-auth-gate" style="display:none">
  <div class="auth-scene"></div><div class="auth-vignette"></div>
  <div class="auth-card">
-  <div class="auth-heading"><div class="auth-brandline"><svg class="renox-login-mascot" viewBox="0 0 72 72" role="img" aria-label="Maskot Renox"><defs><linearGradient id="renoxMascotGradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#55e5ff"/><stop offset="1" stop-color="#9a69ff"/></linearGradient></defs><path d="M36 7v8M30 7h12M16 30a20 20 0 0 1 40 0v20a9 9 0 0 1-9 9H25a9 9 0 0 1-9-9V30Z" fill="url(#renoxMascotGradient)" stroke="#e9faff" stroke-width="2.5"/><path d="M26 34h.5M46 34h.5M27 44q9 9 18 0" stroke="#10162c" stroke-width="4" stroke-linecap="round"/><path d="M8 38h8M56 38h8" stroke="#8beaff" stroke-width="3" stroke-linecap="round"/></svg><h1>Renox<br>Project</h1></div><span class="auth-pill">U N B A N  X  L O O K U P</span></div>
+  <div class="auth-heading"><div class="auth-brandline"><h1>Renox Project</h1></div></div>
   <div class="auth-art"><img src="/login-anime.jpg" alt="Artwork Renox Project"></div>
   <div class="auth-form">
    <label class="auth-input-wrap"><span class="auth-input-icon" aria-hidden="true">🔒</span><input id="gateUsername" class="field auth-field" maxlength="24" placeholder="USERNAME" autocomplete="username" aria-label="Username"></label>
    <label class="auth-input-wrap"><span class="auth-input-icon" aria-hidden="true">🔒</span><input id="gatePassword" class="field auth-field" type="password" maxlength="128" placeholder="PASSWORD" autocomplete="current-password" aria-label="Password"><button type="button" class="auth-eye" onclick="toggleGatePassword()" aria-label="Tampilkan password">◉</button></label>
    <label class="remember-login"><input id="rememberLogin" type="checkbox"><span class="remember-switch" aria-hidden="true"></span><span class="remember-text">Simpan login di perangkat ini</span></label>
-   <div class="auth-actions"><button id="gateLoginButton" class="primary auth-login" onclick="gateAuth('login')">L O G I N</button><button class="auth-register" onclick="gateAuth('register')">BUAT AKUN BARU</button></div>
+   <div class="auth-actions"><button id="gateLoginButton" class="primary auth-login" onclick="gateAuth('login')">MASUK</button><button class="auth-register" onclick="gateAuth('register')">BUAT AKUN BARU</button></div>
    <div id="gateStatus" class="hint auth-status" aria-live="polite"></div>
    <div class="auth-foot"><span>● SYSTEM ONLINE</span><span>RENОX PROJECT</span></div>
   </div>
@@ -546,6 +626,10 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
  <div class="sidebar-profile"><div class="sidebar-avatar">R</div><div><b>Renox Member</b><small>COMMUNITY · ONLINE</small></div><span class="sidebar-dot"></span></div>
  <div class="navtitle">MAIN MENU</div>
  <div class="nav" onclick="showPage('favorites',this)"><i>☆</i><span>Saved Friends</span></div>
+ 
+ <div class="nav" onclick="showPage('info',this)"><i>ⓘ</i><span>Info & Rules</span></div>
+ <div class="nav" onclick="showPage('tools',this)"><i>⌘</i><span>Tools</span></div>
+ <div class="nav" onclick="showPage('menu',this)"><i>▦</i><span>Menu Fitur</span></div>
  <div class="nav active" onclick="showPage('home',this)"><i>⌂</i><span>Dashboard</span></div>
  <div class="nav" onclick="showPage('lookup',this)"><i>⌕</i><span>Roblox Lookup</span></div>
  <div class="nav" onclick="showPage('nexoai',this)"><i>✦</i><span>Nexo AI</span></div>
@@ -554,6 +638,7 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
  <div class="nav" onclick="showPage('mobilelegends',this)"><i>◇</i><span>Mobile Legends</span></div>
  <div class="nav" onclick="showPage('community',this)"><i>▤</i><span>Global Chat</span></div>
  <div class="nav" onclick="showPage('pinterest',this)"><i>▧</i><span>Pinterest Search</span></div>
+ <div class="nav" onclick="showPage('searchtools',this)"><i>⌕</i><span>SFile & TikTok Search</span></div>
  <div class="nav" onclick="showPage('tiktok',this)"><i>♪</i><span>TikTok Lookup · Detail</span></div>
  <div class="nav" onclick="showPage('telegramlookup',this)"><i>➤</i><span>Telegram Lookup</span></div>
  <div class="nav" onclick="showPage('calculator',this)"><i>＋</i><span>Kalkulator</span></div>
@@ -567,6 +652,7 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
  <div class="nav" onclick="showPage('memes',this)"><i>▧</i><span>Reddit Memes</span></div>
  <div class="nav" onclick="showPage('music',this)"><i>♫</i><span>YouTube Music</span></div>
  <div class="nav" onclick="showPage('amfinder',this)"><i>✧</i><span>AM Finder</span></div>
+ <div class="nav" onclick="showPage('mltools',this)"><i>✧</i><span>ML Studio</span></div>
  <div class="nav" onclick="showPage('temp-mail',this)"><i>✉</i><span>Temp Mail</span></div>
  <div class="nav" onclick="showPage('checkban',this)"><i>◉</i><span>Unban Method</span></div>
  <div class="nav" onclick="showPage('videodownloader',this)"><i>⇩</i><span>Video Downloader</span></div>
@@ -585,11 +671,13 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
 
 <main>
 <div id="maintenanceBanner">MAINTENANCE MODE — Beberapa fitur mungkin sedang dibatasi oleh owner.</div><div class="topbar">
- <div class="topbar-left"> <div><h2 id="pageTitle">Dashboard</h2><p>Welcome to your Roblox information center.</p></div></div>
+ <div class="topbar-left"> <button type="button" class="renox-sidebar-toggle" onclick="document.body.classList.toggle('menu-open')" aria-label="Buka navigasi">☰</button><div><h2 id="pageTitle">Dashboard</h2><p>Welcome to your Roblox information center.</p></div></div>
  <div class="tag">RENOX / SIGNATURE UI</div>
 </div>
 
 <section class="page active" id="home">
+<div class="renox-dashboard-hero"><div class="rdh-kicker">RENOX PROJECT / PERSONAL CONTROL CENTER</div><h2 class="rdh-title">Welcome Back, <span id="rdhAccountName">Renox Member</span></h2><p class="rdh-desc">Your tools, community and project controls — all in one place.</p><div class="rdh-status">● &nbsp; All systems running smoothly</div></div>
+
 <div class="home-announcement card" id="homeAnnouncement"><div class="home-announcement-mark"><svg class="speaker-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l6 5V5l-6 5H3Zm13-2a6 6 0 0 1 0 8m2-11a10 10 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>RENOX BULLETIN</span></div><div><b id="homeAnnouncementTitle">Memuat pengumuman terbaru...</b><p id="homeAnnouncementText">Update resmi komunitas akan tampil di sini.</p></div><button onclick="showPage('announcements')">LIHAT ↗</button></div>
 
 <div class="card hadith-card home-hadith-card"><div class="section-head"><h3>📜 HADIST HARI INI</h3><span>DAILY REFLECTION</span></div><div class="hadith-mark">❝</div><blockquote id="dailyHadith">“Sesungguhnya amal itu tergantung pada niatnya.”</blockquote><p id="hadithSource">HR. Bukhari dan Muslim</p></div>
@@ -716,6 +804,17 @@ Terima kasih.</textarea>
   <p class="hint">Tombol membuka draf email untuk ditinjau dan dikirim sendiri. Renox tidak mengirim email otomatis.</p>
  </div>
 </section>
+<section class="page" id="searchtools">
+ <div class="hero"><div class="mini">RENOX / DINONIC SEARCH TOOLS</div><h1>MEDIA <span>SEARCH</span></h1><p>Cari file publik di SFile dan video TikTok berdasarkan kata kunci.</p></div>
+ <div class="card"><h3>SFILE SEARCH</h3><div class="searchbox"><input id="sfileQuery" maxlength="120" placeholder="Cari nama file..." onkeydown="if(event.key==='Enter')runDinonicSearch('sfile')"><button onclick="runDinonicSearch('sfile')">SEARCH</button></div><div id="sfileStatus" class="hint" aria-live="polite"></div><div id="sfileResults" class="feed-list"></div></div>
+ <div class="card" style="margin-top:14px"><h3>TIKTOK VIDEO SEARCH</h3><div class="searchbox"><input id="tiktokSearchQuery" maxlength="120" placeholder="Cari video TikTok..." onkeydown="if(event.key==='Enter')runDinonicSearch('tiktok')"><button onclick="runDinonicSearch('tiktok')">SEARCH</button></div><div id="tiktokSearchStatus" class="hint" aria-live="polite"></div><div id="tiktokSearchResults" class="feed-list"></div></div>
+</section>
+
+<section class="page" id="mltools">
+ <div class="hero"><div class="mini">RENOX / MOBILE LEGENDS TOOLS</div><h1>ML <span>STUDIO</span></h1><p>Mockup lobby dan pencarian profil publik Mobile Legends.</p></div>
+ <div class="card"><h3>MOBILE LEGENDS FAKE LOBBY</h3><p class="hint">Hasil diberi label simulasi dan bukan bukti lobby asli.</p><input id="fakeMLName" class="field" maxlength="24" placeholder="Username tampilan"><input id="fakeMLRank" class="field" maxlength="20" value="imo" placeholder="Rank"><input id="fakeMLAvatar" class="field" placeholder="URL avatar (opsional)"><button class="primary" onclick="generateFakeML()">BUAT MOCKUP</button><div id="fakeMLResult" class="hint"></div></div>
+ <div class="card" style="margin-top:14px"><h3>STALK MOBILE LEGENDS</h3><input id="mlStalkId" class="field" inputmode="numeric" placeholder="User ID"><input id="mlStalkServer" class="field" inputmode="numeric" placeholder="Server ID"><button class="primary" onclick="stalkMobileLegends()">CEK PROFIL PUBLIK</button><div id="mlStalkResult" class="feed-list"></div></div>
+</section>
 <section class="page" id="pinterest">
  <div class="hero"><div class="mini">PUBLIC IMAGE DISCOVERY</div><h1>PINTEREST <span>SEARCH</span></h1><p>Cari inspirasi gambar publik berdasarkan kata kunci. Hasil dapat dibuka dan disimpan dari sumbernya.</p></div>
  <div class="card"><div class="searchbox"><input id="pinterestQuery" maxlength="120" placeholder="Contoh: anime wallpaper, gaming setup..." onkeydown="if(event.key==='Enter')searchPinterest()"><button onclick="searchPinterest()">CARI GAMBAR ↗</button></div><p class="hint" id="pinterestStatus">Pencarian langsung melalui Pinterest API resmi. Memerlukan akses Pinterest Search Partner Pins.</p><div id="pinterestResults" class="pinterest-grid"></div><div style="display:flex;justify-content:center;margin-top:16px"><button id="pinterestMore" class="secondary" style="display:none" onclick="loadMorePinterest()">MUAT LEBIH BANYAK</button></div></div>
@@ -765,7 +864,7 @@ Terima kasih.</textarea>
 </section>
 
 
-<section class="page" id="shop"><div class="hero"><div class="mini">RENOX ECONOMY / REWARDS</div><h1>RENOX <span>SHOP</span></h1><p>Kumpulkan saldo lewat daily login dan tukarkan dengan title profil.</p></div><div class="card"><div class="section-head"><h3>Renox Saldo</h3><span>DAILY REWARD</span></div><div class="v7-balance" id="renoxBalance">Rp 0</div><p class="hint">Saldo hanya diperoleh dari Daily Login. Hadiah harian: Rp 1.000.</p><button class="primary" onclick="claimDaily()">CLAIM DAILY LOGIN +Rp 1.000</button><div id="dailyStatus" class="hint"></div></div><div class="section-head"><h3>Title Collection</h3><span>PROFILE COSMETICS</span></div><div class="v7-shop-grid" id="renoxShopItems"></div><div class="card" style="margin-top:14px"><div class="section-head"><h3>Profile Banner</h3><span>COMING SOON</span></div><div class="v7-banner-soon">BANNER / SOON</div><p class="hint">Banner akan tampil menembus area kartu profil pada update mendatang.</p></div></section>
+<section class="page" id="shop"><div class="hero"><div class="mini">RENOX ECONOMY / REWARDS</div><h1>RENOX <span>SHOP</span></h1><p>Kumpulkan saldo lewat daily login dan tukarkan dengan title profil.</p></div><div class="card"><div class="section-head"><h3>Renox Saldo</h3><span>DAILY REWARD</span></div><div class="v7-balance" id="renoxBalance">Rp 0</div><p class="hint">Saldo hanya diperoleh dari Daily Login. Hadiah harian: Rp 1.000.</p><button class="primary" onclick="claimDaily()">CLAIM DAILY LOGIN +Rp 1.000</button><div id="dailyStatus" class="hint"></div></div><div class="section-head"><h3>Title Collection</h3><span>PROFILE COSMETICS</span></div><div class="v7-shop-grid" id="renoxShopItems"></div><div class="card" style="margin-top:14px"><div class="section-head"><h3>Profile Banner</h3><span>COMING SOON</span></div><div class="v7-banner-soon">BANNER / SOON</div><p class="hint">Banner akan tampil menembus area kartu profil pada update mendatang.</p></div><div class="card" style="margin-top:14px"><div class="section-head"><h3>ROLE ACCESS</h3><span>MEMBER / RESELLER</span></div><p class="hint">Ingin upgrade akses akun Renox? Hubungi admin resmi melalui Telegram untuk informasi harga, pembayaran, dan aktivasi role.</p><div class="v7-shop-grid"><article class="v7-shop-item"><div class="mini">STANDARD ACCESS</div><h3>MEMBER</h3><p class="hint">Akses komunitas Renox.</p><button class="primary" type="button" onclick="launchTelegram('RenoxPjt')">BUY MEMBER ACCESS ↗</button></article><article class="v7-shop-item"><div class="mini">ADVANCED ACCESS</div><h3>RESELLER</h3><p class="hint">Akses fitur reseller, termasuk email center setelah aktivasi.</p><button class="primary" type="button" onclick="launchTelegram('RenoxPjt')">BUY RESELLER ACCESS ↗</button></article></div><p class="hint" style="margin-top:10px">Role Admin tidak dijual dan hanya diberikan untuk akun developer resmi. Pastikan transaksi dan aktivasi dikonfirmasi oleh admin.</p></div></section>
 <section class="page" id="privatechat"><div class="nox-wa-app">
 <aside class="nox-wa-sidebar"><div class="nox-wa-top"><div><span class="nox-wa-kicker">RENOX MESSAGING</span><h1>Nox <b>Chat</b></h1></div><span class="nox-wa-online">● ONLINE</span></div>
 <div class="nox-wa-search"><span>⌕</span><input id="dmPeer" class="field" placeholder="Cari nama pengguna RENOX..."><button onclick="searchDMUsers()">CARI</button></div><div class="nox-wa-list-head">PESAN TERBARU</div><div id="dmRecentList" class="nox-wa-recent"><div class="nox-wa-empty">Masukkan Guest ID untuk memulai chat.</div></div><p class="nox-wa-safe">Jangan bagikan kata sandi atau informasi pribadi.</p></aside>
@@ -807,6 +906,10 @@ Terima kasih.</textarea>
 </section>
 
 <div class="footer">RENOX PROJECT v9.3 © 2026 • SIGNATURE EDITION<div class="footer-contacts"><a href="https://web.telegram.org/k/#@DiszRenox" rel="noopener noreferrer">CONTACT DEVELOPER · TELEGRAM</a><a href="https://web.telegram.org/k/#@unbandrenox" rel="noopener noreferrer">GROUP DISKUSI · TELEGRAM</a></div></div>
+
+<section class="page" id="info"><div class="info-hero"><div class="info-kicker">RENOX PROJECT / COMMUNITY INFO</div><h1>USER <span>ACTIVITY</span></h1><p>Ringkasan aktivitas akun dan aturan komunitas Renox.</p><div class="info-user"><div class="info-avatar">R</div><div><b id="infoAccountName">Renox Member</b><small>AKTIVITAS DI PERANGKAT INI</small></div></div></div><div class="info-panel"><div class="info-panel-head"><h3>Aktivitas Terbaru</h3><button type="button" onclick="renderRenoxActivity()">REFRESH ↻</button></div><div id="renoxActivityList" class="activity-list"></div></div><div class="info-panel rules-panel"><div class="info-panel-head"><h3>Community Rules</h3><span>WAJIB DIPATUHI</span></div><div class="rule-row"><b>01</b><div><strong>Dilarang barter</strong><p>Jangan melakukan barter akun, akses, atau barang di dalam aplikasi.</p></div></div><div class="rule-row"><b>02</b><div><strong>Dilarang menjual</strong><p>Dilarang menawarkan atau melakukan transaksi jual-beli di area komunitas.</p></div></div><div class="rule-row"><b>03</b><div><strong>Dilarang menghina</strong><p>Hormati semua pengguna. Hindari hinaan, perundungan, dan ujaran merendahkan.</p></div></div></div></section>
+<section class="page" id="tools"><div class="tools-hero"><div class="info-kicker">RENOX PROJECT / TOOL CENTER</div><h1>TOOLS <span>LIBRARY</span></h1><p>Pilih alat yang ingin digunakan. Fitur lama tetap tersedia.</p></div><div class="feature-grid"><button onclick="showPage('nexoai')"><i>✦</i><b>Nexo AI</b><small>AI Assistant</small></button><button onclick="showPage('pinterest')"><i>▧</i><b>Pinterest Search</b><small>Image discovery</small></button><button onclick="showPage('searchtools')"><i>⌕</i><b>SFile & TikTok</b><small>Media search</small></button><button onclick="showPage('freefire')"><i>◈</i><b>Free Fire Lookup</b><small>Player lookup</small></button><button onclick="showPage('mobilelegends')"><i>◇</i><b>Mobile Legends</b><small>Player lookup</small></button><button onclick="showPage('mltools')"><i>🎮</i><b>ML Studio</b><small>Lobby mockup & profile</small></button><button onclick="showPage('tiktok')"><i>♪</i><b>TikTok Lookup</b><small>Public profile</small></button><button onclick="showPage('telegramlookup')"><i>➤</i><b>Telegram Lookup</b><small>Public lookup</small></button><button onclick="showPage('calculator')"><i>＋</i><b>Calculator</b><small>Quick calculations</small></button><button onclick="showPage('gethtml')"><i>&lt;/&gt;</i><b>Get HTML</b><small>Source viewer</small></button><button onclick="showPage('videodownloader')"><i>⇩</i><b>Video Downloader</b><small>Media utility</small></button><button onclick="showPage('temp-mail')"><i>✉</i><b>Temp Mail</b><small>Temporary inbox</small></button></div></section>
+<section class="page" id="menu"><div class="tools-hero"><div class="info-kicker">RENOX PROJECT / ALL FEATURES</div><h1>FEATURE <span>MENU</span></h1><p>Semua bagian aplikasi dalam satu tempat.</p></div><div class="menu-category"><h3>COMMUNITY</h3><div class="feature-grid"><button onclick="showPage('community')"><i>▤</i><b>Global Chat</b><small>Public room</small></button><button onclick="showPage('privatechat')"><i>✉</i><b>Private Chat</b><small>Direct messages</small></button><button onclick="showPage('favorites')"><i>☆</i><b>Saved Friends</b><small>Saved profiles</small></button><button onclick="showPage('profile')"><i>◌</i><b>Profile</b><small>Account settings</small></button></div></div><div class="menu-category"><h3>DISCOVER & ENTERTAINMENT</h3><div class="feature-grid"><button onclick="showPage('animestream')"><i>▶</i><b>Anime Streaming</b><small>Latest anime</small></button><button onclick="showPage('apps')"><i>▣</i><b>App Directory</b><small>Explore apps</small></button><button onclick="showPage('renoxgame')"><i>🎮</i><b>Renox Game</b><small>Games</small></button><button onclick="showPage('music')"><i>♫</i><b>YouTube Music</b><small>Music player</small></button><button onclick="showPage('memes')"><i>▧</i><b>Reddit Memes</b><small>Community memes</small></button></div></div><div class="menu-category"><h3>PROJECT & ACCOUNT</h3><div class="feature-grid"><button onclick="showPage('announcements')"><i>▣</i><b>Announcements</b><small>Project updates</small></button><button onclick="showPage('leaks')"><i>◉</i><b>Leaks</b><small>Game updates</small></button><button onclick="showPage('history')"><i>◷</i><b>Search History</b><small>Recent searches</small></button><button onclick="showPage('settings')"><i>⚙</i><b>Display Settings</b><small>Appearance</small></button><button onclick="showPage('phoneinfo')"><i>▣</i><b>Phone Information</b><small>Device info</small></button><button onclick="showPage('checkban')"><i>◉</i><b>Unban Method</b><small>Account support</small></button></div></div></section>
 </main>
 </div>
 
@@ -829,7 +932,7 @@ function showPage(page,el){document.body.classList.toggle('renox-global-chat-ope
  if($(page))$(page).classList.add('active');updateRenoxHelperVisibility();
  document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
  if(el)el.classList.add('active');
- const titles={'wifi-lookup-page':'Lookup WiFi',menu:'Menu Navigasi',home:'Dashboard',shop:'Renox Shop',lookup:'Roblox Lookup',nexoai:'Nexo AI',noxmaps:'Nox Maps',history:'Search History',favorites:'Saved Friends',freefire:'Free Fire Lookup',mobilelegends:'Mobile Legends Lookup',community:'Global Chat',noxchat:'Nox Chat',pinterest:'Pinterest Search',privatechat:'Nox Chat',schedule:'Jadwal Pelajaran',calculator:'Kalkulator',tiktok:'TikTok Lookup',animestream:'Anime Streaming',telegramlookup:'Telegram Lookup',apps:'App Directory',renoxgame:'Renox Game',profile:'Account Profile',gethtml:'Get HTML',videodownloader:'Video Downloader',videolounge:'Video Lounge',amfinder:'AM Finder', 'temp-mail':'Temp Mail',checkban:'Unban Method',music:'Music Player',announcements:'Announcements',leaks:'Game Leaks',memes:'Reddit Memes',owner:'Owner Console',settings:'Display Settings',phoneinfo:'Phone Information'};
+ const titles={info:'Info & Rules',tools:'Tools',menu:'Menu Fitur','wifi-lookup-page':'Lookup WiFi',menu:'Menu Navigasi',home:'Dashboard',shop:'Renox Shop',lookup:'Roblox Lookup',nexoai:'Nexo AI',noxmaps:'Nox Maps',history:'Search History',favorites:'Saved Friends',freefire:'Free Fire Lookup',mobilelegends:'Mobile Legends Lookup',community:'Global Chat',noxchat:'Nox Chat',pinterest:'Pinterest Search',searchtools:'SFile & TikTok Search',mltools:'ML Studio',privatechat:'Nox Chat',schedule:'Jadwal Pelajaran',calculator:'Kalkulator',tiktok:'TikTok Lookup',animestream:'Anime Streaming',telegramlookup:'Telegram Lookup',apps:'App Directory',renoxgame:'Renox Game',profile:'Account Profile',gethtml:'Get HTML',videodownloader:'Video Downloader',videolounge:'Video Lounge',amfinder:'AM Finder', 'temp-mail':'Temp Mail',checkban:'Unban Method',music:'Music Player',announcements:'Announcements',leaks:'Game Leaks',memes:'Reddit Memes',owner:'Owner Console',settings:'Display Settings',phoneinfo:'Phone Information'};
  $('pageTitle').textContent=titles[page]||'Renox Project';
  if(page==='history')renderHistory();
  if(page==='favorites')renderFavorites();
@@ -942,6 +1045,45 @@ let guestProfile={id:guestId,name:'Guest-'+guestId.slice(0,4),avatar:''};
 try{const cached=JSON.parse(localStorage.getItem('renoxProfile:'+guestId)||'null');if(cached)guestProfile={...guestProfile,...cached}}catch(e){}
 let lastChatTime=0;let renoxOwnerMode=false;
 function escapeText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+let renoxLoginRequested=false,renoxSplashShown=false,renoxSplashTimer=null;
+function renoxErrorText(error){
+ const value=error?.message??error;
+ if(typeof value==='string')return value;
+ if(value&&typeof value==='object'){
+  for(const k of ['error','message','details','reason'])if(typeof value[k]==='string'&&value[k].trim())return value[k];
+  try{return JSON.stringify(value)}catch{}
+ }
+ return 'Kesalahan API tidak diketahui';
+}
+function openRenoxLogin(){
+ renoxLoginRequested=true;
+ const welcome=document.getElementById('renoxWelcome'),gate=document.getElementById('accountGate');
+ if(welcome)welcome.style.display='none';
+ if(gate){gate.style.display='flex';gate.scrollTop=0}
+ const user=document.getElementById('gateUsername');if(user)user.focus({preventScroll:true});
+}
+function showRenoxSplash(){
+ const box=document.getElementById('renoxSplash'),video=document.getElementById('renoxSplashVideo'),bar=document.getElementById('renoxSplashProgress'),label=document.getElementById('renoxSplashPercent');
+ if(!box||!video)return;
+ renoxSplashShown=true;box.classList.add('show');video.currentTime=0;
+ const update=()=>{
+  const duration=Number.isFinite(video.duration)&&video.duration>0?video.duration:0;
+  const pct=duration?Math.min(100,Math.round(video.currentTime/duration*100)):0;
+  if(bar)bar.style.width=pct+'%';if(label)label.textContent=pct+'% · Loading...';
+ };
+ video.addEventListener('timeupdate',update);
+ video.addEventListener('loadedmetadata',update,{once:true});
+ video.addEventListener('ended',finishRenoxSplash,{once:true});
+ video.play().catch(()=>{if(label)label.textContent='Video belum dapat diputar · tekan Skip'});
+}
+function finishRenoxSplash(){
+ const box=document.getElementById('renoxSplash'),video=document.getElementById('renoxSplashVideo'),bar=document.getElementById('renoxSplashProgress'),label=document.getElementById('renoxSplashPercent');
+ if(video){video.pause();video.removeAttribute('src');video.load()}
+ if(bar)bar.style.width='100%';if(label)label.textContent='100% · Ready';
+ if(box)box.classList.remove('show');
+}
+
 async function apiJSON(url,options={}){let r;try{r=await fetch(url,{credentials:'same-origin',cache:'no-store',...options,headers:{'Accept':'application/json','Content-Type':'application/json',...(options.headers||{})}})}catch(e){throw new Error('Tidak dapat terhubung ke server RENOX. Periksa backend Pterodactyl dan koneksi API.')}const raw=await r.text();let d={};if(raw){try{d=JSON.parse(raw)}catch{throw new Error('Server mengirim respons bukan JSON (HTTP '+r.status+'). Periksa backend/API.')}}if(!r.ok)throw new Error(d.error||d.message||('Server error HTTP '+r.status));return d}
 function renoxAvatarFallback(){
  const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="80" fill="#858b98"/><circle cx="80" cy="57" r="29" fill="#d9dce2"/><path d="M24 148c5-34 26-51 56-51s51 17 56 51" fill="#d9dce2"/></svg>';
@@ -1059,6 +1201,44 @@ let animeProvider='Bstation';const animeCatalogData=[{provider:'Bstation',title:
 function selectAnimeProvider(name,el){animeProvider=name;document.querySelectorAll('.anime-provider-tabs button').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===name.toLowerCase()));filterAnimeCatalog()}
 function filterAnimeCatalog(){const q=($('animeCatalogSearch').value||'').toLowerCase();const list=animeCatalogData.filter(x=>x.provider===animeProvider&&(!q||(x.title+' '+x.desc).toLowerCase().includes(q)));$('animeCatalog').innerHTML=list.map(x=>`<article class="anime-project-item"><small>${escapeText(x.provider.toUpperCase())} · PROJECT CATALOG</small><b>${escapeText(x.title)}</b><p>${escapeText(x.desc)}</p><button class="secondary" onclick="showAnimeProviderInfo()">LIHAT INFO PLAYER</button></article>`).join('');$('animeCatalogStatus').textContent='Provider aktif: '+animeProvider+' · daftar aktual bergantung pada feed resmi dan hak distribusi.'}
 function showAnimeProviderInfo(){$('animeProjectStatus').textContent=animeProvider+' tidak mengizinkan pemutar eksternal secara umum. RENOX tidak akan mengarahkan pengguna keluar atau membypass DRM/login/paywall.'}
+async function runDinonicSearch(kind){
+ const sfile=kind==='sfile',input=$(sfile?'sfileQuery':'tiktokSearchQuery'),status=$(sfile?'sfileStatus':'tiktokSearchStatus'),out=$(sfile?'sfileResults':'tiktokSearchResults');
+ const q=input.value.trim();if(q.length<2){status.textContent='Masukkan minimal 2 karakter.';return}
+ status.textContent='Menghubungkan ke Dinonic API...';out.innerHTML='';
+ try{
+  const endpoint=sfile?'/api/sfile-search?q='+encodeURIComponent(q)+'&page=1':'/api/tiktok-search?q='+encodeURIComponent(q);
+  const d=await apiJSON(endpoint),items=Array.isArray(d.results)?d.results:[];
+  if(!items.length){status.textContent='Tidak ada hasil yang dikenali dari provider.';return}
+  out.innerHTML=items.slice(0,30).map((item,i)=>{
+   const x=item&&typeof item==='object'?item:{title:String(item)};
+   const title=escapeText(x.title||x.name||x.filename||x.desc||('Hasil '+(i+1)));
+   const url=String(x.url||x.link||x.download||x.share_url||x.web_url||'');
+   const safeUrl=/^https?:\/\//i.test(url)?url:'';
+   const image=String(x.cover||x.coverUrl||x.thumbnail||x.thumb||x.image||'');
+   const safeImage=/^https:\/\//i.test(image)?image:'';
+   const meta=[x.size,x.duration,x.author,x.username,x.views].filter(Boolean).map(escapeText).join(' · ');
+   return '<article class="feed-item">'+(safeImage?'<img loading="lazy" style="width:100%;max-height:190px;object-fit:cover;border-radius:12px" src="'+escapeText(safeImage)+'" alt="">':'')+'<div><b>'+title+'</b>'+(meta?'<p>'+meta+'</p>':'')+(safeUrl?'<p><a href="'+escapeText(safeUrl)+'" target="_blank" rel="noopener noreferrer">BUKA HASIL ↗</a></p>':'')+'</div></article>';
+  }).join('');
+  status.textContent=items.length+' hasil · '+(d.provider||'Dinonic API');
+ }catch(e){status.textContent='⚠ '+e.message}
+}
+
+async function generateFakeFF(){
+ const username=$('fakeFFName').value.trim(),lobby=$('fakeFFLobby').value||'30',out=$('fakeFFResult');if(!username){out.textContent='Isi username tampilan.';return}out.textContent='Membuat mockup simulasi...';
+ try{const d=await apiJSON('/api/fakeff-lobby?'+new URLSearchParams({username,lobby})),root=d.data||d.result||d,image=root.image||root.url||root.imageUrl||root.canvas||'';if(typeof image!=='string'||!image){out.textContent='Provider merespons tetapi gambar belum dikenali.';return}const src=image.startsWith('data:')||/^https:\/\//i.test(image)?image:'data:image/png;base64,'+image;out.innerHTML='<b>SIMULASI / MOCKUP</b><img alt="Mockup lobby Free Fire" style="display:block;width:100%;max-width:520px;margin-top:10px;border-radius:14px" src="'+escapeText(src)+'">'}catch(e){out.textContent='⚠ '+e.message}}
+async function generateFakeML(){
+ const name=$('fakeMLName').value.trim(),out=$('fakeMLResult');if(!name){out.textContent='Isi username tampilan.';return}
+ out.textContent='Membuat mockup simulasi...';
+ try{const params=new URLSearchParams({username:name,rank:$('fakeMLRank').value||'imo',avatar:$('fakeMLAvatar').value||'',border:'0'});const d=await apiJSON('/api/fakeml-lobby?'+params);const root=d.data||d.result||d;const image=root.image||root.url||root.imageUrl||root.canvas||'';if(typeof image==='string'&&image){const src=image.startsWith('data:')||image.startsWith('http')?image:'data:image/png;base64,'+image;out.innerHTML='<b>SIMULASI / MOCKUP</b><img alt="Mockup lobby Mobile Legends" style="display:block;width:100%;max-width:520px;margin-top:10px;border-radius:14px" src="'+escapeText(src)+'">'}else out.textContent='Provider merespons, tetapi URL gambar belum dikenali.'}
+ catch(e){out.textContent='⚠ '+e.message}
+}
+async function stalkMobileLegends(){
+ const id=$('mlStalkId').value.trim(),server=$('mlStalkServer').value.trim(),out=$('mlStalkResult');if(!id||!server){out.textContent='Isi User ID dan Server ID.';return}
+ out.textContent='Mengambil profil publik...';
+ try{const d=await apiJSON('/api/ml-stalk?'+new URLSearchParams({id,server}));const root=d.data||d.result||d;out.innerHTML='<pre class="card" style="white-space:pre-wrap;overflow-wrap:anywhere">'+escapeText(JSON.stringify(root,null,2))+'</pre>'}
+ catch(e){out.textContent='⚠ '+e.message}
+}
+
 function addNexoMessage(role,content){
  const row=document.createElement('div');row.className='nexo-message '+role;
  const label=role==='user'?'ANDA':'NEXO AI';
@@ -1082,7 +1262,7 @@ async function sharePinterestPin(url,title){
 async function searchPinterest(){
  const q=$('pinterestQuery').value.trim(),out=$('pinterestResults'),status=$('pinterestStatus'),more=$('pinterestMore');
  if(q.length<2){status.textContent='Masukkan minimal 2 karakter.';return}
- pinterestBookmark=null;pinterestLastQuery=q;pinterestSeenImages=new Set();out.innerHTML='';more.style.display='none';status.textContent='Menghubungkan ke Pinterest API resmi...';
+ pinterestBookmark=null;pinterestLastQuery=q;pinterestSeenImages=new Set();out.innerHTML='';more.style.display='none';status.textContent='Menghubungkan ke Dinonic API...';
  await fetchPinterestPage(q,false);
 }
 async function loadMorePinterest(){if(!pinterestBookmark||!pinterestLastQuery)return;await fetchPinterestPage(pinterestLastQuery,true)}
@@ -1100,12 +1280,23 @@ async function fetchPinterestPage(q,append){
  }catch(e){status.textContent=e.message||'Pinterest API gagal diakses.'}
  finally{more.disabled=false}
 }
+async function generateRenoxQR(){
+ const text=$('qrText').value.trim(),out=$('qrResult');if(!text){out.textContent='Isi teks terlebih dahulu.';return}out.textContent='Membuat QR...';
+ try{const q=new URLSearchParams({text,color:$('qrColor').value,bg:$('qrBg').value,size:$('qrSize').value});const d=await apiJSON('/api/qr-generate?'+q);const root=d.data||d.result||d;const image=root.image||root.url||root.imageUrl||root.qr||root.base64||'';if(typeof image!=='string'||!image){out.textContent='Provider merespons tetapi gambar QR tidak dikenali.';return}const src=image.startsWith('data:')||/^https:\/\//i.test(image)?image:'data:image/png;base64,'+image;out.innerHTML='<img alt="QR Code Renox" style="display:block;width:min(100%,320px);background:#fff;padding:12px;border-radius:16px" src="'+escapeText(src)+'"><a download="renox-qr.png" href="'+escapeText(src)+'">SIMPAN QR</a>'}catch(e){out.textContent='⚠ '+e.message}}
+async function generateRenoxTTS(){
+ const text=$('ttsText').value.trim(),out=$('ttsResult');if(!text){out.textContent='Isi teks terlebih dahulu.';return}out.textContent='Membuat audio...';
+ try{const q=new URLSearchParams({text,lang:$('ttsLang').value,slow:'false'}),d=await apiJSON('/api/google-tts?'+q),root=d.data||d.result||d;const audio=root.audio||root.url||root.audioUrl||root.mp3||root.base64||'';if(typeof audio!=='string'||!audio){out.textContent='Provider merespons tetapi audio belum dikenali.';return}const src=audio.startsWith('data:')||/^https:\/\//i.test(audio)?audio:'data:audio/mpeg;base64,'+audio;out.innerHTML='<audio controls style="width:100%" src="'+escapeText(src)+'"></audio>'}catch(e){out.textContent='⚠ '+e.message}}
+async function loadLatestAnime(page=1){
+ const status=$('animeLatestStatus'),out=$('animeLatestResults');status.textContent='Memuat daftar anime...';out.innerHTML='';
+ try{const d=await apiJSON('/api/anime-latest?page='+page),root=d.data||[],items=Array.isArray(root)?root:(root.items||root.results||root.anime||[]);if(!items.length){status.textContent='Provider belum mengembalikan daftar yang dikenali.';return}out.innerHTML=items.slice(0,30).map((x,i)=>{const title=escapeText(x.title||x.name||x.judul||'Anime '+(i+1)),url=String(x.url||x.link||x.href||''),img=String(x.image||x.cover||x.thumbnail||'');return '<article class="feed-item">'+( /^https:\/\//i.test(img)?'<img loading="lazy" style="width:100%;max-width:120px;border-radius:10px" src="'+escapeText(img)+'" alt="">':'')+'<div><b>'+title+'</b>'+(x.episode?'<p>'+escapeText(x.episode)+'</p>':'')+( /^https:\/\//i.test(url)?'<a href="'+escapeText(url)+'" target="_blank" rel="noopener noreferrer">LIHAT DETAIL ↗</a>':'')+'</div></article>'}).join('');status.textContent=items.length+' item · '+(d.provider||'Dinonic API')}catch(e){status.textContent='⚠ '+e.message}}
+async function sendRenoxMail(){
+ const status=$('mailStatus'),payload={to:$('mailTo').value.trim(),subject:$('mailSubject').value.trim(),text:$('mailText').value.trim()};if(!payload.to||!payload.subject||!payload.text){status.textContent='Lengkapi penerima, subjek, dan isi email.';return}status.textContent='Mengirim email...';try{await apiJSON('/api/role/email',{method:'POST',body:JSON.stringify(payload)});status.textContent='Email diterima oleh provider untuk diproses.'}catch(e){status.textContent='⚠ '+e.message}}
 async function askNexoAI(){
  const input=$('nexoPrompt'),prompt=input.value.trim();if(!prompt)return;
  input.value='';addNexoMessage('user',prompt);$('nexoSend').disabled=true;$('nexoStatus').textContent='Nexo sedang mencari web dan menyusun jawaban...';
  const loading=addNexoMessage('assistant','Sedang berpikir dan mencari sumber publik…');
  try{
-  const d=await apiJSON('/api/nexo-ai',{method:'POST',body:JSON.stringify({prompt})});
+  const d=await apiJSON('/api/nexo-gemini',{method:'POST',body:JSON.stringify({prompt})});
   loading.querySelector('p').textContent=d.answer+(d.notice?'\n\n'+d.notice:'');
   if(d.sources?.length){const sources=document.createElement('div');sources.className='nexo-sources';const label=document.createElement('b');label.textContent='SUMBER WEB';sources.appendChild(label);d.sources.forEach(s=>{const a=document.createElement('a');a.href=s.url;a.target='_blank';a.rel='noopener';a.textContent=s.title+' ↗';sources.appendChild(a)});loading.querySelector('.nexo-bubble').appendChild(sources)}
   $('nexoStatus').textContent='Provider: '+(d.provider||'AI gratis')+' · Periksa sumber untuk informasi penting.';
@@ -1588,14 +1779,14 @@ async function checkAccount(){
  let d;
  try{d=await apiJSON('/api/auth/me')}catch(e){
   document.body.classList.add('auth-locked');
-  const gate=$('accountGate');if(gate)gate.style.display='flex';
-  const status=$('gateStatus');if(status)status.textContent='Gagal memeriksa sesi: '+(e?.message||'Kesalahan API tidak diketahui');
+  const gate=$('accountGate');if(gate)gate.style.display=renoxLoginRequested?'flex':'none';
+  const status=$('gateStatus');if(status)status.textContent='Gagal memeriksa sesi: '+renoxErrorText(e);
   return false;
  }
  const authenticated=!!d.authenticated;
  const locked=!authenticated||!!d.blockedByMaintenance||!!d.revoked;
  document.body.classList.toggle('auth-locked',locked);document.body.classList.toggle('renox-authenticated',!locked);
- const gate=$('accountGate');if(gate)gate.style.display=locked?'flex':'none';
+ const gate=$('accountGate');if(gate)gate.style.display=(locked&&renoxLoginRequested)?'flex':'none';
  if(!authenticated){updateRenoxHelperVisibility();
   const status=$('gateStatus');
   if(status&&d.blockedByMaintenance)status.textContent='RENOX sedang maintenance. Login hanya tersedia untuk developer dan staff.';
@@ -1603,7 +1794,7 @@ async function checkAccount(){
   const authStatus=$('authStatus');if(authStatus)authStatus.textContent='Sesi belum login.';
   return false;
  }
- const accountName=d.username||'Member';renoxAccountName=accountName;guestProfile.name=accountName;
+ const accountName=d.username||'Member';renoxAccountName=accountName;guestProfile.name=accountName;if($('rdhAccountName'))$('rdhAccountName').textContent=accountName;
  const authStatus=$('authStatus');if(authStatus)authStatus.textContent='✓ Login aktif sebagai '+accountName;
  // Autentikasi sudah berhasil. Kesalahan pemuatan profil/dashboard tidak boleh
  // mengunci pengguna kembali ke layar login.
@@ -1631,6 +1822,7 @@ async function checkAccount(){
  }catch(e){console.warn('RENOX dashboard initialization:',e)}
  if(d.developer){try{await checkDeveloper()}catch(e){console.warn('Developer session:',e.message)}}
  updateRenoxHelperVisibility();
+ if(!renoxSplashShown)showRenoxSplash();
  return true;
 }
 function fmtBytes(n){if(!Number.isFinite(n))return'—';const u=['B','KB','MB','GB','TB'];let i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return n.toFixed(i?1:0)+' '+u[i]}
@@ -2095,7 +2287,13 @@ body.renox-story-open .liquid-bottom-nav,body.renox-story-open .renox-bottom-nav
 #statusViewer.fullscreen-status .status-media-nav{display:flex;align-items:center;justify-content:center;gap:20px;position:absolute;bottom:calc(125px + env(safe-area-inset-bottom));left:0;right:0;z-index:3}
 #statusViewer.fullscreen-status .status-media-nav button{width:40px;height:40px;border:1px solid #ffffff55;border-radius:50%;background:#101a30;color:white;font-size:24px}
 @media(max-height:700px){#statusViewer.fullscreen-status .status-viewer-media{max-height:44dvh}#statusViewer.fullscreen-status .status-viewer-media img,#statusViewer.fullscreen-status .status-viewer-media video{max-height:44dvh!important}#statusViewer.fullscreen-status .noxstatus-thanks{gap:5px 8px;padding-top:7px!important}}
-</style></body>
+</style><script id="renox-activity-tracker">(()=>{const key='renoxActivityLog';function getLog(){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch{return []}}function addActivity(label,icon){const rows=getLog();if(rows[0]?.label===label&&Date.now()-rows[0].time<60000)return;rows.unshift({label,icon,time:Date.now()});localStorage.setItem(key,JSON.stringify(rows.slice(0,35)))}window.renderRenoxActivity=function(){const box=document.getElementById('renoxActivityList');if(!box)return;const rows=getLog();box.innerHTML=rows.length?rows.map(x=>'<div class="activity-item"><span class="activity-icon">'+(x.icon||'•')+'</span><div><b>'+String(x.label).replace(/[<>]/g,'')+'</b><small>'+new Date(x.time).toLocaleString('id-ID')+'</small></div></div>').join(''):'<div class="activity-item"><span class="activity-icon">✦</span><div><b>Belum ada aktivitas</b><small>Aktivitas navigasi kamu akan muncul di sini.</small></div></div>'};const original=window.showPage;if(typeof original==='function')window.showPage=function(page,el){original(page,el);const names={home:'Membuka Dashboard',info:'Membuka Info & Rules',tools:'Membuka Tools',menu:'Membuka Menu Fitur',community:'Membuka Global Chat',privatechat:'Membuka Private Chat'};addActivity(names[page]||('Membuka '+page),'◈');if(page==='info'){const name=document.getElementById('homeProfileName')?.textContent||'Renox Member';const target=document.getElementById('infoAccountName');if(target)target.textContent=name;renderRenoxActivity()}};document.addEventListener('DOMContentLoaded',()=>{addActivity('Membuka Renox Project','✦');renderRenoxActivity()})})();</script>
+
+<style id="renox-sidebar-final-fix">
+.renox-sidebar-toggle{display:none;width:42px;height:42px;flex:0 0 42px;border:1px solid #a879ff66;border-radius:13px;background:#a879ff22;color:#eee2ff;font-size:21px;place-items:center;cursor:pointer}
+@media(max-width:760px){.renox-sidebar-toggle{display:grid!important}.layout>.sidebar{display:none!important}.menu-open .layout>.sidebar{display:flex!important;position:fixed!important;inset:0 auto 0 0!important;width:min(310px,86vw)!important;height:100vh!important;z-index:100500!important;overflow-y:auto!important;padding:20px 14px!important;background:#101322!important;box-shadow:20px 0 60px #000b!important}.menu-open .layout>.sidebar .brand,.menu-open .layout>.sidebar .navtitle,.menu-open .layout>.sidebar .nav span,.menu-open .layout>.sidebar .sidebar-bottom p{display:block!important}.menu-open .layout>.sidebar .nav{display:flex!important;justify-content:flex-start!important;padding:12px!important}.menu-open .layout>.sidebar .sidebar-bottom{text-align:left!important}}
+</style>
+</body>
 
 <style>
 /* RENOX V10 — immersive status and liquid navigation */

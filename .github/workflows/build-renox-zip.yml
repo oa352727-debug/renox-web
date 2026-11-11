@@ -1,0 +1,32 @@
+name: Build Renox ZIP
+on:
+  push:
+    branches:
+      - feature/dinonic-search-tools
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check backend syntax
+        run: node --check server.js
+      - name: Package source
+        run: |
+          zip -r renox-project-latest.zip . \
+            -x ".git/*" \
+            -x "node_modules/*" \
+            -x "data/*" \
+            -x ".env" \
+            -x "*.log"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: renox-project-latest
+          path: renox-project-latest.zip
+          if-no-files-found: error
+          retention-days: 7

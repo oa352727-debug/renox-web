@@ -1,6 +1,6 @@
 {
   "name": "renox-project",
-  "version": "10.2.1",
+  "version": "10.3.0",
   "private": true,
   "description": "Renox Project Node.js backend",
   "main": "server.js",

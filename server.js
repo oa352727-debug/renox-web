@@ -27,8 +27,8 @@ const PRESENCE_TTL = 90_000;
 const MAX_BODY = 16_000_000;
 const NOXTOK_MAX_VIDEO_BYTES = Math.max(1, Number(process.env.NOXTOK_MAX_VIDEO_MB || 250)) * 1024 * 1024;
 const RELEASE = {
-  version: "10.2.1",
-  name: "Renox Project · Lookup & Web Tools Update",
+  version: "10.3.0",
+  name: "Renox Project · Dinonic Tools & Mobile Legends Update",
   publishedAt: "2026-11-08",
   changes: [
     "Unban: formulir pengajuan wajib berisi nomor, alasan, dan tanggal pemblokiran.",
@@ -162,6 +162,14 @@ function isOwner(req) {
 function getClientKey(req) { return req.socket.remoteAddress || "unknown"; }
 function getClientIp(req) { return String(req.socket.remoteAddress || "unknown").replace(/^::ffff:/, ""); }
 function getAccountKey(req) { const raw=cookieMap(req).renox_account||"", first=raw.indexOf("."); return first>0?raw.slice(0,first):""; }
+function getAuthenticatedAccount(req) {
+  const raw=cookieMap(req).renox_account||"",first=raw.indexOf("."),key=first>0?raw.slice(0,first):"",token=first>0?raw.slice(first+1):"",parts=token.split(".");
+  const expected=parts.length===3?sign(parts[0]+"|"+key+"|"+parts[1]):"";
+  const valid=parts.length===3&&Number(parts[0])>Date.now()&&parts[2].length===expected.length&&crypto.timingSafeEqual(Buffer.from(parts[2]),Buffer.from(expected));
+  const account=db.accounts?.[key];
+  if(!valid||!account||account.sessionId!==parts[1])return null;
+  return {key,account,role:account.developer?"admin":(account.role==="reseller"?"reseller":"member")};
+}
 function trackIp(req,key) { if(!key)return; const ip=getClientIp(req); db.ipLog=db.ipLog||{}; db.ipLog[key]={ip,lastLogin:Date.now()}; }
 let botHeartbeatAt=0;
 
@@ -258,6 +266,27 @@ async function synoxGet(pathname, params) {
   const payload = await response.json().catch(() => ({}));
   if (!response.ok || payload.status === false) throw new Error(payload.message || `SynoxCloud HTTP ${response.status}`);
   return payload;
+}
+async function dinonicGet(pathname, params = {}) {
+  const apiKey = String(process.env.DINONIC_API_KEY || "").trim();
+  if (!apiKey) throw new Error("Dinonic API belum dikonfigurasi. Isi DINONIC_API_KEY di Environment Pterodactyl.");
+  const endpoint = new URL("https://api.dinonic.web.id" + pathname);
+  endpoint.searchParams.set("apikey", apiKey);
+  for (const [key, value] of Object.entries(params)) endpoint.searchParams.set(key, String(value));
+  const response = await fetch(endpoint, { headers: { "Accept": "application/json", "User-Agent": "RenoxProject/10.3" }, signal: AbortSignal.timeout(18000) });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || payload.status === false || payload.success === false) {
+    throw new Error(cleanText(payload.message || payload.error || `Dinonic API HTTP ${response.status}`, 220));
+  }
+  return payload;
+}
+function dinonicItems(payload) {
+  const root = payload?.data ?? payload?.result ?? payload?.results ?? payload;
+  if (Array.isArray(root)) return root;
+  for (const key of ["items", "results", "pins", "videos", "files", "data", "result"]) {
+    if (Array.isArray(root?.[key])) return root[key];
+  }
+  return [];
 }
 function isPublicWebUrl(raw) {
   let u; try { u = new URL(raw); } catch { return false; }
@@ -434,13 +463,12 @@ const server = http.createServer(async (req, res) => {
       const username = cleanText(url.searchParams.get("username"), 30).replace(/^@+/, "");
       if (!/^[a-zA-Z0-9._]{2,30}$/.test(username)) return json(res,400,{error:"Username TikTok tidak valid."});
       if (!rateLimit(`tiktok:${getClientKey(req)}`, 8, 60000)) return json(res,429,{error:"Terlalu banyak pencarian. Coba lagi sebentar."});
-      const payload = await synoxGet("/stalker/tiktokstalk", { user: username });
+      const payload = await dinonicGet("/stalk/tiktok", { username });
       const root=payload.data||payload.result||payload;
       const user=root.user||root.userInfo||root.user_info||root.profile||root;
       const stats=root.stats||root.statsV2||user.stats||user.statistics||{};
-      const uniqueId=user.uniqueId||user.unique_id||user.username||user.uniqueID||"";
-      if ((payload.status===false)||!uniqueId) return json(res,404,{error:payload.message||"Profil TikTok tidak ditemukan atau format data provider berubah."});
-      return json(res,200,{user:{uniqueId:cleanText(uniqueId,30),nickname:cleanText(user.nickname||user.displayName||user.name||uniqueId,80),signature:cleanText(user.signature||user.bio||"",300),avatarLarger:user.avatarLarger||user.avatarMedium||user.avatarThumb||user.avatar||user.avatar_url||"",avatarMedium:user.avatarMedium||user.avatar||"",avatarThumb:user.avatarThumb||user.avatar||"",followerCount:Number(stats.followerCount||stats.followers||user.followerCount||0),followingCount:Number(stats.followingCount||stats.following||user.followingCount||0),videoCount:Number(stats.videoCount||stats.videos||user.videoCount||0),heartCount:Number(stats.heartCount||stats.heart||stats.likes||user.heartCount||0),verified:Boolean(user.verified||user.isVerified),privateAccount:Boolean(user.privateAccount||user.isPrivate),region:cleanText(user.region||user.regionCode||"",40),userId:cleanText(user.id||user.uid||user.secUid||"",80),createTime:Number(user.createTime||user.create_time||0)}});
+      const uniqueId=user.uniqueId||user.unique_id||user.username||user.uniqueID||user.unique_id||username;
+      return json(res,200,{user:{uniqueId:cleanText(uniqueId,30),nickname:cleanText(user.nickname||user.displayName||user.name||uniqueId,80),signature:cleanText(user.signature||user.bio||"",300),avatarLarger:user.avatarLarger||user.avatarMedium||user.avatarThumb||user.avatar||user.avatar_url||user.avatarUrl||"",avatarMedium:user.avatarMedium||user.avatar||user.avatar_url||"",avatarThumb:user.avatarThumb||user.avatar||"",followerCount:Number(stats.followerCount||stats.followers||user.followerCount||user.followers||0),followingCount:Number(stats.followingCount||stats.following||user.followingCount||0),videoCount:Number(stats.videoCount||stats.videos||user.videoCount||0),heartCount:Number(stats.heartCount||stats.heart||stats.likes||user.heartCount||0),verified:Boolean(user.verified||user.isVerified),privateAccount:Boolean(user.privateAccount||user.isPrivate),region:cleanText(user.region||user.regionCode||"",40),userId:cleanText(user.id||user.uid||user.secUid||"",80),createTime:Number(user.createTime||user.create_time||0),bioLink:user.bioLink||user.bio_link||""}});
     }
     if (req.method === "GET" && route === "/api/email-public") {
       const email=cleanText(url.searchParams.get("email"),120).toLowerCase();
@@ -500,36 +528,15 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === "GET" && route === "/api/pinterest-search") {
       const q=cleanText(url.searchParams.get("q"),120);
-      const offset=Math.max(0,Math.min(500,Number(url.searchParams.get("bookmark")||0)||0));
       if(q.length<2)return json(res,400,{error:"Masukkan kata kunci minimal 2 karakter."});
       if(!rateLimit(`pinterest:${getClientKey(req)}`,12,60000))return json(res,429,{error:"Pencarian terlalu cepat. Tunggu sebentar."});
-      const searchUrl=new URL("https://www.pinterest.com/search/pins/");
-      searchUrl.searchParams.set("q",q);
-      const response=await fetch(searchUrl,{headers:{
-        "User-Agent":"Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 Chrome/125.0.0.0 Mobile Safari/537.36",
-        "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language":"id-ID,id;q=0.9,en-US;q=0.8"
-      },redirect:"follow",signal:AbortSignal.timeout(22000)});
-      if(!response.ok)throw new Error(`Pinterest membatasi pencarian tidak resmi (HTTP ${response.status}). Coba lagi nanti.`);
-      let html=await response.text();
-      html=html.replace(/\\u002F/g,"/").replace(/\\u003A/g,":").replace(/\\\//g,"/").replace(/&amp;/g,"&");
-      const found=new Map();
-      const addImage=(raw,title="")=>{
-        let src=String(raw||"").replace(/\\u002F/g,"/").replace(/\\\//g,"/").replace(/&amp;/g,"&");
-        if(!src.startsWith("https://i.pinimg.com/"))return;
-        src=src.replace(/\/\d+x\d+\//,"/originals/");
-        if(!/\.(jpg|jpeg|png|webp)(\?|$)/i.test(src))return;
-        if(!found.has(src))found.set(src,{id:crypto.createHash("sha1").update(src).digest("hex").slice(0,12),title:cleanText(title||q,160),image:src,thumb:src,source:"https://www.pinterest.com/search/pins/?q="+encodeURIComponent(q)});
-      };
-      const patterns=[
-        /"(?:url|src|image_url)"\s*:\s*"(https?:\\?\/\\?\/i\.pinimg\.com[^"]+)"/gi,
-        /https?:\\?\/\\?\/i\.pinimg\.com\\?\/(?:originals|[0-9]+x[0-9]+)\\?\/[^"'\\\s<>]+?\.(?:jpg|jpeg|png|webp)(?:\?[^"'\\\s<>]*)?/gi,
-        /(?:src|data-src)="(https:\/\/i\.pinimg\.com\/[^"]+)"/gi
-      ];
-      for(const re of patterns){let m;while((m=re.exec(html))!==null){const raw=m[1]||m[0];addImage(raw,q);if(found.size>=180)break;}}
-      const all=[...found.values()];
-      const page=all.slice(offset,offset+20);
-      return json(res,200,{query:q,provider:"Pinterest public page · unofficial scraper",results:page,bookmark:all.length>offset+20?String(offset+20):null,hasMore:all.length>offset+20,notice:all.length?"Hasil dari halaman publik Pinterest. Jumlah hasil bergantung pada akses yang diberikan Pinterest.":"Pinterest tidak mengirim gambar yang dapat dibaca; situs dapat sedang membatasi scraper."});
+      const payload=await dinonicGet("/search/pinterest",{q});
+      const results=dinonicItems(payload).map((x,i)=>{
+        const image=x.image||x.image_url||x.thumbnail||x.thumb||x.url||x.src||x.media?.url||"";
+        const source=x.source||x.pin_url||x.link||x.url||image;
+        return {id:x.pinId||x.pin_id||x.id||String(i),title:cleanText(x.title||x.description||q,160),image,thumb:x.thumb||x.thumbnail||image,source};
+      }).filter(x=>/^https:\/\//i.test(x.image));
+      return json(res,200,{query:q,provider:"Dinonic API",results,bookmark:null,notice:results.length?"Hasil pencarian Pinterest dari Dinonic.":"Provider tidak mengembalikan gambar yang dikenali."});
     }
     if (req.method === "GET" && route === "/api/pinterest-download") {
       const raw=url.searchParams.get("url")||"";let imageUrl;
@@ -547,6 +554,20 @@ const server = http.createServer(async (req, res) => {
       if(bytes.length>12*1024*1024)throw new Error("Ukuran gambar terlalu besar (maksimum 12 MB).");
       res.writeHead(200,{"Content-Type":type,"Content-Length":bytes.length,"Content-Disposition":`attachment; filename="renox-pinterest-${Date.now()}.${type.includes("png")?"png":type.includes("webp")?"webp":"jpg"}`,"Cache-Control":"no-store","X-Content-Type-Options":"nosniff"});
       return res.end(bytes);
+    }
+    if (req.method === "GET" && route === "/api/sfile-search") {
+      const q=cleanText(url.searchParams.get("q"),120),page=Math.max(1,Math.min(50,Number(url.searchParams.get("page")||1)||1));
+      if(q.length<2)return json(res,400,{error:"Masukkan kata kunci minimal 2 karakter."});
+      if(!rateLimit(`sfile:${getClientKey(req)}`,10,60000))return json(res,429,{error:"Pencarian terlalu cepat. Tunggu sebentar."});
+      const payload=await dinonicGet("/search/sfile",{q,page});
+      return json(res,200,{query:q,page,provider:"Dinonic API",results:dinonicItems(payload),raw:payload});
+    }
+    if (req.method === "GET" && route === "/api/tiktok-search") {
+      const q=cleanText(url.searchParams.get("q"),120);
+      if(q.length<2)return json(res,400,{error:"Masukkan kata kunci minimal 2 karakter."});
+      if(!rateLimit(`tiktok-search:${getClientKey(req)}`,10,60000))return json(res,429,{error:"Pencarian terlalu cepat. Tunggu sebentar."});
+      const payload=await dinonicGet("/search/tiktok",{q});
+      return json(res,200,{query:q,provider:"Dinonic API",results:dinonicItems(payload),raw:payload});
     }
     if (req.method === "GET" && route === "/api/maps-search") {
       const q=cleanText(url.searchParams.get("q"),160);
@@ -626,6 +647,69 @@ const server = http.createServer(async (req, res) => {
       if(!payload.status||!result.status||!/^https:\/\/copier\.saveweb2zip\.com\/api\/downloadArchive\/[A-Za-z0-9_-]+$/.test(result.download||""))return json(res,502,{error:"Provider tidak menghasilkan arsip ZIP yang valid."});
       return json(res,200,{status:true,md5:cleanText(result.md5,100),copiedFilesAmount:Number(result.copiedFilesAmount||0),download:result.download});
     }
+
+    if (req.method === "GET" && route === "/api/fakeff-lobby") {
+      const username=cleanText(url.searchParams.get("username"),24),lobby=Number(url.searchParams.get("lobby")||30);
+      if(!/^[a-zA-Z0-9 _.-]{2,24}$/.test(username)||!Number.isInteger(lobby)||lobby<1||lobby>100)return json(res,400,{error:"Username atau jumlah lobby tidak valid."});
+      if(!rateLimit("fakeff:"+getClientKey(req),4,60000))return json(res,429,{error:"Terlalu banyak membuat simulasi."});
+      return json(res,200,await dinonicGet("/canvas/fakeff",{username,lobby}));
+    }
+    if (req.method === "GET" && route === "/api/fakeml-lobby") {
+      const username=cleanText(url.searchParams.get("username"),24),rank=cleanText(url.searchParams.get("rank")||"imo",20),avatar=String(url.searchParams.get("avatar")||"").trim(),border=String(url.searchParams.get("border")||"0");
+      if(!/^[a-zA-Z0-9 _.-]{2,24}$/.test(username))return json(res,400,{error:"Username Mobile Legends tidak valid."});
+      if(avatar&&!isPublicWebUrl(avatar))return json(res,400,{error:"Avatar harus berupa URL publik HTTP/HTTPS."});
+      if(!/^[a-zA-Z0-9_-]{1,20}$/.test(rank)||!["0","1","2","3"].includes(border))return json(res,400,{error:"Rank atau border tidak valid."});
+      if(!rateLimit("fakeml:"+getClientKey(req),4,60000))return json(res,429,{error:"Terlalu banyak membuat simulasi."});
+      return json(res,200,await dinonicGet("/canvas/fakeml",{username,avatar:avatar||"VALUE",rank,border}));
+    }
+    if (req.method === "GET" && route === "/api/ml-stalk") {
+      const id=cleanText(url.searchParams.get("id"),24),server=cleanText(url.searchParams.get("server"),12);
+      if(!/^\d{5,20}$/.test(id)||!/^\d{1,8}$/.test(server))return json(res,400,{error:"Masukkan User ID dan Server ID Mobile Legends yang valid."});
+      if(!rateLimit("ml-stalk:"+getClientKey(req),6,60000))return json(res,429,{error:"Terlalu banyak lookup Mobile Legends."});
+      return json(res,200,await dinonicGet("/stalker/mobile-legend",{id,server}));
+    }
+    if (req.method === "GET" && route === "/api/qr-generate") {
+      const textValue=String(url.searchParams.get("text")||"").trim(),color=String(url.searchParams.get("color")||"#000000"),bg=String(url.searchParams.get("bg")||"#ffffff"),size=Number(url.searchParams.get("size")||512);
+      if(!textValue||textValue.length>1500)return json(res,400,{error:"Isi teks QR (maksimal 1.500 karakter)."});
+      if(!/^#[0-9a-f]{6}$/i.test(color)||!/^#[0-9a-f]{6}$/i.test(bg)||!Number.isInteger(size)||size<128||size>1024)return json(res,400,{error:"Warna atau ukuran QR tidak valid."});
+      if(!rateLimit("qr:"+getClientKey(req),10,60000))return json(res,429,{error:"Terlalu banyak membuat QR."});
+      return json(res,200,await dinonicGet("/tools/qr-custom",{text:textValue,color,bg,size}));
+    }
+    if (req.method === "GET" && route === "/api/google-tts") {
+      const textValue=String(url.searchParams.get("text")||"").trim(),lang=cleanText(url.searchParams.get("lang")||"id",8),slow=String(url.searchParams.get("slow")||"false");
+      if(!textValue||textValue.length>800)return json(res,400,{error:"Teks wajib diisi (maksimal 800 karakter)."});
+      if(!/^[a-z]{2}(?:-[A-Z]{2})?$/.test(lang)||!["true","false"].includes(slow))return json(res,400,{error:"Bahasa atau mode suara tidak valid."});
+      if(!rateLimit("tts:"+getClientKey(req),8,60000))return json(res,429,{error:"Terlalu banyak permintaan suara."});
+      return json(res,200,await dinonicGet("/tools/google-tts",{text:textValue,lang,slow}));
+    }
+    if (req.method === "POST" && route === "/api/nexo-gemini") {
+      const b=await readBody(req),prompt=String(b.prompt||"").trim();
+      if(!prompt||prompt.length>1200)return json(res,400,{error:"Prompt wajib diisi (maksimal 1.200 karakter)."});
+      if(!rateLimit("gemini:"+getClientKey(req),12,60000))return json(res,429,{error:"Nexo AI sedang menerima terlalu banyak pesan."});
+      const payload=await dinonicGet("/ai/gemini",{prompt});
+      const root=payload.data??payload.result??payload;
+      const answer=typeof root==="string"?root:(root.answer||root.response||root.text||root.message||root.output||"");
+      if(!answer)return json(res,502,{error:"Gemini provider tidak mengembalikan teks jawaban yang dikenali.",provider:"Dinonic Gemini"});
+      return json(res,200,{answer:String(answer).slice(0,12000),provider:"Google Gemini · Dinonic"});
+    }
+    if (req.method === "GET" && route === "/api/anime-latest") {
+      const page=Math.max(1,Math.min(30,Number(url.searchParams.get("page")||1)||1));
+      if(!rateLimit("anime-latest:"+getClientKey(req),8,60000))return json(res,429,{error:"Terlalu banyak memuat daftar anime."});
+      const payload=await dinonicGet("/anime/nontonanimex/terbaru",{page});
+      return json(res,200,{provider:"NontonAnimeX · Dinonic",page,data:payload.data??payload.result??payload});
+    }
+    if (req.method === "POST" && route === "/api/role/email") {
+      const auth=getAuthenticatedAccount(req);
+      if(!auth)return json(res,401,{error:"Silakan login terlebih dahulu."});
+      if(!["reseller","admin"].includes(auth.role))return json(res,403,{error:"Fitur email hanya tersedia untuk role Reseller dan Admin."});
+      const b=await readBody(req),to=String(b.to||"").trim(),subject=cleanText(b.subject,140),textBody=String(b.text||"").trim(),htmlBody=String(b.html||"").trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)||!subject||(!textBody&&!htmlBody)||textBody.length>5000||htmlBody.length>10000)return json(res,400,{error:"Alamat email, subjek, atau isi email tidak valid."});
+      if(!rateLimit("role-email:"+auth.key,5,3600000))return json(res,429,{error:"Batas pengiriman email tercapai. Coba lagi nanti."});
+      const mailEnv=["DINONIC_MAIL_HOST","DINONIC_MAIL_PORT","DINONIC_MAIL_USER","DINONIC_MAIL_PASS"];
+      if(mailEnv.some(k=>!process.env[k]))return json(res,503,{error:"SMTP belum dikonfigurasi oleh admin di Environment Pterodactyl."});
+      const payload=await dinonicGet("/tools/send-mail",{to,subject,text:textBody,html:htmlBody,from_name:cleanText(process.env.DINONIC_MAIL_FROM_NAME||"Renox Project",60),host:process.env.DINONIC_MAIL_HOST,port:process.env.DINONIC_MAIL_PORT,user:process.env.DINONIC_MAIL_USER,pass:process.env.DINONIC_MAIL_PASS});
+      return json(res,200,{ok:true,result:payload});
+    }
     if (req.method === "GET" && route === "/api/otp-checker") {
       return json(res,403,{status:false,code:"OWNERSHIP_VERIFICATION_REQUIRED",error:"Pemeriksaan OTP dinonaktifkan. Renox tidak dapat mengambil atau menampilkan kode OTP dari nomor yang kepemilikannya belum diverifikasi."});
     }
@@ -637,8 +721,9 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === "GET" && route === "/api/ff-lookup") {
       const id = cleanText(url.searchParams.get("id"), 40);
-      if (!id) return json(res, 400, { error: "Masukkan Player ID Free Fire." });
-      return json(res, 200, await configuredGameLookup("FF_LOOKUP_API", id, "Free Fire"));
+      if (/^\d{5,20}$/.test(id) === false) return json(res, 400, { error: "Masukkan Player ID Free Fire yang valid." });
+      if (!rateLimit(`ff:${getClientKey(req)}`, 8, 60000)) return json(res,429,{error:"Terlalu banyak pencarian Free Fire. Tunggu sebentar."});
+      return json(res, 200, await dinonicGet("/stalk/ff", { id }));
     }
     if (req.method === "GET" && route === "/api/ml-lookup") {
       const id = cleanText(url.searchParams.get("id"), 60);
@@ -930,7 +1015,7 @@ const server = http.createServer(async (req, res) => {
       const staff=(db.settings.staffUsers||[]).some(x=>String(x).toLowerCase()===key);
       const accountAllowed=!db.settings.maintenance||db.accounts?.[key]?.developer||staff;
       const ok=valid&&db.accounts?.[key]&&db.accounts[key].sessionId===parts[1]&&accountAllowed;
-      if(ok&&db.accounts[key].developer){const ownerExpiry=String(Date.now()+7*86400000),ownerToken=ownerExpiry+"."+sign(ownerExpiry);res.setHeader("Set-Cookie","renox_owner="+ownerToken+"; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800"+(process.env.NODE_ENV==="production"?"; Secure":""));} return json(res,200,{authenticated:!!ok,developer:!!(ok&&db.accounts[key].developer),revoked:!!valid&&!ok&&accountAllowed,blockedByMaintenance:!!valid&&!accountAllowed,maintenance:Boolean(db.settings.maintenance),username:ok?db.accounts[key].username:null,guestId:ok?crypto.createHash("sha256").update("renox-account:"+key).digest("hex").slice(0,32):null});
+      if(ok&&db.accounts[key].developer){const ownerExpiry=String(Date.now()+7*86400000),ownerToken=ownerExpiry+"."+sign(ownerExpiry);res.setHeader("Set-Cookie","renox_owner="+ownerToken+"; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800"+(process.env.NODE_ENV==="production"?"; Secure":""));} return json(res,200,{authenticated:!!ok,role:ok?(db.accounts[key].developer?"admin":(db.accounts[key].role==="reseller"?"reseller":"member")):null,developer:!!(ok&&db.accounts[key].developer),revoked:!!valid&&!ok&&accountAllowed,blockedByMaintenance:!!valid&&!accountAllowed,maintenance:Boolean(db.settings.maintenance),username:ok?db.accounts[key].username:null,guestId:ok?crypto.createHash("sha256").update("renox-account:"+key).digest("hex").slice(0,32):null});
     }
     if(req.method==="POST"&&route==="/api/auth/logout"){
       res.writeHead(200,{"Content-Type":"application/json","Set-Cookie":"renox_account=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0"});return res.end(JSON.stringify({ok:true}));
@@ -952,6 +1037,13 @@ const server = http.createServer(async (req, res) => {
     }
     if (route.startsWith("/api/owner/")) {
       if (!isOwner(req)) return json(res, 401, { error:"Owner access required." });
+      if(req.method==="POST"&&route==="/api/owner/account-role"){
+        const b=await readBody(req),key=String(b.username||"").trim().toLowerCase(),role=String(b.role||"").toLowerCase();
+        if(!db.accounts?.[key])return json(res,404,{error:"Akun tidak ditemukan."});
+        if(!["member","reseller"].includes(role))return json(res,400,{error:"Role harus member atau reseller. Admin hanya melalui akun developer."});
+        if(db.accounts[key].developer)return json(res,403,{error:"Role admin developer tidak dapat diturunkan melalui endpoint ini."});
+        db.accounts[key].role=role;await saveDB();return json(res,200,{ok:true,username:db.accounts[key].username,role});
+      }
       if (req.method === "GET" && route === "/api/owner/unban-requests") {
         return json(res,200,{requests:(db.unbanRequests||[]).map(x=>({...x,numberMasked:x.number.replace(/(\\d{3})\\d+(\\d{2})/,"$1••••$2")}))});
       }
