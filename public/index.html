@@ -554,6 +554,7 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
  <div class="nav" onclick="showPage('mobilelegends',this)"><i>◇</i><span>Mobile Legends</span></div>
  <div class="nav" onclick="showPage('community',this)"><i>▤</i><span>Global Chat</span></div>
  <div class="nav" onclick="showPage('pinterest',this)"><i>▧</i><span>Pinterest Search</span></div>
+ <div class="nav" onclick="showPage('searchtools',this)"><i>⌕</i><span>SFile & TikTok Search</span></div>
  <div class="nav" onclick="showPage('tiktok',this)"><i>♪</i><span>TikTok Lookup · Detail</span></div>
  <div class="nav" onclick="showPage('telegramlookup',this)"><i>➤</i><span>Telegram Lookup</span></div>
  <div class="nav" onclick="showPage('calculator',this)"><i>＋</i><span>Kalkulator</span></div>
@@ -716,6 +717,11 @@ Terima kasih.</textarea>
   <p class="hint">Tombol membuka draf email untuk ditinjau dan dikirim sendiri. Renox tidak mengirim email otomatis.</p>
  </div>
 </section>
+<section class="page" id="searchtools">
+ <div class="hero"><div class="mini">RENOX / DINONIC SEARCH TOOLS</div><h1>MEDIA <span>SEARCH</span></h1><p>Cari file publik di SFile dan video TikTok berdasarkan kata kunci.</p></div>
+ <div class="card"><h3>SFILE SEARCH</h3><div class="searchbox"><input id="sfileQuery" maxlength="120" placeholder="Cari nama file..." onkeydown="if(event.key==='Enter')runDinonicSearch('sfile')"><button onclick="runDinonicSearch('sfile')">SEARCH</button></div><div id="sfileStatus" class="hint" aria-live="polite"></div><div id="sfileResults" class="feed-list"></div></div>
+ <div class="card" style="margin-top:14px"><h3>TIKTOK VIDEO SEARCH</h3><div class="searchbox"><input id="tiktokSearchQuery" maxlength="120" placeholder="Cari video TikTok..." onkeydown="if(event.key==='Enter')runDinonicSearch('tiktok')"><button onclick="runDinonicSearch('tiktok')">SEARCH</button></div><div id="tiktokSearchStatus" class="hint" aria-live="polite"></div><div id="tiktokSearchResults" class="feed-list"></div></div>
+</section>
 <section class="page" id="pinterest">
  <div class="hero"><div class="mini">PUBLIC IMAGE DISCOVERY</div><h1>PINTEREST <span>SEARCH</span></h1><p>Cari inspirasi gambar publik berdasarkan kata kunci. Hasil dapat dibuka dan disimpan dari sumbernya.</p></div>
  <div class="card"><div class="searchbox"><input id="pinterestQuery" maxlength="120" placeholder="Contoh: anime wallpaper, gaming setup..." onkeydown="if(event.key==='Enter')searchPinterest()"><button onclick="searchPinterest()">CARI GAMBAR ↗</button></div><p class="hint" id="pinterestStatus">Pencarian langsung melalui Pinterest API resmi. Memerlukan akses Pinterest Search Partner Pins.</p><div id="pinterestResults" class="pinterest-grid"></div><div style="display:flex;justify-content:center;margin-top:16px"><button id="pinterestMore" class="secondary" style="display:none" onclick="loadMorePinterest()">MUAT LEBIH BANYAK</button></div></div>
@@ -829,7 +835,7 @@ function showPage(page,el){document.body.classList.toggle('renox-global-chat-ope
  if($(page))$(page).classList.add('active');updateRenoxHelperVisibility();
  document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
  if(el)el.classList.add('active');
- const titles={'wifi-lookup-page':'Lookup WiFi',menu:'Menu Navigasi',home:'Dashboard',shop:'Renox Shop',lookup:'Roblox Lookup',nexoai:'Nexo AI',noxmaps:'Nox Maps',history:'Search History',favorites:'Saved Friends',freefire:'Free Fire Lookup',mobilelegends:'Mobile Legends Lookup',community:'Global Chat',noxchat:'Nox Chat',pinterest:'Pinterest Search',privatechat:'Nox Chat',schedule:'Jadwal Pelajaran',calculator:'Kalkulator',tiktok:'TikTok Lookup',animestream:'Anime Streaming',telegramlookup:'Telegram Lookup',apps:'App Directory',renoxgame:'Renox Game',profile:'Account Profile',gethtml:'Get HTML',videodownloader:'Video Downloader',videolounge:'Video Lounge',amfinder:'AM Finder', 'temp-mail':'Temp Mail',checkban:'Unban Method',music:'Music Player',announcements:'Announcements',leaks:'Game Leaks',memes:'Reddit Memes',owner:'Owner Console',settings:'Display Settings',phoneinfo:'Phone Information'};
+ const titles={'wifi-lookup-page':'Lookup WiFi',menu:'Menu Navigasi',home:'Dashboard',shop:'Renox Shop',lookup:'Roblox Lookup',nexoai:'Nexo AI',noxmaps:'Nox Maps',history:'Search History',favorites:'Saved Friends',freefire:'Free Fire Lookup',mobilelegends:'Mobile Legends Lookup',community:'Global Chat',noxchat:'Nox Chat',pinterest:'Pinterest Search',searchtools:'SFile & TikTok Search',privatechat:'Nox Chat',schedule:'Jadwal Pelajaran',calculator:'Kalkulator',tiktok:'TikTok Lookup',animestream:'Anime Streaming',telegramlookup:'Telegram Lookup',apps:'App Directory',renoxgame:'Renox Game',profile:'Account Profile',gethtml:'Get HTML',videodownloader:'Video Downloader',videolounge:'Video Lounge',amfinder:'AM Finder', 'temp-mail':'Temp Mail',checkban:'Unban Method',music:'Music Player',announcements:'Announcements',leaks:'Game Leaks',memes:'Reddit Memes',owner:'Owner Console',settings:'Display Settings',phoneinfo:'Phone Information'};
  $('pageTitle').textContent=titles[page]||'Renox Project';
  if(page==='history')renderHistory();
  if(page==='favorites')renderFavorites();
@@ -1059,6 +1065,27 @@ let animeProvider='Bstation';const animeCatalogData=[{provider:'Bstation',title:
 function selectAnimeProvider(name,el){animeProvider=name;document.querySelectorAll('.anime-provider-tabs button').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===name.toLowerCase()));filterAnimeCatalog()}
 function filterAnimeCatalog(){const q=($('animeCatalogSearch').value||'').toLowerCase();const list=animeCatalogData.filter(x=>x.provider===animeProvider&&(!q||(x.title+' '+x.desc).toLowerCase().includes(q)));$('animeCatalog').innerHTML=list.map(x=>`<article class="anime-project-item"><small>${escapeText(x.provider.toUpperCase())} · PROJECT CATALOG</small><b>${escapeText(x.title)}</b><p>${escapeText(x.desc)}</p><button class="secondary" onclick="showAnimeProviderInfo()">LIHAT INFO PLAYER</button></article>`).join('');$('animeCatalogStatus').textContent='Provider aktif: '+animeProvider+' · daftar aktual bergantung pada feed resmi dan hak distribusi.'}
 function showAnimeProviderInfo(){$('animeProjectStatus').textContent=animeProvider+' tidak mengizinkan pemutar eksternal secara umum. RENOX tidak akan mengarahkan pengguna keluar atau membypass DRM/login/paywall.'}
+async function runDinonicSearch(kind){
+ const sfile=kind==='sfile',input=$(sfile?'sfileQuery':'tiktokSearchQuery'),status=$(sfile?'sfileStatus':'tiktokSearchStatus'),out=$(sfile?'sfileResults':'tiktokSearchResults');
+ const q=input.value.trim();if(q.length<2){status.textContent='Masukkan minimal 2 karakter.';return}
+ status.textContent='Menghubungkan ke Dinonic API...';out.innerHTML='';
+ try{
+  const endpoint=sfile?'/api/sfile-search?q='+encodeURIComponent(q)+'&page=1':'/api/tiktok-search?q='+encodeURIComponent(q);
+  const d=await apiJSON(endpoint),items=Array.isArray(d.results)?d.results:[];
+  if(!items.length){status.textContent='Tidak ada hasil yang dikenali dari provider.';return}
+  out.innerHTML=items.slice(0,30).map((item,i)=>{
+   const x=item&&typeof item==='object'?item:{title:String(item)};
+   const title=escapeText(x.title||x.name||x.filename||x.desc||('Hasil '+(i+1)));
+   const url=String(x.url||x.link||x.download||x.share_url||x.web_url||'');
+   const safeUrl=/^https?:\/\//i.test(url)?url:'';
+   const image=String(x.cover||x.coverUrl||x.thumbnail||x.thumb||x.image||'');
+   const safeImage=/^https:\/\//i.test(image)?image:'';
+   const meta=[x.size,x.duration,x.author,x.username,x.views].filter(Boolean).map(escapeText).join(' · ');
+   return '<article class="feed-item">'+(safeImage?'<img loading="lazy" style="width:100%;max-height:190px;object-fit:cover;border-radius:12px" src="'+escapeText(safeImage)+'" alt="">':'')+'<div><b>'+title+'</b>'+(meta?'<p>'+meta+'</p>':'')+(safeUrl?'<p><a href="'+escapeText(safeUrl)+'" target="_blank" rel="noopener noreferrer">BUKA HASIL ↗</a></p>':'')+'</div></article>';
+  }).join('');
+  status.textContent=items.length+' hasil · '+(d.provider||'Dinonic API');
+ }catch(e){status.textContent='⚠ '+e.message}
+}
 function addNexoMessage(role,content){
  const row=document.createElement('div');row.className='nexo-message '+role;
  const label=role==='user'?'ANDA':'NEXO AI';
@@ -1082,7 +1109,7 @@ async function sharePinterestPin(url,title){
 async function searchPinterest(){
  const q=$('pinterestQuery').value.trim(),out=$('pinterestResults'),status=$('pinterestStatus'),more=$('pinterestMore');
  if(q.length<2){status.textContent='Masukkan minimal 2 karakter.';return}
- pinterestBookmark=null;pinterestLastQuery=q;pinterestSeenImages=new Set();out.innerHTML='';more.style.display='none';status.textContent='Menghubungkan ke Pinterest API resmi...';
+ pinterestBookmark=null;pinterestLastQuery=q;pinterestSeenImages=new Set();out.innerHTML='';more.style.display='none';status.textContent='Menghubungkan ke Dinonic API...';
  await fetchPinterestPage(q,false);
 }
 async function loadMorePinterest(){if(!pinterestBookmark||!pinterestLastQuery)return;await fetchPinterestPage(pinterestLastQuery,true)}
