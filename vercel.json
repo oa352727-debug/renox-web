@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://denisrealbaik.sumber.reziki188.smasnug.web.id:3053/api/:path*"
+      "destination": "http://139.59.108.245:4807/api/:path*"
     }
   ]
 }
