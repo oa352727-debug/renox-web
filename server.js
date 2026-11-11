@@ -650,7 +650,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === "GET" && route === "/api/ff-lookup") {
       const id = cleanText(url.searchParams.get("id"), 40);
-      if (!/^\\d{5,20}$/.test(id)) return json(res, 400, { error: "Masukkan Player ID Free Fire yang valid." });
+      if (/^\d{5,20}$/.test(id) === false) return json(res, 400, { error: "Masukkan Player ID Free Fire yang valid." });
       if (!rateLimit(`ff:${getClientKey(req)}`, 8, 60000)) return json(res,429,{error:"Terlalu banyak pencarian Free Fire. Tunggu sebentar."});
       return json(res, 200, await dinonicGet("/stalk/ff", { id }));
     }
