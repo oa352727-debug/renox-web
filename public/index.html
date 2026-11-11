@@ -417,6 +417,61 @@ html.renox-no-shadows .sidebar,html.renox-no-shadows .hero,html.renox-no-shadows
 @media(max-width:700px){#phoneInfoGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.phone-info-tile{padding:12px}.home-announcement{align-items:flex-start;flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
 
+
+/* RENOX redesigned public welcome, login, cinematic splash and dashboard */
+#renoxWelcome{position:fixed;inset:0;z-index:10010;display:flex;justify-content:center;overflow-y:auto;padding:24px 18px 36px;background:#070707;color:#fff}
+#renoxWelcome:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(#ffffff0c 1px,transparent 1px),linear-gradient(90deg,#ffffff0c 1px,transparent 1px);background-size:58px 58px}
+.rw-inner{position:relative;width:min(680px,100%);display:flex;flex-direction:column;align-items:center;gap:22px;padding:16px 0}
+.rw-logo{width:142px;height:142px;object-fit:contain;border-radius:34px;filter:drop-shadow(0 0 24px #9c55ff66)}
+.rw-title{font-size:clamp(34px,8vw,52px);font-weight:950;letter-spacing:5px;text-align:center;text-shadow:0 0 24px #ffffff55}
+.rw-sub{padding:10px 22px;border:1px solid #ffffff80;border-radius:99px;color:#c6b3dc;font-size:11px;letter-spacing:2px}
+.rw-banner{width:100%;aspect-ratio:1.75;position:relative;overflow:hidden;border:2px solid #fff;border-radius:30px;background:#151020;box-shadow:0 15px 45px #000}
+.rw-banner img{width:100%;height:100%;object-fit:cover;display:block}
+.rw-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#08030a99,transparent 80%)}
+.rw-banner-copy{position:absolute;z-index:1;left:6%;bottom:8%;font-size:clamp(21px,5vw,34px);font-weight:900;font-style:italic;text-shadow:0 2px 9px #000}
+.rw-banner-copy small{display:block;font-size:clamp(12px,3vw,18px);margin-top:5px}
+.rw-features{width:100%;display:grid;gap:14px}
+.rw-feature{border:2px solid #fff;border-radius:24px;padding:19px 22px;background:#191919;display:flex;align-items:center;gap:20px;box-shadow:0 8px 25px #0008}
+.rw-feature-icon{width:68px;height:68px;flex:0 0 68px;border:1px solid #ffffff88;border-radius:20px;display:grid;place-items:center;font-size:30px;background:#ffffff12}
+.rw-feature b{font-size:19px;letter-spacing:1px}.rw-feature p{font-size:13px;color:#aaa;line-height:1.6;margin-top:6px}
+.rw-action{width:100%;min-height:72px;border-radius:28px;border:2px solid white;font-size:20px;font-weight:950;letter-spacing:2px}
+.rw-enter{background:#f2f2f2;color:#080808}.rw-buy{background:#171717;color:#fff;border-color:#fff}
+.rw-community{border:1px solid #fff;border-radius:18px;padding:13px 22px;color:#fff;text-decoration:none;font-weight:800;letter-spacing:1px}
+.rw-social{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%}.rw-social a{padding:17px 10px;text-align:center;border:2px solid #fff;border-radius:20px;color:#fff;text-decoration:none;font-weight:800}
+.rw-copy{font-size:12px;color:#888;border:1px solid #aaa;border-radius:12px;padding:9px 18px}
+#renoxSplash{position:fixed;inset:0;z-index:10020;background:#050309;display:none;align-items:center;justify-content:center;overflow:hidden;color:#fff}
+#renoxSplash.show{display:flex}
+#renoxSplash video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#renoxSplash:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#05030a35,#05030a70 65%,#05030ac9)}
+.rs-skip{position:absolute;z-index:3;right:22px;top:24px;border:1px solid #ffffff80;background:#101827d9;color:#fff;border-radius:99px;padding:12px 20px;font-weight:900;letter-spacing:2px}
+.rs-center{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px;width:min(520px,90%)}
+.rs-logo{width:150px;height:150px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 28px #a45cff)}
+.rs-title{font-size:clamp(30px,7vw,48px);font-weight:900;letter-spacing:3px;color:#c49aff;margin-top:22px}
+.rs-by{margin-top:20px;letter-spacing:4px;color:#eee}
+.rs-track{width:100%;height:7px;background:#ffffff40;border-radius:99px;margin-top:42px;overflow:hidden}
+.rs-track i{display:block;width:0;height:100%;background:linear-gradient(90deg,#8b43d8,#d5a6ff);transition:width .1s linear}
+.rs-percent{font-size:12px;letter-spacing:3px;color:#d5c3ee;margin-top:12px}
+#accountGate{display:none}
+.auth-card{width:min(620px,100%)!important}
+.auth-brandline{display:flex;flex-direction:column;align-items:center;gap:16px}
+.renox-login-mascot{display:none!important}
+.auth-brandline:before{content:"";display:block;width:118px;height:118px;background:url('https://files.catbox.moe/fbk1xn.png') center/contain no-repeat;filter:drop-shadow(0 0 22px #9b5bff)}
+.auth-heading h1{font-size:clamp(36px,8vw,48px)!important;line-height:1.1!important}
+.auth-pill{display:none}
+.auth-heading:after{content:"Masuk untuk melanjutkan";font-size:15px;color:#aaa;margin-top:10px}
+.auth-art{display:none}
+.auth-form{padding:24px;border:2px solid #fff;border-radius:28px;background:#171717e8;box-shadow:0 12px 40px #0008}
+.auth-card .auth-input-wrap{border:2px solid #fff!important;border-radius:20px!important;background:#101010!important}
+.auth-login{background:linear-gradient(110deg,#fff,#ddd)!important;color:#080808!important;letter-spacing:1px!important}
+.auth-login:before{content:"↪ ";font-size:20px}
+.auth-register{background:#ffffff10!important;border:1px solid #ffffff55!important}
+.auth-foot{margin-top:20px;color:#888}
+.renox-dashboard-hero{position:relative;overflow:hidden;border:1px solid #ffffff24;border-radius:23px;padding:21px;margin:0 0 18px;background:linear-gradient(120deg,#20133bdf,#0b0b13ed);box-shadow:0 14px 40px #0005}
+.renox-dashboard-hero:after{content:"";position:absolute;right:-40px;top:-80px;width:240px;height:240px;border-radius:50%;border:1px solid #b47bff35;box-shadow:0 0 0 18px #a56bff0a,0 0 0 38px #a56bff08}
+.rdh-kicker{font-size:9px;letter-spacing:3px;color:#c29cff}.rdh-title{font-size:clamp(24px,5vw,34px);margin:8px 0}.rdh-title span{color:#c29cff}.rdh-desc{font-size:11px;color:#aeb0c0;line-height:1.7}
+.rdh-status{display:inline-flex;align-items:center;gap:8px;border:1px solid #5cda9a55;border-radius:30px;padding:8px 11px;color:#7be3ad;font-size:10px;margin-top:15px}
+@media(max-width:550px){#renoxWelcome{padding:16px 14px 30px}.rw-inner{gap:17px}.rw-logo{width:120px;height:120px}.rw-feature{padding:15px}.rw-feature-icon{width:56px;height:56px;flex-basis:56px}.rw-feature b{font-size:16px}.rw-feature p{font-size:11px}.rw-action{min-height:64px;font-size:17px}.auth-form{padding:18px}.rs-logo{width:125px;height:125px}}
+
 </style>
 <style id="renox-wa-comic-update">
 body.renox-comic-theme{background:#fffaf0!important;color:#171717!important}body.renox-comic-theme:before{background:radial-gradient(circle,#242424 1px,transparent 1.4px) 0 0/17px 17px,linear-gradient(180deg,#fffdf7,#fff4e7)!important}
@@ -521,16 +576,40 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
 </style>
 </head>
 <body class="auth-locked">
-<div id="accountGate" class="renox-auth-gate">
+<div id="renoxWelcome">
+ <div class="rw-inner">
+  <img class="rw-logo" src="https://files.catbox.moe/fbk1xn.png" alt="Renox Project">
+  <h1 class="rw-title">Renox Project</h1>
+  <div class="rw-sub">● PROJECT · POWERED BY @diszrenox</div>
+  <div class="rw-banner"><img src="https://files.catbox.moe/vy3gr6.jpg" alt="Renox Project banner"><div class="rw-banner-copy">Renox Project<small>Powered By @diszrenox</small></div></div>
+  <div class="rw-features">
+   <div class="rw-feature"><span class="rw-feature-icon">ϟ</span><div><b>ULTRA FAST</b><p>Lightning speed performance &amp; low latency execution.</p></div></div>
+   <div class="rw-feature"><span class="rw-feature-icon">⬟</span><div><b>SECURE</b><p>Account protection and secure project access.</p></div></div>
+   <div class="rw-feature"><span class="rw-feature-icon">◉</span><div><b>POWERFUL</b><p>Advanced tools &amp; remote access features built-in.</p></div></div>
+  </div>
+  <button class="rw-action rw-enter" onclick="openRenoxLogin()">⇥ &nbsp; ENTER LOGIN &nbsp; →</button>
+  <button class="rw-action rw-buy" onclick="launchTelegram('diszrenox')">♧ &nbsp; BUY ACCESS &nbsp; VIA TG</button>
+  <a class="rw-community" href="https://t.me/diszrenox" target="_blank" rel="noopener">♟ &nbsp; JOIN RENOX COMMUNITY</a>
+  <div class="rw-social"><a href="https://t.me/diszrenox" target="_blank" rel="noopener">◉ &nbsp; Telegram</a><a href="https://wa.me/" target="_blank" rel="noopener">◉ &nbsp; WhatsApp</a></div>
+  <div class="rw-copy">© 2026Renox Project</div>
+ </div>
+</div>
+<div id="renoxSplash" aria-label="Renox Project loading">
+ <video id="renoxSplashVideo" src="https://files.catbox.moe/88u8v3.mp4" playsinline muted preload="auto"></video>
+ <button class="rs-skip" onclick="finishRenoxSplash()">⏭ Skip</button>
+ <div class="rs-center"><img class="rs-logo" src="https://files.catbox.moe/fbk1xn.png" alt="Renox"><div class="rs-title">Renox Project</div><div class="rs-by">✦ &nbsp; by Nox &nbsp; ✦</div><div class="rs-track"><i id="renoxSplashProgress"></i></div><div class="rs-percent" id="renoxSplashPercent">0% · Loading...</div></div>
+</div>
+
+<div id="accountGate" class="renox-auth-gate" style="display:none">
  <div class="auth-scene"></div><div class="auth-vignette"></div>
  <div class="auth-card">
-  <div class="auth-heading"><div class="auth-brandline"><svg class="renox-login-mascot" viewBox="0 0 72 72" role="img" aria-label="Maskot Renox"><defs><linearGradient id="renoxMascotGradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#55e5ff"/><stop offset="1" stop-color="#9a69ff"/></linearGradient></defs><path d="M36 7v8M30 7h12M16 30a20 20 0 0 1 40 0v20a9 9 0 0 1-9 9H25a9 9 0 0 1-9-9V30Z" fill="url(#renoxMascotGradient)" stroke="#e9faff" stroke-width="2.5"/><path d="M26 34h.5M46 34h.5M27 44q9 9 18 0" stroke="#10162c" stroke-width="4" stroke-linecap="round"/><path d="M8 38h8M56 38h8" stroke="#8beaff" stroke-width="3" stroke-linecap="round"/></svg><h1>Renox<br>Project</h1></div><span class="auth-pill">U N B A N  X  L O O K U P</span></div>
+  <div class="auth-heading"><div class="auth-brandline"><h1>Renox Project</h1></div></div>
   <div class="auth-art"><img src="/login-anime.jpg" alt="Artwork Renox Project"></div>
   <div class="auth-form">
    <label class="auth-input-wrap"><span class="auth-input-icon" aria-hidden="true">🔒</span><input id="gateUsername" class="field auth-field" maxlength="24" placeholder="USERNAME" autocomplete="username" aria-label="Username"></label>
    <label class="auth-input-wrap"><span class="auth-input-icon" aria-hidden="true">🔒</span><input id="gatePassword" class="field auth-field" type="password" maxlength="128" placeholder="PASSWORD" autocomplete="current-password" aria-label="Password"><button type="button" class="auth-eye" onclick="toggleGatePassword()" aria-label="Tampilkan password">◉</button></label>
    <label class="remember-login"><input id="rememberLogin" type="checkbox"><span class="remember-switch" aria-hidden="true"></span><span class="remember-text">Simpan login di perangkat ini</span></label>
-   <div class="auth-actions"><button id="gateLoginButton" class="primary auth-login" onclick="gateAuth('login')">L O G I N</button><button class="auth-register" onclick="gateAuth('register')">BUAT AKUN BARU</button></div>
+   <div class="auth-actions"><button id="gateLoginButton" class="primary auth-login" onclick="gateAuth('login')">MASUK</button><button class="auth-register" onclick="gateAuth('register')">BUAT AKUN BARU</button></div>
    <div id="gateStatus" class="hint auth-status" aria-live="polite"></div>
    <div class="auth-foot"><span>● SYSTEM ONLINE</span><span>RENОX PROJECT</span></div>
   </div>
@@ -592,6 +671,8 @@ body.renox-comic-theme .home-feature-tile{background:#fff!important;border:2px s
 </div>
 
 <section class="page active" id="home">
+<div class="renox-dashboard-hero"><div class="rdh-kicker">RENOX PROJECT / PERSONAL CONTROL CENTER</div><h2 class="rdh-title">Welcome Back, <span id="rdhAccountName">Renox Member</span></h2><p class="rdh-desc">Your tools, community and project controls — all in one place.</p><div class="rdh-status">● &nbsp; All systems running smoothly</div></div>
+
 <div class="home-announcement card" id="homeAnnouncement"><div class="home-announcement-mark"><svg class="speaker-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l6 5V5l-6 5H3Zm13-2a6 6 0 0 1 0 8m2-11a10 10 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>RENOX BULLETIN</span></div><div><b id="homeAnnouncementTitle">Memuat pengumuman terbaru...</b><p id="homeAnnouncementText">Update resmi komunitas akan tampil di sini.</p></div><button onclick="showPage('announcements')">LIHAT ↗</button></div>
 
 <div class="card hadith-card home-hadith-card"><div class="section-head"><h3>📜 HADIST HARI INI</h3><span>DAILY REFLECTION</span></div><div class="hadith-mark">❝</div><blockquote id="dailyHadith">“Sesungguhnya amal itu tergantung pada niatnya.”</blockquote><p id="hadithSource">HR. Bukhari dan Muslim</p></div>
@@ -955,6 +1036,45 @@ let guestProfile={id:guestId,name:'Guest-'+guestId.slice(0,4),avatar:''};
 try{const cached=JSON.parse(localStorage.getItem('renoxProfile:'+guestId)||'null');if(cached)guestProfile={...guestProfile,...cached}}catch(e){}
 let lastChatTime=0;let renoxOwnerMode=false;
 function escapeText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+let renoxLoginRequested=false,renoxSplashShown=false,renoxSplashTimer=null;
+function renoxErrorText(error){
+ const value=error?.message??error;
+ if(typeof value==='string')return value;
+ if(value&&typeof value==='object'){
+  for(const k of ['error','message','details','reason'])if(typeof value[k]==='string'&&value[k].trim())return value[k];
+  try{return JSON.stringify(value)}catch{}
+ }
+ return 'Kesalahan API tidak diketahui';
+}
+function openRenoxLogin(){
+ renoxLoginRequested=true;
+ const welcome=document.getElementById('renoxWelcome'),gate=document.getElementById('accountGate');
+ if(welcome)welcome.style.display='none';
+ if(gate){gate.style.display='flex';gate.scrollTop=0}
+ const user=document.getElementById('gateUsername');if(user)user.focus({preventScroll:true});
+}
+function showRenoxSplash(){
+ const box=document.getElementById('renoxSplash'),video=document.getElementById('renoxSplashVideo'),bar=document.getElementById('renoxSplashProgress'),label=document.getElementById('renoxSplashPercent');
+ if(!box||!video)return;
+ renoxSplashShown=true;box.classList.add('show');video.currentTime=0;
+ const update=()=>{
+  const duration=Number.isFinite(video.duration)&&video.duration>0?video.duration:0;
+  const pct=duration?Math.min(100,Math.round(video.currentTime/duration*100)):0;
+  if(bar)bar.style.width=pct+'%';if(label)label.textContent=pct+'% · Loading...';
+ };
+ video.addEventListener('timeupdate',update);
+ video.addEventListener('loadedmetadata',update,{once:true});
+ video.addEventListener('ended',finishRenoxSplash,{once:true});
+ video.play().catch(()=>{if(label)label.textContent='Video belum dapat diputar · tekan Skip'});
+}
+function finishRenoxSplash(){
+ const box=document.getElementById('renoxSplash'),video=document.getElementById('renoxSplashVideo'),bar=document.getElementById('renoxSplashProgress'),label=document.getElementById('renoxSplashPercent');
+ if(video){video.pause();video.removeAttribute('src');video.load()}
+ if(bar)bar.style.width='100%';if(label)label.textContent='100% · Ready';
+ if(box)box.classList.remove('show');
+}
+
 async function apiJSON(url,options={}){let r;try{r=await fetch(url,{credentials:'same-origin',cache:'no-store',...options,headers:{'Accept':'application/json','Content-Type':'application/json',...(options.headers||{})}})}catch(e){throw new Error('Tidak dapat terhubung ke server RENOX. Periksa backend Pterodactyl dan koneksi API.')}const raw=await r.text();let d={};if(raw){try{d=JSON.parse(raw)}catch{throw new Error('Server mengirim respons bukan JSON (HTTP '+r.status+'). Periksa backend/API.')}}if(!r.ok)throw new Error(d.error||d.message||('Server error HTTP '+r.status));return d}
 function renoxAvatarFallback(){
  const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="80" fill="#858b98"/><circle cx="80" cy="57" r="29" fill="#d9dce2"/><path d="M24 148c5-34 26-51 56-51s51 17 56 51" fill="#d9dce2"/></svg>';
@@ -1650,14 +1770,14 @@ async function checkAccount(){
  let d;
  try{d=await apiJSON('/api/auth/me')}catch(e){
   document.body.classList.add('auth-locked');
-  const gate=$('accountGate');if(gate)gate.style.display='flex';
-  const status=$('gateStatus');if(status)status.textContent='Gagal memeriksa sesi: '+(e?.message||'Kesalahan API tidak diketahui');
+  const gate=$('accountGate');if(gate)gate.style.display=renoxLoginRequested?'flex':'none';
+  const status=$('gateStatus');if(status)status.textContent='Gagal memeriksa sesi: '+renoxErrorText(e);
   return false;
  }
  const authenticated=!!d.authenticated;
  const locked=!authenticated||!!d.blockedByMaintenance||!!d.revoked;
  document.body.classList.toggle('auth-locked',locked);document.body.classList.toggle('renox-authenticated',!locked);
- const gate=$('accountGate');if(gate)gate.style.display=locked?'flex':'none';
+ const gate=$('accountGate');if(gate)gate.style.display=(locked&&renoxLoginRequested)?'flex':'none';
  if(!authenticated){updateRenoxHelperVisibility();
   const status=$('gateStatus');
   if(status&&d.blockedByMaintenance)status.textContent='RENOX sedang maintenance. Login hanya tersedia untuk developer dan staff.';
@@ -1665,7 +1785,7 @@ async function checkAccount(){
   const authStatus=$('authStatus');if(authStatus)authStatus.textContent='Sesi belum login.';
   return false;
  }
- const accountName=d.username||'Member';renoxAccountName=accountName;guestProfile.name=accountName;
+ const accountName=d.username||'Member';renoxAccountName=accountName;guestProfile.name=accountName;if($('rdhAccountName'))$('rdhAccountName').textContent=accountName;
  const authStatus=$('authStatus');if(authStatus)authStatus.textContent='✓ Login aktif sebagai '+accountName;
  // Autentikasi sudah berhasil. Kesalahan pemuatan profil/dashboard tidak boleh
  // mengunci pengguna kembali ke layar login.
@@ -1693,6 +1813,7 @@ async function checkAccount(){
  }catch(e){console.warn('RENOX dashboard initialization:',e)}
  if(d.developer){try{await checkDeveloper()}catch(e){console.warn('Developer session:',e.message)}}
  updateRenoxHelperVisibility();
+ if(!renoxSplashShown)showRenoxSplash();
  return true;
 }
 function fmtBytes(n){if(!Number.isFinite(n))return'—';const u=['B','KB','MB','GB','TB'];let i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return n.toFixed(i?1:0)+' '+u[i]}
