@@ -1,23 +1,6 @@
-const http = require("http");
-// Load local .env values without an external dependency (Pterodactyl variables still take priority).
-(function loadEnvFile() {
-  try {
-    const envPath = path.join(__dirname, ".env");
-    if (!fs.existsSync(envPath)) return;
-    for (const line of fs.readFileSync(envPath, "utf8").split(/\\r?\\n/)) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith("#")) continue;
-      const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*(.*)$/);
-      if (!match || process.env[match[1]] !== undefined) continue;
-      let value = match[2].trim();
-      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) value = value.slice(1, -1);
-      process.env[match[1]] = value;
-    }
-  } catch (error) {
-    console.error("[Renox] Gagal membaca .env:", error.message);
-  }
-})();
+require("dotenv").config();
 
+const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
