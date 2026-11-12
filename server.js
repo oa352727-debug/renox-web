@@ -60,7 +60,7 @@ try {
   console.error("[Renox] Bot.js tidak dimuat:", error.message);
 }
 
-const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 26186);
+const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 4807);
 const HOST = "0.0.0.0";
 const PUBLIC = path.join(__dirname, "public");
 // Gunakan volume persisten Pterodactyl bila tersedia.
