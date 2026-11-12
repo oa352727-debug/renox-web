@@ -380,6 +380,10 @@ input,.field,textarea,select{background:rgba(8,12,25,.38)!important;border:1px s
 .favorite-grid{display:grid;gap:10px}.favorite-card{display:flex;align-items:center;gap:12px;padding:13px;border-radius:16px;background:linear-gradient(140deg,#252a39,#121722);border:1px solid #ffffff18}.favorite-card img{width:48px;height:48px;object-fit:cover;border-radius:13px}.favorite-card div{flex:1;min-width:0}.favorite-card b,.favorite-card small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.favorite-card b{font-size:13px}.favorite-card small{font-size:10px;color:#9ba6ba;margin-top:4px}.favorite-card a,.favorite-card button{font-size:9px;color:white;text-decoration:none;border:1px solid #ffffff25;background:#ffffff0b;border-radius:9px;padding:9px}
 @media(max-width:700px){.sidebar{width:min(82vw,300px);padding:20px 14px}.sidebar-profile{margin-bottom:12px}main{width:100%;margin-left:0}.home-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.favorite-card{flex-wrap:wrap}.favorite-card div{min-width:calc(100% - 75px)}.favorite-card a,.favorite-card button{margin-left:5px}.status-compose-card{padding:22px 17px}}
 
+
+/* Authenticated users must be able to dismiss the login gate. The visual theme sets display:flex!important, so an ordinary inline display:none is not enough. */
+body.renox-authenticated #accountGate{display:none!important;visibility:hidden!important;pointer-events:none!important}
+body.auth-locked #accountGate{display:flex!important;visibility:visible!important;pointer-events:auto!important}
 /* Login gate: hide all app navigation/content until authenticated */
 body.auth-locked .layout,
 body.auth-locked #projectAudioToggle,
