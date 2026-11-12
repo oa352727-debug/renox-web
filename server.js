@@ -6,13 +6,39 @@ const os = require("os");
 const { spawn } = require("child_process");
 const { promisify } = require("util");
 const execFile = promisify(require("child_process").execFile);
-let telegramMonitor = { notifyNewRegistration: () => {} };
+let telegramMonitor = {
+  notifyNewRegistration() {}, notifyAnnouncement() {}, notifyMaintenance() {}
+};
 try {
-  const { createTelegramMonitor } = require("./telegram-monitor.js");
-  telegramMonitor = createTelegramMonitor();
+  const { createRenoxBot } = require("./bot.js");
+  telegramMonitor = createRenoxBot({
+    getStats: () => ({
+      users: Object.keys(db.accounts || {}).length,
+      profiles: Object.keys(db.profiles || {}).length,
+      online: Object.values(db.profiles || {}).filter(p => Date.now() - (p.lastSeen || 0) < PRESENCE_TTL).length,
+      messages: (db.messages || []).length,
+      maintenance: Boolean(db.settings?.maintenance),
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      cpuCount: os.cpus().length
+    }),
+    setMaintenance: async (enabled, reason) => {
+      db.settings.maintenance = Boolean(enabled);
+      db.settings.maintenanceReason = cleanText(reason || (enabled ? "Maintenance oleh developer" : ""), 180);
+      await saveDB();
+      return { maintenance: db.settings.maintenance, reason: db.settings.maintenanceReason };
+    },
+    createAnnouncement: async (title, content) => {
+      const item = { id: crypto.randomUUID(), title: cleanText(title, 100), content: cleanText(content, 1200), createdAt: Date.now(), author: "RENOX TELEGRAM BOT" };
+      if (!item.title || !item.content) throw new Error("Judul dan isi pengumuman wajib diisi.");
+      db.announcements.unshift(item);
+      while (db.announcements.length > 50) db.announcements.pop();
+      await saveDB();
+      return item;
+    }
+  });
 } catch (error) {
-  console.error("[Renox] Telegram bot tidak dimuat:", error.message);
-  console.error("[Renox] Pastikan bot.js berada satu folder dengan server.js.");
+  console.error("[Renox] Bot.js tidak dimuat:", error.message);
 }
 
 const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 26186);
@@ -1024,6 +1050,7 @@ const server = http.createServer(async (req, res) => {
       }
       if (req.method === "POST" && route === "/api/owner/maintenance") {
         const b = await readBody(req); db.settings.maintenance = Boolean(b.enabled); db.settings.maintenanceReason = cleanText(b.reason,180); db.settings.maintenanceAffected = cleanText(b.affected,500); db.settings.maintenanceUntil = String(b.until || "").slice(0,32); await saveDB();
+        telegramMonitor.notifyMaintenance(db.settings.maintenance, db.settings.maintenanceReason).catch(() => {});
         return json(res,200,{ ok:true, maintenance:db.settings.maintenance, maintenanceReason:db.settings.maintenanceReason, maintenanceAffected:db.settings.maintenanceAffected, maintenanceUntil:db.settings.maintenanceUntil, botActive:Date.now()-botHeartbeatAt<45000 });
       }
       if (req.method === "POST" && (route === "/api/owner/announcements" || route === "/api/owner/leaks")) {
@@ -1031,7 +1058,9 @@ const server = http.createServer(async (req, res) => {
         if (!title || !content) return json(res,400,{error:"Judul dan isi wajib diisi."});
         const target = route.endsWith("announcements") ? db.announcements : db.leaks;
         target.unshift({ id:crypto.randomUUID(), title, content, createdAt:Date.now(), author:"RENOX OWNER" });
-        while(target.length>50)target.pop(); await saveDB(); return json(res,201,{ok:true,item:target[0]});
+        while(target.length>50)target.pop(); await saveDB();
+        if (route.endsWith("announcements")) telegramMonitor.notifyAnnouncement(target[0]).catch(() => {});
+        return json(res,201,{ok:true,item:target[0]});
       }
       if (req.method === "DELETE" && route.startsWith("/api/owner/announcements/")) {
         const id = route.split("/").pop(); db.announcements=db.announcements.filter(x=>x.id!==id); await saveDB(); return json(res,200,{ok:true});
