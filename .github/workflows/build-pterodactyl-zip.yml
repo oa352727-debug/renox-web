@@ -38,6 +38,7 @@ jobs:
           mkdir -p renox-pterodactyl/public
           cp server.js telegram-monitor.js package.json renox-pterodactyl/
           cp public/index.html renox-pterodactyl/public/index.html
+          cp public/login-anime.jpg renox-pterodactyl/public/login-anime.jpg
           cat > renox-pterodactyl/README-INSTALL.txt <<'EOF'
           RENOX PROJECT + TELEGRAM MONITOR (ONE PROCESS)
           
@@ -52,11 +53,12 @@ jobs:
           2. Upload/extract these files into the Pterodactyl server root.
           3. Replace server.js, telegram-monitor.js, package.json, and public/index.html.
           4. Keep the existing data/renox-db.json unchanged.
-          5. Set PORT to the Pterodactyl allocation (currently 3058, if unchanged).
-          6. Add TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in Pterodactyl Startup / Environment.
+          5. Set PORT to the port allocation shown in your Pterodactyl panel (do not assume an old port).
+          6. Add DINONIC_API_KEY if using Dinonic features. Add TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID only if using the Telegram monitor. Set these in Pterodactyl Startup / Environment.
           7. Run npm install if dependencies are not installed, then restart the server.
           
           TELEGRAM ENVIRONMENT:
+          DINONIC_API_KEY=your_dinonic_api_key
           TELEGRAM_BOT_TOKEN=token_from_BotFather
           TELEGRAM_CHAT_ID=your_private_chat_or_group_id
           
