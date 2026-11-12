@@ -292,6 +292,19 @@ const server = http.createServer(async (req, res) => {
     const requestIp=getClientIp(req); if(db.bannedIps?.[requestIp] && !route.startsWith("/api/owner/")) return json(res,403,{error:"Akses dari alamat IP ini dibatasi oleh developer."});
   try {
     if (req.method === "GET" && route === "/api/health") return json(res, 200, { project: "RENOX PROJECT", status: "ONLINE", version: RELEASE.version, uptime: Math.floor(process.uptime()), pid: process.pid });
+    if (req.method === "POST" && route === "/api/tools/red-blue-pill") {
+      const apiKey = String(process.env.DINONIC_API_KEY || "").trim();
+      if (!apiKey) return json(res, 503, { error: "Fitur belum dikonfigurasi. Isi DINONIC_API_KEY di environment server." });
+      const body = await readBody(req);
+      const atas = cleanText(body.atas, 180), kiri = cleanText(body.kiri, 80), kanan = cleanText(body.kanan, 80);
+      if (!atas || !kiri || !kanan) return json(res, 400, { error: "Teks pertanyaan dan kedua pilihan wajib diisi." });
+      const endpoint = new URL("https://api.dinonic.web.id/canvas/red-blue-pill-meme");
+      endpoint.searchParams.set("apikey", apiKey); endpoint.searchParams.set("atas", atas); endpoint.searchParams.set("kiri", kiri); endpoint.searchParams.set("kanan", kanan);
+      const upstream = await fetch(endpoint, { headers: { "Accept": "application/json", "User-Agent": "RenoxProject/10.2" }, signal: AbortSignal.timeout(30000) });
+      const raw = await upstream.text(); let payload; try { payload = JSON.parse(raw); } catch { payload = { result: raw.slice(0, 4000) }; }
+      if (!upstream.ok) return json(res, 502, { error: "Dinonic API gagal memproses meme.", status: upstream.status });
+      return json(res, 200, payload);
+    }
     if(req.method==="GET"&&route==="/api/bot/events"){
       const configured=String(process.env.RENOX_BOT_TOKEN||"");
       const supplied=String(req.headers["x-renox-bot-token"]||"");
