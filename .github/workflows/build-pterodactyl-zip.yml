@@ -7,6 +7,7 @@ on:
       - 'server.js'
       - 'telegram-monitor.js'
       - 'bot.js'
+      - '.env.example'
       - 'public/index.html'
       - 'index.html'
       - 'package.json'
@@ -39,45 +40,39 @@ jobs:
         run: |
           mkdir -p renox-pterodactyl/public
           cp server.js bot.js package.json renox-pterodactyl/
+          cp .env.example renox-pterodactyl/.env
           cp public/index.html renox-pterodactyl/public/index.html
           cp public/login-anime.jpg renox-pterodactyl/public/login-anime.jpg
           cat > renox-pterodactyl/README-INSTALL.txt <<'EOF'
-          RENOX PROJECT + TELEGRAM MONITOR (ONE PROCESS)
-          
-          IMPORTANT:
-          - This package runs Renox and the Telegram bot in the SAME Node.js process.
-          - bot.js is loaded by server.js; no extra port or second process is needed.
-          - No Pterodactyl API URL/key is needed.
-          - Keep your existing data/renox-db.json. Back it up first and NEVER replace it with a blank database.
-          
+          RENOX PROJECT + TELEGRAM BOT (ONE PROCESS)
+
           INSTALL:
           1. Back up data/renox-db.json.
-          2. Upload/extract these files into the Pterodactyl server root.
-          3. Replace server.js, telegram-monitor.js, package.json, and public/index.html.
-          4. Keep the existing data/renox-db.json unchanged.
-          5. Set PORT to the port allocation shown in your Pterodactyl panel (do not assume an old port).
-          6. Add DINONIC_API_KEY if using Dinonic features. Add TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID only if using the Telegram monitor. Set these in Pterodactyl Startup / Environment.
-          7. Run npm install if dependencies are not installed, then restart the server.
-          
-          TELEGRAM ENVIRONMENT:
+          2. Upload/extract ZIP into the Pterodactyl server root.
+          3. Replace server.js, bot.js, package.json, and public/index.html.
+          4. Edit .env and fill in your own credentials. Alternatively configure variables in Pterodactyl Startup.
+          5. Keep your existing data/renox-db.json unchanged.
+          6. Set PORT to the allocation shown in Pterodactyl.
+          7. Run npm install, then npm start.
+
+          .ENV VALUES:
+          PORT=your_pterodactyl_allocation
           DINONIC_API_KEY=your_dinonic_api_key
-          TELEGRAM_BOT_TOKEN=token_from_BotFather
+          TELEGRAM_BOT_TOKEN=your_botfather_token
           TELEGRAM_CHAT_ID=your_private_chat_or_group_id
           TELEGRAM_ADMIN_IDS=your_numeric_telegram_user_id
-          
-          FEATURES:
-          - Sends a startup notification when Renox starts.
-          - Sends new-registration notifications with the username.
-          - Sends server/user statistics every 10 minutes and on /stats or /status.
-          - Reports registered accounts, profiles, online users, messages, RAM, CPU cores, uptime, and maintenance.
-          - Dashboard announcements and maintenance changes are automatically sent to Telegram.
-          - Admin commands: /maintenance_on, /maintenance_off, /announce Title | Content.
-          - /start and /help show bot usage.
-          
-          UPTIME means the current server.js process runtime. It resets when the Pterodactyl process restarts.
-          IMPORTANT: Set TELEGRAM_ADMIN_IDS to trusted numeric Telegram user IDs. Without it, management commands remain locked.
-          If Renox is OFF, its in-process bot is also offline and cannot send an OFF message.
-          Keep Telegram credentials private. Do not commit them to GitHub.
+
+          BOT COMMANDS:
+          /start /help — bantuan
+          /status /stats — statistik server dan user
+          /maintenance — status maintenance
+          /maintenance_on [reason] — aktifkan maintenance (admin)
+          /maintenance_off — nonaktifkan maintenance (admin)
+          /announce Title | Content — buat pengumuman Renox (admin)
+
+          Dashboard announcements and maintenance changes are automatically broadcast to Telegram.
+          Set TELEGRAM_ADMIN_IDS to trusted numeric Telegram user IDs. Do not share your .env or commit real credentials to GitHub.
+          Uptime resets when the Node.js process restarts.
           EOF
           cd renox-pterodactyl
           zip -r ../Renox-Pterodactyl-OneProcess.zip .
