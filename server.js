@@ -8,7 +8,7 @@ const { promisify } = require("util");
 const execFile = promisify(require("child_process").execFile);
 let telegramMonitor = { notifyNewRegistration: () => {} };
 try {
-  const { createTelegramMonitor } = require("./bot.js");
+  const { createTelegramMonitor } = require("./telegram-monitor.js");
   telegramMonitor = createTelegramMonitor();
 } catch (error) {
   console.error("[Renox] Telegram bot tidak dimuat:", error.message);
