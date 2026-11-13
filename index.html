@@ -385,6 +385,15 @@ input,.field,textarea,select{background:rgba(8,12,25,.38)!important;border:1px s
 body.renox-authenticated #accountGate{display:none!important;visibility:hidden!important;pointer-events:none!important}
 body.auth-locked #accountGate{display:flex!important;visibility:visible!important;pointer-events:auto!important}
 /* Login gate: hide all app navigation/content until authenticated */
+/* Hard lock every floating navigation/helper layer before a valid session. */
+body.auth-locked #renoxBottomNav,
+body.auth-locked .renox-bottom-nav,
+body.auth-locked #renoxHelperLauncher,
+body.auth-locked #renoxHelperOverlay,
+body.auth-locked [id*="renoxHelper"],
+body.auth-locked .renox-helper,
+body.auth-locked .renox-helper-launcher,
+body.auth-locked .renox-helper-overlay{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
 body.auth-locked .layout,
 body.auth-locked #projectAudioToggle,
 body.auth-locked .project-audio-toggle,
@@ -1802,49 +1811,56 @@ async function checkAccount(){
  let d;
  try{d=await apiJSON('/api/auth/me')}catch(e){
   document.body.classList.add('auth-locked');
+  document.body.classList.remove('renox-authenticated');
   const gate=$('accountGate');if(gate)gate.style.display='flex';
   const status=$('gateStatus');if(status)status.textContent='Gagal memeriksa sesi: '+(e?.message||'Kesalahan API tidak diketahui');
+  updateRenoxHelperVisibility();
   return false;
  }
  const authenticated=!!d.authenticated;
  const locked=!authenticated||!!d.blockedByMaintenance||!!d.revoked;
- document.body.classList.toggle('auth-locked',locked);document.body.classList.toggle('renox-authenticated',!locked);
+ document.body.classList.toggle('auth-locked',locked);
+ document.body.classList.toggle('renox-authenticated',!locked);
  const gate=$('accountGate');if(gate)gate.style.display=locked?'flex':'none';
- if(!authenticated){updateRenoxHelperVisibility();
+ if(!authenticated){
+  updateRenoxHelperVisibility();
   const status=$('gateStatus');
   if(status&&d.blockedByMaintenance)status.textContent='RENOX sedang maintenance. Login hanya tersedia untuk developer dan staff.';
   else if(status&&d.revoked)status.textContent='Akun ini keluar karena digunakan di perangkat lain.';
   const authStatus=$('authStatus');if(authStatus)authStatus.textContent='Sesi belum login.';
   return false;
  }
- const accountName=d.username||'Member';renoxAccountName=accountName;guestProfile.name=accountName;
+ const accountName=d.username||'Member';
+ renoxAccountName=accountName;
+ guestProfile.name=accountName;
  const authStatus=$('authStatus');if(authStatus)authStatus.textContent='✓ Login aktif sebagai '+accountName;
- // Autentikasi sudah berhasil. Kesalahan pemuatan profil/dashboard tidak boleh
- // mengunci pengguna kembali ke layar login.
- try{
-  if(d.guestId&&d.guestId!==guestId){
-   guestId=d.guestId;
-   try{localStorage.setItem(GUEST_KEY,guestId)}catch(e){}
-   let cached=null;
-   try{cached=JSON.parse(localStorage.getItem('renoxProfile:'+guestId)||'null')}catch(e){}
-   try{const existing=await apiJSON('/api/profile/'+encodeURIComponent(guestId));cached=existing.profile}catch(e){}
-   guestProfile=cached?{...guestProfile,...cached,id:guestId}:{...guestProfile,id:guestId};
-   if(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name))guestProfile.name=accountName;
-   if(!cached||/^Guest(?:-|$)/i.test(cached?.name||'')){
-    try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:guestProfile.name||accountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile=saved.profile}catch(e){}
-   }
-  }else if(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name)){
-   guestProfile.name=accountName;
-   try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:accountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile=saved.profile}catch(e){console.warn('Account profile sync:',e.message)}
-  }
-  try{localStorage.setItem('renoxProfile:'+guestId,JSON.stringify(guestProfile))}catch(e){}
-  try{updateGuestPreview()}catch(e){console.warn('RENOX profile preview:',e)}
-  try{loadGuestProfile()}catch(e){console.warn('RENOX profile load:',e)}
-  try{loadStatuses()}catch(e){console.warn('RENOX status load:',e)}
-  try{refreshServerStats()}catch(e){console.warn('RENOX server stats:',e)}
- }catch(e){console.warn('RENOX dashboard initialization:',e)}
- if(d.developer){try{await checkDeveloper()}catch(e){console.warn('Developer session:',e.message)}}
+ // Jangan menahan perpindahan ke Dashboard karena sinkronisasi profil/API lain.
  updateRenoxHelperVisibility();
+ void (async()=>{
+  try{
+   if(d.guestId&&d.guestId!==guestId){
+    guestId=d.guestId;
+    try{localStorage.setItem(GUEST_KEY,guestId)}catch(e){}
+    let cached=null;
+    try{cached=JSON.parse(localStorage.getItem('renoxProfile:'+guestId)||'null')}catch(e){}
+    try{const existing=await apiJSON('/api/profile/'+encodeURIComponent(guestId));cached=existing.profile}catch(e){}
+    guestProfile=cached?{...guestProfile,...cached,id:guestId}:{...guestProfile,id:guestId};
+    if(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name))guestProfile.name=accountName;
+    if(!cached||/^Guest(?:-|$)/i.test(cached?.name||'')){
+     try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:guestProfile.name||accountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile=saved.profile}catch(e){}
+    }
+   }else if(!guestProfile.name||/^Guest(?:-|$)/i.test(guestProfile.name)){
+    guestProfile.name=accountName;
+    try{const saved=await apiJSON('/api/profile',{method:'POST',body:JSON.stringify({guestId,name:accountName,avatar:guestProfile.avatar||'',banner:guestProfile.banner||''})});if(saved.profile)guestProfile=saved.profile}catch(e){console.warn('Account profile sync:',e.message)}
+   }
+   try{localStorage.setItem('renoxProfile:'+guestId,JSON.stringify(guestProfile))}catch(e){}
+   try{updateGuestPreview()}catch(e){console.warn('RENOX profile preview:',e)}
+   try{loadGuestProfile()}catch(e){console.warn('RENOX profile load:',e)}
+   try{loadStatuses()}catch(e){console.warn('RENOX status load:',e)}
+   try{refreshServerStats()}catch(e){console.warn('RENOX server stats:',e)}
+  }catch(e){console.warn('RENOX dashboard initialization:',e)}
+  if(d.developer){try{await checkDeveloper()}catch(e){console.warn('Developer session:',e.message)}}
+ })();
  return true;
 }
 function fmtBytes(n){if(!Number.isFinite(n))return'—';const u=['B','KB','MB','GB','TB'];let i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return n.toFixed(i?1:0)+' '+u[i]}
